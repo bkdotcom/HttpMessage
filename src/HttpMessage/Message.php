@@ -12,7 +12,6 @@
 
 namespace bdk\HttpMessage;
 
-use bdk\Debug\Utility\ArrayUtil;
 use bdk\HttpMessage\Stream;
 use InvalidArgumentException;
 use Psr\Http\Message\MessageInterface;
