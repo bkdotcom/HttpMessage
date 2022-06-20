@@ -895,6 +895,15 @@ trait DataProviderTrait
         return $nonWritable;
     }
 
+    public function statusPhrases()
+    {
+        return [
+            ['500', null, 'Internal Server Error'],
+            [103, '', ''],
+            [200, "tab\ttab", "tab\ttab"],
+        ];
+    }
+
     public function invalidStatusCodes()
     {
         return [
@@ -913,13 +922,13 @@ trait DataProviderTrait
     public function invalidReasonPhrases()
     {
         return [
+            'nl'      => ["Custom reason phrase\n\rThe next line"],
             'true'    => [true],
             'false'   => [false],
             'array'   => [[200]],
             'object'  => [(object) ['reasonPhrase' => 'Ok']],
             'integer' => [99],
             'float'   => [400.5],
-            // 'null'    => [null],
             'lambda'  => [function () {}],
         ];
     }
