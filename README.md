@@ -3,9 +3,10 @@ PSR-7 (HttpMessage) Implementation
 
 ## Notable features
 
-* Preserves "." and space in query params and "parsedBody" (POST)
-* `UploadedFile::getClientFullPath()`` PHP 8.1 added a new file upload property (not included in PSR-7)
 * Supported and tested on PHP 5.4 - 8.1
+* Preserves "." and space in query params (GET) and "parsedBody" (POST) keys.
+* `UploadedFile::getClientFullPath()`.  PHP 8.1 added a new file upload property (not included in PSR-7)
+* HttpFoundationBridge class to create ServerRequeset and Response from HttpFoundation request and response
 
 ## Tests / Quality
 

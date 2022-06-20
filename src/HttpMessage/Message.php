@@ -163,7 +163,7 @@ class Message implements MessageInterface
         $this->assertHeaderName($name);
         $name = $this->normalizeHeaderName($name);
         $this->assertHeaderValue($value);
-        $value = $this->normalizeHeaderValue($value);
+        $values = $this->normalizeHeaderValue($value);
         $nameLower = \strtolower($name);
         $new = clone $this;
         if (isset($new->headerNames[$nameLower])) {
@@ -172,7 +172,7 @@ class Message implements MessageInterface
             unset($new->headers[$namePrev]);
         }
         $new->headerNames[$nameLower] = $name;
-        $new->headers[$name] = $value;
+        $new->headers[$name] = $values;
         if ($nameLower === 'host') {
             $new->afterUpdateHost();
         }
@@ -436,16 +436,26 @@ class Message implements MessageInterface
     }
 
     /**
-     * Trim header value(s)
+     * Trims whitespace from the header value(s).
+     *
+     * Spaces and tabs ought to be excluded by parsers when extracting the field value from a header field.
+     *
+     * header-field = field-name ":" OWS field-value OWS
+     * OWS          = *( SP / HTAB )
      *
      * @param string|array $value header value
      *
-     * @return array
-     * @throws InvalidArgumentException
+     * @return string[] Trimmed header values
+     *
+     * @see https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.4
      */
     private function normalizeHeaderValue($value)
     {
-        return \array_values($this->trimHeaderValues($value));
+        $values = (array) $value;
+        $values = \array_map(function ($value) {
+            return \trim((string) $value, " \t");
+        }, $values);
+        return \array_values($values);
     }
 
     /**
@@ -478,26 +488,5 @@ class Message implements MessageInterface
                 $this->afterUpdateHost();
             }
         }
-    }
-
-    /**
-     * Trims whitespace from the header values.
-     *
-     * Spaces and tabs ought to be excluded by parsers when extracting the field value from a header field.
-     *
-     * header-field = field-name ":" OWS field-value OWS
-     * OWS          = *( SP / HTAB )
-     *
-     * @param string[] $values Header values
-     *
-     * @return string[] Trimmed header values
-     *
-     * @see https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.4
-     */
-    private function trimHeaderValues($values = array())
-    {
-        return \array_map(function ($value) {
-            return \trim((string) $value, " \t");
-        }, (array) $values);
     }
 }

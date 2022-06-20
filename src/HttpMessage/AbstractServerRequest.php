@@ -332,16 +332,7 @@ abstract class AbstractServerRequest extends Request
         if (\is_array($fileInfo['tmp_name'])) {
             return self::createUploadedFileArray($fileInfo);
         }
-        return new UploadedFile(
-            $fileInfo['tmp_name'],
-            (int) $fileInfo['size'],
-            (int) $fileInfo['error'],
-            $fileInfo['name'],
-            $fileInfo['type'],
-            isset($fileInfo['full_path'])
-                ? $fileInfo['full_path']
-                : null
-        );
+        return new UploadedFile($fileInfo);
     }
 
     /**

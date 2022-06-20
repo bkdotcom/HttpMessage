@@ -71,8 +71,8 @@ class HttpFoundationBridge
     public static function createResponse(HttpFoundationResponse $response)
     {
         $statusCode = $response->getStatusCode();
-        $reasonPhrase = isset($response->statusTexts[$statusCode])
-            ? $response->statusTexts[$statusCode]
+        $reasonPhrase = isset(HttpFoundationResponse::$statusTexts[$statusCode])
+            ? HttpFoundationResponse::$statusTexts[$statusCode]
             : null;
         $protocolVersion = $response->getProtocolVersion();
         $stream = self::createResponseStream($response);
