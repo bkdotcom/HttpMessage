@@ -391,7 +391,11 @@ class ServerRequestTest extends TestCase
             ? 'InvalidArgumentException'
             : (PHP_VERSION_ID >= 70000
                 ? 'TypeError'
-                : 'ErrorException');
+                : 'RuntimeException');
+        \set_error_handler(function ($type, $msg) {
+            \restore_error_handler();
+            throw new \RuntimeException($msg);
+        });
         $this->expectException($exceptionClass);
         $this->createServerRequest()
             ->withUploadedFiles($value);
@@ -682,7 +686,11 @@ class ServerRequestTest extends TestCase
             ? 'InvalidArgumentException'
             : (PHP_VERSION_ID >= 70000
                 ? 'TypeError'
-                : 'ErrorException');
+                : 'RuntimeException');
+        \set_error_handler(function ($type, $msg) {
+            \restore_error_handler();
+            throw new \RuntimeException($msg);
+        });
         $this->expectException($exceptionClass);
         $this->createServerRequest()
             ->withQueryParams($value);
@@ -711,7 +719,11 @@ class ServerRequestTest extends TestCase
             ? 'InvalidArgumentException'
             : (PHP_VERSION_ID >= 70000
                 ? 'TypeError'
-                : 'ErrorException');
+                : 'RuntimeException');
+        \set_error_handler(function ($type, $msg) {
+            \restore_error_handler();
+            throw new \RuntimeException($msg);
+        });
         $this->expectException($exceptionClass);
         $this->createServerRequest()
             ->withCookieParams($value);
