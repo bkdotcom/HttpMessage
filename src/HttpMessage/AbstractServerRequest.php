@@ -352,22 +352,21 @@ abstract class AbstractServerRequest extends Request
      */
     private static function uriHostPortFromGlobals()
     {
-        $host = null;
-        $port = null;
-        if (isset($_SERVER['HTTP_HOST'])) {
-            list($host, $port) = self::uriHostPortFromHttpHost($_SERVER['HTTP_HOST']);
-        } elseif (isset($_SERVER['SERVER_NAME'])) {
-            $host = $_SERVER['SERVER_NAME'];
-        } elseif (isset($_SERVER['SERVER_ADDR'])) {
-            $host = $_SERVER['SERVER_ADDR'];
-        }
-        if ($port === null && isset($_SERVER['SERVER_PORT'])) {
-            $port = $_SERVER['SERVER_PORT'];
-        }
-        return array(
-            'host' => $host,
-            'port' => $port,
+        $hostPort = array(
+            'host' => null,
+            'port' => null,
         );
+        if (isset($_SERVER['HTTP_HOST'])) {
+            $hostPort = self::uriHostPortFromHttpHost($_SERVER['HTTP_HOST']);
+        } elseif (isset($_SERVER['SERVER_NAME'])) {
+            $hostPort['host'] = $_SERVER['SERVER_NAME'];
+        } elseif (isset($_SERVER['SERVER_ADDR'])) {
+            $hostPort['host'] = $_SERVER['SERVER_ADDR'];
+        }
+        if ($hostPort['port'] === null && isset($_SERVER['SERVER_PORT'])) {
+            $hostPort['port'] = $_SERVER['SERVER_PORT'];
+        }
+        return $hostPort;
     }
 
     /**
@@ -380,15 +379,13 @@ abstract class AbstractServerRequest extends Request
     private static function uriHostPortFromHttpHost($httpHost)
     {
         $url = 'http://' . $httpHost;
-        $parts = \parse_url($url);
-        if ($parts === false) {
-            return [null, null];
-        }
-        $parts = \array_merge(array(
+        $partsDefault = array(
             'host' => null,
             'port' => null,
-        ), $parts);
-        return array($parts['host'], $parts['port']);
+        );
+        $parts = \parse_url($url) ?: array();
+        $parts = \array_merge($partsDefault, $parts);
+        return \array_intersect_key($parts, $partsDefault);
     }
 
     /**

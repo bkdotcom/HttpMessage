@@ -133,18 +133,14 @@ class UploadedFile implements UploadedFileInterface
     public function getStream()
     {
         if ($this->isMoved) {
-            throw new RuntimeException(
-                'The stream has been moved.'
-            );
+            throw new RuntimeException('The stream has been moved.');
         }
         if (!$this->stream && $this->file) {
             $this->stream = $this->getStreamFromFile();
         }
         if (!$this->stream) {
             // ie error is not UPLOAD_ERR_OK
-            throw new RuntimeException(
-                'No stream is available or can be created.'
-            );
+            throw new RuntimeException('No stream is available or can be created.');
         }
         return $this->stream;
     }
@@ -475,14 +471,11 @@ class UploadedFile implements UploadedFileInterface
             : \move_uploaded_file($this->file, $targetPath);
         \restore_error_handler();
         if ($this->isMoved === false) {
-            $msg = \sprintf(
-                'Unable to move the file to %s',
-                $targetPath
-            );
-            if ($errMsg) {
-                $msg .= '(' . $errMsg . ')';
-            }
-            throw new RuntimeException($msg);
+            throw new RuntimeException(\rtrim(\sprintf(
+                'Unable to move the file to %s (%s)',
+                $targetPath,
+                $errMsg
+            ), ' ()'));
         }
         return $this->isMoved;
     }

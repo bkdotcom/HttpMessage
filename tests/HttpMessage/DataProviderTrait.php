@@ -164,6 +164,7 @@ trait DataProviderTrait
     public function validHeaderValues()
     {
         return [
+            [1234],
             ['text/plain'],
             ['PHP 9.1'],
             ['text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'],

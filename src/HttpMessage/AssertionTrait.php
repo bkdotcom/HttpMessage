@@ -21,6 +21,32 @@ use Psr\Http\Message\UploadedFileInterface;
 trait AssertionTrait
 {
     /**
+     * Test that value is a string (or optionally numeric)
+     *
+     * @param string $value        The value to check.
+     * @param string $what         The name of the value.
+     * @param bool   $allowNumeric Allow float or int?
+     *
+     * @return void
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function assertString($value, $what = '', $allowNumeric = false)
+    {
+        if (\is_string($value)) {
+            return;
+        }
+        if ($allowNumeric && \is_numeric($value)) {
+            return;
+        }
+        throw new InvalidArgumentException(\sprintf(
+            '%s must be a string, but %s provided.',
+            \ucfirst($what),
+            $this->getTypeDebug($value)
+        ));
+    }
+
+    /**
      * Get the value's type
      *
      * @param mixed $value Value to inspect
@@ -48,12 +74,7 @@ trait AssertionTrait
      */
     private function assertHeaderName($name)
     {
-        if (\is_string($name) === false && \is_numeric($name) === false) {
-            throw new InvalidArgumentException(\sprintf(
-                'Header name must be a string but %s provided.',
-                self::getTypeDebug($name)
-            ));
-        }
+        $this->assertString($name, 'Header name', true);
         if ($name === '') {
             throw new InvalidArgumentException('Header name can not be empty.');
         }
@@ -114,13 +135,7 @@ trait AssertionTrait
         if ($value === '') {
             return;
         }
-        if (\is_string($value) === false && \is_numeric($value) === false) {
-            throw new InvalidArgumentException(\sprintf(
-                'The header values only accept string and number, but %s provided.',
-                self::getTypeDebug($value)
-            ));
-        }
-
+        $this->assertString($value, 'Header value', true);
         /*
             https://www.rfc-editor.org/rfc/rfc7230.txt (page.25)
 
@@ -180,12 +195,7 @@ trait AssertionTrait
      */
     protected function assertMethod($method)
     {
-        if (\is_string($method) === false) {
-            throw new InvalidArgumentException(\sprintf(
-                'HTTP method must be a string, but %s provided',
-                self::getTypeDebug($method)
-            ));
-        }
+        $this->assertString($method, 'HTTP method');
         if ($method === '') {
             throw new InvalidArgumentException('Method must be a non-empty string.');
         }
@@ -209,16 +219,15 @@ trait AssertionTrait
      */
     protected function assertAttributeName($name, $throw = true)
     {
-        if (\is_string($name) || \is_numeric($name)) {
-            return true;
+        try {
+            $this->assertString($name, 'Attribute name', true);
+        } catch (InvalidArgumentException $e) {
+            if ($throw) {
+                throw $e;
+            }
+            return false;
         }
-        if ($throw) {
-            throw new InvalidArgumentException(\sprintf(
-                'Attribute name must be a string, but %s provided.',
-                self::getTypeDebug($name)
-            ));
-        }
-        return false;
+        return true;
     }
 
     /**
@@ -241,12 +250,7 @@ trait AssertionTrait
                     $name
                 ));
             }
-            if (\is_string($value) === false && \is_numeric($value) === false) {
-                throw new InvalidArgumentException(\sprintf(
-                    'Cookie value must be a string, but %s provided.',
-                    self::getTypeDebug($value)
-                ));
-            }
+            $this->assertString($value, 'Cookie value', true);
         });
     }
 
@@ -261,12 +265,7 @@ trait AssertionTrait
     protected function assertQueryParams($get)
     {
         \array_walk_recursive($get, function ($value) {
-            if (\is_string($value) === false) {
-                throw new InvalidArgumentException(\sprintf(
-                    'Query param value must be a string, but %s provided.',
-                    self::getTypeDebug($value)
-                ));
-            }
+            $this->assertString($value, 'Query param value');
         });
     }
 
@@ -336,11 +335,7 @@ trait AssertionTrait
         if ($phrase === '') {
             return;
         }
-        if (\is_string($phrase) === false) {
-            throw new InvalidArgumentException(
-                'Reason-phrase must be a string'
-            );
-        }
+        $this->assertString($phrase, 'Reason-phrase');
         // Don't allow control characters (incl \r & \n)
         if (\preg_match('#[^\P{C}\t]#u', $phrase, $matches, PREG_OFFSET_CAPTURE) === 1) {
             throw new InvalidArgumentException(\sprintf(
@@ -376,5 +371,100 @@ trait AssertionTrait
                 $code
             ));
         }
+    }
+
+    /*
+        Uri assertions
+    */
+
+    /**
+     * Throw exception if invalid host string.
+     *
+     * @param string $host The host string to of a URI.
+     *
+     * @return void
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function assertHost($host)
+    {
+        $this->assertString($host, 'host');
+        if (\in_array($host, array('','localhost'), true)) {
+            // An empty host value is equivalent to removing the host.
+            // No validation required
+            return;
+        }
+        if ($this->isFqdn($host)) {
+            return;
+        }
+        if (\filter_var($host, FILTER_VALIDATE_IP)) {
+            // only if php < 7.0
+            return;
+        }
+        throw new InvalidArgumentException(\sprintf(
+            '"%s" is not a valid host',
+            $host
+        ));
+    }
+
+    /**
+     * Throw exception if invalid port value
+     *
+     * @param int $port port value
+     *
+     * @return void
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function assertPort($port)
+    {
+        if (!\is_int($port)) {
+            throw new InvalidArgumentException(\sprintf(
+                'Port must be a int, but %s provided.',
+                $this->getTypeDebug($port)
+            ));
+        }
+        if ($port < 1 || $port > 0xffff) {
+            throw new InvalidArgumentException(\sprintf('Invalid port: %d. Must be between 0 and 65535', $port));
+        }
+    }
+
+    /**
+     * Assert valid scheme
+     *
+     * @param string $scheme Scheme to validate
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    protected function assertScheme($scheme)
+    {
+        $this->assertString($scheme, 'scheme');
+        if (\preg_match('/^[a-z][-a-z0-9.+]*$/i', $scheme) !== 1) {
+            throw new InvalidArgumentException(\sprintf(
+                'Invalid scheme:  %s',
+                $scheme
+            ));
+        }
+    }
+
+    /**
+     * Test if hostname is a fully-qualified domain naim
+     *
+     * @param string $host Hostname to test
+     *
+     * @return bool
+     *
+     * @see https://www.regextester.com/103452
+     */
+    private function isFqdn($host)
+    {
+        if (PHP_VERSION_ID >= 70000) {
+            return \filter_var($host, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) !== false;
+        }
+        $regexPartialHostname = '(?!-)[a-zA-Z0-9-]{0,62}[a-zA-Z0-9]';
+        $regex1 = '/(?=^.{4,253}$)(^(' . $regexPartialHostname . '\.)+[a-zA-Z]{2,63}$)/';
+        $regex2 = '/^' . $regexPartialHostname . '$/';
+        return \preg_match($regex1, $host) === 1 || \preg_match($regex2, $host) === 1;
     }
 }
