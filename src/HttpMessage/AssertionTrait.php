@@ -61,7 +61,7 @@ trait AssertionTrait
     }
 
     /*
-    	Message assertions
+        Message assertions
     */
 
     /**
@@ -102,7 +102,7 @@ trait AssertionTrait
      */
     private function assertHeaderValue($value)
     {
-        if (\is_scalar($value) && !\is_bool($value)) {
+        if (\is_scalar($value) && \is_bool($value) === false) {
             $value = array((string) $value);
         }
         if (\is_array($value) === false) {
@@ -181,7 +181,7 @@ trait AssertionTrait
     }
 
     /*
-		Request assertions
+        Request assertions
     */
 
     /**
@@ -205,7 +205,7 @@ trait AssertionTrait
     }
 
     /*
-    	ServerRequest assertions
+        ServerRequest assertions
     */
 
     /**
@@ -316,7 +316,7 @@ trait AssertionTrait
     }
 
     /*
-    	Response assertions
+        Response assertions
     */
 
     /**
@@ -356,13 +356,13 @@ trait AssertionTrait
      */
     protected function assertStatusCode($code)
     {
-    	if (\is_string($code) && \preg_match('/^\d+$/', $code)) {
-	        $code = (int) $code;
-    	}
+        if (\is_string($code) && \preg_match('/^\d+$/', $code)) {
+            $code = (int) $code;
+        }
         if (\is_int($code) === false) {
             throw new InvalidArgumentException(\sprintf(
                 'Status code must to be an integer, but %s provided',
-				self::getTypeDebug($code)
+                self::getTypeDebug($code)
             ));
         }
         if ($code < 100 || $code > 599) {
@@ -418,7 +418,7 @@ trait AssertionTrait
      */
     protected function assertPort($port)
     {
-        if (!\is_int($port)) {
+        if (\is_int($port) === false) {
             throw new InvalidArgumentException(\sprintf(
                 'Port must be a int, but %s provided.',
                 $this->getTypeDebug($port)
@@ -442,7 +442,7 @@ trait AssertionTrait
         $this->assertString($scheme, 'scheme');
         if (\preg_match('/^[a-z][-a-z0-9.+]*$/i', $scheme) !== 1) {
             throw new InvalidArgumentException(\sprintf(
-                'Invalid scheme:  %s',
+                'Invalid scheme: "%s"',
                 $scheme
             ));
         }
