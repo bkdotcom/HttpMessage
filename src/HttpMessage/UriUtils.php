@@ -10,6 +10,27 @@ use Psr\Http\Message\UriInterface;
 class UriUtils
 {
     /**
+     * Determines if two Uri's should be considered cross-origin
+     *
+     * @param UriInterface $uri1 Uri 1
+     * @param UriInterface $uri2 Uri2
+     *
+     * @return bool
+     */
+    public static function isCrossOrigin(UriInterface $uri1, UriInterface $uri2)
+    {
+        if (\strcasecmp($uri1->getHost(), $uri2->getHost()) !== 0) {
+            return true;
+        }
+
+        if ($uri1->getScheme() !== $uri2->getScheme()) {
+            return true;
+        }
+
+        return self::computePort($uri1) !== self::computePort($uri2);
+    }
+
+    /**
      * Converts the relative URI into a new URI that is resolved against the base URI.
      *
      * @param UriInterface $base Base URI
@@ -63,24 +84,23 @@ class UriUtils
     }
 
     /**
-     * Determines two Uri's should be considered cross-origin
+     * Parse URL (multi-byte safe)
      *
-     * @param UriInterface $uri1 Uri 1
-     * @param UriInterface $uri2 Uri2
+     * @param string $url The URL to parse.
      *
-     * @return bool
+     * @return array|false
      */
-    public static function isCrossOrigin(UriInterface $uri1, UriInterface $uri2)
+    public static function parseUrl($url)
     {
-        if (\strcasecmp($uri1->getHost(), $uri2->getHost()) !== 0) {
-            return true;
-        }
-
-        if ($uri1->getScheme() !== $uri2->getScheme()) {
-            return true;
-        }
-
-        return self::computePort($uri1) !== self::computePort($uri2);
+        // reserved chars
+        $chars = '!*\'();:@&=$,/?#[]';
+        $entities = \str_split(\urlencode($chars), 3);
+        $chars = \str_split($chars);
+        $urlEnc = \str_replace($entities, $chars, \urlencode($url));
+        $parts = self::parseUrlPatched($urlEnc);
+        return $parts
+            ? \array_map('urldecode', $parts)
+            : $parts;
     }
 
     /**
@@ -95,6 +115,62 @@ class UriUtils
             return $port;
         }
         return $uri->getScheme() === 'https' ? 443 : 80;
+    }
+
+    /**
+     * Parse URL with latest `parse_url` fixes / behavior
+     *
+     * PHP < 8.0 : return empty query and fragment
+     * PHP < 5.5 : handle urls that don't have schema
+     *
+     * @param string $url The URL to parse.
+     *
+     * @return array|false
+     */
+    private static function parseUrlPatched($url)
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            return \parse_url($url);
+        }
+        $hasTempScheme = false;
+        if (PHP_VERSION_ID < 50500 && \strpos($url, '//') === 0) {
+            // php 5.4 chokes without the scheme
+            $hasTempScheme = true;
+            $url = 'http:' . $url;
+        }
+        $parts = \parse_url($url);
+        if ($parts === false) {
+            return false;
+        }
+        if ($hasTempScheme) {
+            unset($parts['scheme']);
+        }
+        return self::parseUrlAddEmpty($parts, $url);
+    }
+
+    /**
+     * PHP < 8.0 does not return query & fragment if empty
+     *
+     * @param array  $parts Url components from `parse_url`
+     * @param string $url   Unparsed url
+     *
+     * @return array
+     */
+    private static function parseUrlAddEmpty($parts, $url)
+    {
+        $default = array(
+            'scheme' => null,
+            'host' => null,
+            'port' => null,
+            'user' => null,
+            'pass' => null,
+            'path' => null,
+            'query' => \strpos($url, '?') !== false ? '' : null,
+            'fragment' => \strpos($url, '#') !== false ? '' : null,
+        );
+        return \array_filter(\array_merge($default, $parts), static function ($val) {
+            return $val !== null;
+        });
     }
 
     /**

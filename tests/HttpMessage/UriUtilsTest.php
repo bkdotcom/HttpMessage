@@ -7,14 +7,16 @@ use bdk\HttpMessage\UriUtils;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers bdk\CurlHttpMessage\UriUtils
+ * @covers bdk\HttpMessage\UriUtils
+ *
+ * @phpcs:disable SlevomatCodingStandard.Arrays.AlphabeticallySortedKeys.IncorrectKeyOrder
  */
 class UriUtilsTest extends TestCase
 {
     const RFC3986_BASE = 'http://a/b/c/d;p?q';
 
     /**
-     * @dataProvider isCrossOriginProvider
+     * @dataProvider providerIsCrossOrigin
      */
     public function testIsCrossOrigin($uri1, $uri2, $expect)
     {
@@ -22,7 +24,22 @@ class UriUtilsTest extends TestCase
     }
 
     /**
-     * @dataProvider resolveProvider
+     * @dataProvider providerParseUrl
+     */
+    public function testParseUrl($url, $expect)
+    {
+        $previousLcType = \setlocale(LC_CTYPE, '0');
+        \setlocale(LC_CTYPE, 'en_GB');
+
+        $parts = UriUtils::parseUrl($url);
+
+        \setlocale(LC_CTYPE, $previousLcType);
+
+        self::assertSame($expect, $parts);
+    }
+
+    /**
+     * @dataProvider providerResolve
      */
     public function testResolveUri($base, $rel, $expect)
     {
@@ -38,7 +55,7 @@ class UriUtilsTest extends TestCase
         self::assertSame($expect, (string) UriUtils::resolve($base, $targetUri));
     }
 
-    public function isCrossOriginProvider()
+    public static function providerIsCrossOrigin()
     {
         return [
             ['http://example.com/123', 'http://example.com/', false],
@@ -60,7 +77,40 @@ class UriUtilsTest extends TestCase
         ];
     }
 
-    public function resolveProvider()
+    public static function providerParseUrl()
+    {
+        // chars from parseUrl with %" \
+        $chars = '!*\'();:@&=$,/?#[]%" \\';
+        return array(
+            array('https://user:pass@example.com:80/path/È/💩/page.html?foo=bar&zip=zap#fragment', array(
+                'scheme' => 'https',
+                'host' => 'example.com',
+                'port' => '80',
+                'user' => 'user',
+                'pass' => 'pass',
+                'path' => '/path/È/💩/page.html',
+                'query' => 'foo=bar&zip=zap',
+                'fragment' => 'fragment',
+            )),
+            'encodedChars' => array('http://mydomain.com/' . \rawurlencode($chars), array(
+                'scheme' => 'http',
+                'host' => 'mydomain.com',
+                'path' => '/' . \rawurlencode($chars),
+            )),
+            'invalid' => array('http:///example.com', false),
+            'mixed' => array('/%È21%25È3*%(', array(
+                'path' => '/%È21%25È3*%(',
+            )),
+            'specialChars' => array('//example.com/' . $chars, array(
+                'host' => 'example.com',
+                'path' => '/' . \substr($chars, 0, \strpos($chars, '?')),
+                'query' => '',
+                'fragment' => '[]%" \\',
+            )),
+        );
+    }
+
+    public static function providerResolve()
     {
         return [
             [self::RFC3986_BASE, 'g:h',           'g:h'],
