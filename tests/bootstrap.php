@@ -24,10 +24,10 @@ require __DIR__ . '/../vendor/autoload.php';
 \ini_set('xdebug.var_display_max_depth', 3);
 \ini_set('xdebug.var_display_max_data', '-1');
 
-$modifyTests = new \bdk\Test\ModifyTests();
+$modifyTests = new \bdk\DevUtil\ModifyTests();
 $modifyTests->modify(__DIR__);
 
-\register_shutdown_function(function () {
+\register_shutdown_function(static function () {
     /*
     $files = \glob(TEST_DIR . '/../tmp/log/*.json');
     foreach ($files as $filePath) {

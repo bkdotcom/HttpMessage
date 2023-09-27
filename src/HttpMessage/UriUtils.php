@@ -66,17 +66,7 @@ class UriUtils
                 ->withQuery($targetQuery)
                 ->withFragment($rel->getFragment());
         }
-        $relPath = $rel->getPath();
-        $lastSlashPos = \strrpos($base->getPath(), '/');
-        $targetPath = $lastSlashPos === false
-            ? $relPath
-            : \substr($base->getPath(), 0, $lastSlashPos + 1) . $relPath;
-        if ($relPath[0] === '/') {
-            // \bdk\Test\Debug\Helper::stderr('rel path slash');
-            $targetPath = $relPath;
-        } elseif ($base->getAuthority() !== '' && $base->getPath() === '') {
-            $targetPath = '/' . $relPath;
-        }
+        $targetPath = self::resolveTargetPath($base, $rel);
         return $base
             ->withPath(self::pathRemoveDots($targetPath))
             ->withQuery($rel->getQuery())
@@ -158,6 +148,7 @@ class UriUtils
      */
     private static function parseUrlAddEmpty($parts, $url)
     {
+        // @phpcs:ignore SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder
         $default = array(
             'scheme' => null,
             'host' => null,
@@ -184,7 +175,7 @@ class UriUtils
      */
     private static function pathRemoveDots($path)
     {
-        if ($path === '') { //  || $path === '/'
+        if ($path === '') {
             return $path;
         }
 
@@ -203,12 +194,35 @@ class UriUtils
         if ($path[0] === '/' && (!isset($pathNew[0]) || $pathNew[0] !== '/')) {
             // Re-add the leading slash if necessary for cases like "/.."
             $pathNew = '/' . $pathNew;
-        } elseif ($pathNew !== '' && \in_array($segment, array('.','..'), true)) {
+        } elseif ($pathNew !== '' && \in_array($segment, array('.', '..'), true)) {
             // Add the trailing slash if necessary
             // If pathNew is not empty, then $segment must be set and is the last segment from the foreach
             $pathNew .= '/';
         }
 
         return $pathNew;
+    }
+
+    /**
+     * Resolve target path
+     *
+     * @param UriInterface $base Base URI
+     * @param UriInterface $rel  Relative URI
+     *
+     * @return string
+     */
+    private static function resolveTargetPath(UriInterface $base, UriInterface $rel)
+    {
+        $relPath = $rel->getPath();
+        $lastSlashPos = \strrpos($base->getPath(), '/');
+        $targetPath = $lastSlashPos === false
+            ? $relPath
+            : \substr($base->getPath(), 0, $lastSlashPos + 1) . $relPath;
+        if ($relPath[0] === '/') {
+            $targetPath = $relPath;
+        } elseif ($base->getAuthority() !== '' && $base->getPath() === '') {
+            $targetPath = '/' . $relPath;
+        }
+        return $targetPath;
     }
 }
