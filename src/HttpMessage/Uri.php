@@ -6,14 +6,14 @@
  * @package   bdk/http-message
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
- * @copyright 2014-2022 Brad Kent
+ * @copyright 2014-2023 Brad Kent
  * @version   v1.0
  */
 
 namespace bdk\HttpMessage;
 
 use bdk\HttpMessage\AbstractUri;
-use bdk\HttpMessage\UriUtils;
+use bdk\HttpMessage\Utility\Uri as UriUtils;
 use InvalidArgumentException;
 use Psr\Http\Message\UriInterface;
 
@@ -87,6 +87,41 @@ class Uri extends AbstractUri implements UriInterface
         }
         if ($this->fragment !== '') {
             $uri .= '#' . $this->fragment;
+        }
+        return $uri;
+    }
+
+    /**
+     * Get a Uri populated with values from $_SERVER.
+     *
+     * @return static
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    public static function fromGlobals()
+    {
+        $uri = new Uri('');
+        $parts = \array_merge(
+            array(
+                'scheme' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'
+                    ? 'https'
+                    : 'http',
+            ),
+            self::hostPortFromGlobals(),
+            self::pathQueryFromGlobals()
+        );
+        $methods = array(
+            'host' => 'withHost',
+            'path' => 'withPath',
+            'port' => 'withPort',
+            'query' => 'withQuery',
+            'scheme' => 'withScheme',
+        );
+        foreach ($parts as $name => $value) {
+            if ($value) {
+                $method = $methods[$name];
+                $uri = $uri->{$method}($value);
+            }
         }
         return $uri;
     }

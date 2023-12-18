@@ -1,7 +1,5 @@
 <?php
 
-namespace bdk\Test;
-
 // backward compatibility
 $classMap = array(
     // PHP 5.3 doesn't like leading backslash
@@ -18,6 +16,7 @@ foreach ($classMap as $old => $new) {
 }
 
 require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/HttpMessage/bootstrapFunctionReplace.php';
 
 \define('TEST_DIR', __DIR__);
 
@@ -28,12 +27,6 @@ $modifyTests = new \bdk\DevUtil\ModifyTests();
 $modifyTests->modify(__DIR__);
 
 \register_shutdown_function(static function () {
-    /*
-    $files = \glob(TEST_DIR . '/../tmp/log/*.json');
-    foreach ($files as $filePath) {
-        \unlink($filePath);
-    }
-    */
     $files = array(
         __DIR__ . '/../tmp/logo_clone.png',
     );
