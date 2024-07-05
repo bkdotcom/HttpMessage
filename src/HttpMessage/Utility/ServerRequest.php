@@ -15,7 +15,7 @@ namespace bdk\HttpMessage\Utility;
 use bdk\HttpMessage\ServerRequest as PsrServerRequest;
 use bdk\HttpMessage\Stream;
 use bdk\HttpMessage\UploadedFile;
-use bdk\HttpMessage\Uri;
+use bdk\HttpMessage\Uri as UriImplementation; // https://bugs.php.net/bug.php?id=66773
 use bdk\HttpMessage\Utility\ContentType;
 use bdk\HttpMessage\Utility\ParseStr;
 use InvalidArgumentException;
@@ -42,7 +42,7 @@ class ServerRequest
         $method = isset($_SERVER['REQUEST_METHOD'])
             ? $_SERVER['REQUEST_METHOD']
             : 'GET';
-        $uri = Uri::fromGlobals();
+        $uri = UriImplementation::fromGlobals();
         $files = self::filesFromGlobals($_FILES);
         $serverRequest = new PsrServerRequest($method, $uri, $_SERVER);
         $contentType = $serverRequest->getHeaderLine('Content-Type');
