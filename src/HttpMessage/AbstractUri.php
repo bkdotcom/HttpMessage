@@ -29,7 +29,7 @@ abstract class AbstractUri
     const CHAR_SUB_DELIMS = '!\$&\'\(\)\*\+,;=';
     const CHAR_UNRESERVED = 'a-zA-Z0-9_\-\.~';
 
-    /** @var array<string, int> */
+    /** @var array<string,int> */
     private static $schemes = array(
         'ftp' => 21,
         'http' => 80,
@@ -52,11 +52,12 @@ abstract class AbstractUri
         if ($path[0] !== '/' && $authority !== '') {
             // If the path is rootless and an authority is present,
             // the path MUST be prefixed by "/"
-            $path = '/' . $path;
-        } elseif (\substr($path, 0, 2) === '//' && $authority === '') {
+            return '/' . $path;
+        }
+        if (\substr($path, 0, 2) === '//' && $authority === '') {
             // If the path is starting with more than one "/" and no authority is present,
             // starting slashes MUST be reduced to one.
-            $path = '/' . \ltrim($path, '/');
+            return '/' . \ltrim($path, '/');
         }
         return $path;
     }
@@ -101,7 +102,7 @@ abstract class AbstractUri
     /**
      * Filter/validate query and fragment
      *
-     * @param string $str query or frabment
+     * @param string $str query or fragment
      *
      * @return string
      */

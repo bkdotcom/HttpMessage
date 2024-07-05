@@ -100,7 +100,7 @@ class Uri
         }
         if ($rel->getAuthority() !== '') {
             // rel specified "authority"..
-            //   return base's scheee, rel's everything else (with path cleaned up)
+            //   return base's scheme, rel's everything else (with path cleaned up)
             return $rel
                 ->withScheme($base->getScheme())
                 ->withPath(self::pathRemoveDots($rel->getPath()));
@@ -125,7 +125,7 @@ class Uri
      *
      * @param string|UriInterface $url The URL to parse.
      *
-     * @return array<string, int|string>|false
+     * @return array<string,int|string>|false
      */
     public static function parseUrl($url)
     {
@@ -169,7 +169,7 @@ class Uri
      *
      * @param string $url The URL to parse.
      *
-     * @return array<string, int|string>|false
+     * @return array<string,int|string>|false
      */
     private static function parseUrlPatched($url)
     {
@@ -195,10 +195,10 @@ class Uri
     /**
      * PHP < 8.0 does not return query & fragment if empty
      *
-     * @param array<string, int|string> $parts Url components from `parse_url`
-     * @param string                    $url   Unparsed url
+     * @param array<string,int|string> $parts Url components from `parse_url`
+     * @param string                   $url   Unparsed url
      *
-     * @return array<string, int|string>
+     * @return array<string,int|string>
      */
     private static function parseUrlAddEmpty(array $parts, $url)
     {
@@ -294,7 +294,7 @@ class Uri
     /**
      * @param UriInterface $url Uri instance
      *
-     * @return array<string, int|string>
+     * @return array<string,int|string>
      */
     private static function uriInterfaceToParts(UriInterface $url)
     {
@@ -318,7 +318,7 @@ class Uri
     /**
      * Get host and port from $_SERVER vals
      *
-     * @return array{host: string|null, port: int|null} host & port
+     * @return array{host:string|null,port:int|null} host & port
      *
      * @SuppressWarnings(PHPMD.Superglobals)
      */
@@ -346,7 +346,7 @@ class Uri
      *
      * @param string $httpHost `$_SERVER['HTTP_HOST']` value
      *
-     * @return array{host: string|null, port: int|null}
+     * @return array{host:string|null,port:int|null}
      *
      * @psalm-suppress InvalidReturnType
      * @psalm-suppress InvalidReturnStatement
@@ -366,7 +366,7 @@ class Uri
     /**
      * Get request uri and query from $_SERVER
      *
-     * @return array{path: string, query: string} path & query
+     * @return array{path:string,query:string} path & query
      *
      * @SuppressWarnings(PHPMD.Superglobals)
      *

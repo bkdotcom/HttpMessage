@@ -40,7 +40,7 @@ class UploadedFile implements UploadedFileInterface
     /** @var int */
     private $error;
 
-    /** @var array<int, string> */
+    /** @var array<int,string> */
     private $errors = array(
         UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
         UPLOAD_ERR_EXTENSION  => 'File upload stopped by extension.',
@@ -375,7 +375,7 @@ class UploadedFile implements UploadedFileInterface
      */
     private function assertSize($size)
     {
-        if ($size === null || \is_int($size) && $size > -1) {
+        if ($size === null || (\is_int($size) && $size > -1)) {
             return;
         }
         throw new InvalidArgumentException(\sprintf('Upload file size must be a positive integer.  %s provided', \gettype($size)));
@@ -479,7 +479,7 @@ class UploadedFile implements UploadedFileInterface
     {
         /** @var string $this->file */
         $errMsg = '';
-        // phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter
+        // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
         \set_error_handler(static function ($type, $msg) use (&$errMsg) {
             $errMsg = $msg;
             return true; // Don't execute PHP internal error handler

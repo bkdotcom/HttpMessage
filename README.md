@@ -6,7 +6,14 @@ PSR-7 (HttpMessage) Implementation
 * Supported and tested on PHP 5.4 - 8.3
 * Preserves "." and space in query params (GET) and "parsedBody" (POST) keys.
 * `UploadedFile::getClientFullPath()`.  PHP 8.1 added a new file upload property (not included in PSR-7)
-* HttpFoundationBridge class to create ServerRequeset and Response from HttpFoundation request and response
+
+### Utilties
+* HttpFoundationBridge: create ServerRequeset and Response from HttpFoundation request and response
+* ContentType: common mime-type constants
+* ParseStr: parse URL-encoded string (query / post-body) without converting "." and " " (spaces) in keys
+* Response: `emit`; `codePhrase()` - get standard code phrase for given HTTP status code
+* ServerRequest: `fromGlobals()`
+* Uri: `fromGlobals()`; `parseUrl()`; `isCrossOrigin()`; `resolve()`
 
 ## Tests / Quality
 
