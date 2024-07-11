@@ -16,32 +16,6 @@ use RuntimeException;
  */
 class ServerRequestTest extends TestCase
 {
-    static $errorHandler;
-
-    /**
-     * setUp is executed before each test
-     *
-     * @return void
-     */
-    public function setUp(): void
-    {
-        // for PHP < 7.0
-        // convert PHP Recoverable Error: Argument 1 passed to bdk\HttpMessage\ServerRequest::withQueryParams() must be of the type array, object given
-        self::$errorHandler = \set_error_handler(function ($type, $msg) {
-            throw new RuntimeException($msg);
-        });
-    }
-
-    /**
-     * tearDown is executed after each test
-     *
-     * @return void
-     */
-    public function tearDown(): void
-    {
-        set_error_handler(self::$errorHandler);
-    }
-
     public function testConstruct()
     {
         $serverRequest = $this->createServerRequest();
