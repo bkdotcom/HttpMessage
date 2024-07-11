@@ -37,7 +37,7 @@ class ServerRequest
      *
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    public static function fromGlobals($parseStrOpts = array())
+    public static function fromGlobals($parseStrOpts = array()): PsrServerRequest
     {
         $method = isset($_SERVER['REQUEST_METHOD'])
             ? $_SERVER['REQUEST_METHOD']

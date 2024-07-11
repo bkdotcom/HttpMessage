@@ -129,7 +129,7 @@ class UploadedFile implements UploadedFileInterface
      * @throws RuntimeException in cases when no stream is available or can be
      *     created.
      */
-    public function getStream()
+    public function getStream(): StreamInterface
     {
         if ($this->isMoved) {
             throw new RuntimeException('The stream has been moved.');
@@ -177,7 +177,7 @@ class UploadedFile implements UploadedFileInterface
      * @see http://php.net/is_uploaded_file
      * @see http://php.net/move_uploaded_file
      */
-    public function moveTo($targetPath)
+    public function moveTo(string $targetPath): void
     {
         $this->validateCanMove();
         $this->assertTargetPath($targetPath);
@@ -207,7 +207,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @return int|null The file size in bytes or null if unknown.
      */
-    public function getSize()
+    public function getSize(): ?int
     {
         return $this->size;
     }
@@ -224,7 +224,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @see http://php.net/manual/en/features.file-upload.errors.php
      */
-    public function getError()
+    public function getError(): int
     {
         return $this->error;
     }
@@ -236,7 +236,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @return string
      */
-    public function getErrorMessage()
+    public function getErrorMessage(): string
     {
         if ($this->error === UPLOAD_ERR_OK) {
             return '';
@@ -254,7 +254,7 @@ class UploadedFile implements UploadedFileInterface
      * @return string|null The filename sent by the client
      *   or null if none was provided.
      */
-    public function getClientFilename()
+    public function getClientFilename(): ?string
     {
         return $this->clientFilename ?: null;
     }
@@ -273,7 +273,7 @@ class UploadedFile implements UploadedFileInterface
      * @return string|null The full-path sent by the client
      *   or null if none was provided.
      */
-    public function getClientFullPath()
+    public function getClientFullPath(): ?string
     {
         return $this->clientFullPath ?: null;
     }
@@ -288,7 +288,7 @@ class UploadedFile implements UploadedFileInterface
      * @return string|null The media type sent by the client
      *   or null if none was provided.
      */
-    public function getClientMediaType()
+    public function getClientMediaType(): ?string
     {
         return $this->clientMediaType ?: null;
     }

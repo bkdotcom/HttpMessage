@@ -3,9 +3,6 @@
 namespace bdk\Test\HttpMessage;
 
 use bdk\HttpMessage\Stream;
-use bdk\PhpUnitPolyfill\AssertionTrait;
-use bdk\PhpUnitPolyfill\ExpectExceptionTrait;
-use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
 /**
@@ -14,11 +11,6 @@ use ReflectionMethod;
  */
 class StreamTest extends TestCase
 {
-    use AssertionTrait;
-    use ExpectExceptionTrait;
-    use DataProviderTrait;
-    use FactoryTrait;
-
     public function testConstruct()
     {
         $filePath = TEST_DIR . '/assets/logo.png';

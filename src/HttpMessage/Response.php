@@ -33,11 +33,11 @@ class Response extends Message implements ResponseInterface
     /**
      * Constructor
      *
-     * @param int         $code         The HTTP status code. Defaults to 200.
-     * @param string|null $reasonPhrase The reason phrase to associate with the status code
-     *                                    Defaults to standard phrase for given code
+     * @param int    $code         The HTTP status code. Defaults to 200.
+     * @param string $reasonPhrase The reason phrase to associate with the status code
+     *                               Defaults to standard phrase for given code
      */
-    public function __construct($code = 200, $reasonPhrase = null)
+    public function __construct($code = 200, $reasonPhrase = '')
     {
         list($code, $reasonPhrase) = $this->filterCodePhrase($code, $reasonPhrase);
         $this->statusCode = $code;
@@ -52,7 +52,7 @@ class Response extends Message implements ResponseInterface
      *
      * @return int Status code.
      */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }
@@ -65,7 +65,7 @@ class Response extends Message implements ResponseInterface
      * @see https://datatracker.ietf.org/doc/html/rfc7231#section-6
      * @see http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
      */
-    public function getReasonPhrase()
+    public function getReasonPhrase(): string
     {
         return $this->reasonPhrase;
     }
@@ -89,7 +89,7 @@ class Response extends Message implements ResponseInterface
      *
      * @throws InvalidArgumentException For invalid status code arguments.
      */
-    public function withStatus($code, $reasonPhrase = '')
+    public function withStatus(int $code, string $reasonPhrase = ''): static
     {
         list($code, $reasonPhrase) = $this->filterCodePhrase($code, $reasonPhrase);
         $new = clone $this;
@@ -108,7 +108,7 @@ class Response extends Message implements ResponseInterface
      *
      * @throws InvalidArgumentException
      */
-    private function filterCodePhrase($code, $phrase)
+    private function filterCodePhrase(int $code, string $phrase)
     {
         $this->assertStatusCode($code);
         $code = (int) $code;

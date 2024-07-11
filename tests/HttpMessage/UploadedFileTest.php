@@ -4,20 +4,17 @@ namespace bdk\Test\HttpMessage;
 
 use bdk\HttpMessage\Stream;
 use bdk\HttpMessage\UploadedFile;
-use bdk\PhpUnitPolyfill\ExpectExceptionTrait;
-use PHPUnit\Framework\TestCase;
+use Exception;
+use PHPUnit\Framework\AssertionFailedError;
 use ReflectionMethod;
 use ReflectionProperty;
+use TypeError;
 
 /**
  * @covers \bdk\HttpMessage\UploadedFile
  */
 class UploadedFileTest extends TestCase
 {
-    use ExpectExceptionTrait;
-    use DataProviderTrait;
-    use FactoryTrait;
-
     public function testConstruct()
     {
         // Test 1 (filepath)
@@ -228,34 +225,6 @@ class UploadedFileTest extends TestCase
         $uploadedFile->getStream();
     }
 
-    public function testExceptionMovePath1()
-    {
-        $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('Invalid path provided for move operation; must be a non-empty string');
-        $uploadedFile = $this->createUploadedFile(
-            '/tmp/php1234.tmp',
-            100000,
-            UPLOAD_ERR_OK,
-            'logo.png',
-            'image/png'
-        );
-        $uploadedFile->moveTo(true);
-    }
-
-    public function testExceptionMovePath2()
-    {
-        $this->expectException('RuntimeException');
-        $this->expectExceptionMessage('The target path "some/bogus/path" is not writable.');
-        $uploadedFile = $this->createUploadedFile(
-            '/tmp/php1234.tmp',
-            100000,
-            UPLOAD_ERR_OK,
-            'logo.png',
-            'image/png'
-        );
-        $uploadedFile->moveTo('some/bogus/path');
-    }
-
     public function testExceptionMoveToFileIsMoved()
     {
         $this->expectException('RuntimeException');
@@ -442,6 +411,20 @@ class UploadedFileTest extends TestCase
         $this->createUploadedFile($stream, 0, UPLOAD_ERR_OK, 'foobar.baz', $mediaType);
     }
 
+    public function testMoveToException()
+    {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('The target path "some/bogus/path" is not writable.');
+        $uploadedFile = $this->createUploadedFile(
+            '/tmp/php1234.tmp',
+            100000,
+            UPLOAD_ERR_OK,
+            'logo.png',
+            'image/png'
+        );
+        $uploadedFile->moveTo('some/bogus/path');
+    }
+
     /**
      * @param $path
      *
@@ -449,13 +432,26 @@ class UploadedFileTest extends TestCase
      */
     public function testMovingToInvalidPathThrowsException($path)
     {
-        $this->expectException('InvalidArgumentException');
+        try {
+            $stream = $this->createStream();
+            $stream->write('Foo bar!');
 
-        $stream = $this->createStream();
-        $stream->write('Foo bar!');
-
-        $upload = $this->createUploadedFile($stream, 0, UPLOAD_ERR_OK);
-        $upload->moveTo($path);
+            $upload = $this->createUploadedFile($stream, 0, UPLOAD_ERR_OK);
+            $upload->moveTo($path);
+        } catch (Exception $e) {
+            self::assertSame(\get_class($e), 'InvalidArgumentException');
+            return;
+        } catch (TypeError $e) {
+            self::assertSame(\get_class($e), 'TypeError');
+            return;
+        }
+        $filepath = \getcwd() . '/' . (string) $path;
+        $message = 'Exception not thrown for destination path ' . $path;
+        if (\file_exists($filepath)) {
+            $message .= ' -> created ' . $filepath;
+            \unlink($filepath);
+        }
+        throw new AssertionFailedError($message);
     }
 
     /**

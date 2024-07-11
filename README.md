@@ -3,17 +3,39 @@ PSR-7 (HttpMessage) Implementation
 
 ## Notable features
 
-* Supported and tested on PHP 5.4 - 8.3
+* Supported and tested on 
+  * PHP 5.4 - 8.3
+  * psr/http-message 1.0.1, 1.1, & 2.0
 * Preserves "." and space in query params (GET) and "parsedBody" (POST) keys.
+* `ServerRequest::fromGlobals()` - Populates ServerRequest's parsed body when application/x-www-form-urlencoded, application/json, or non-empty `$_POST`
 * `UploadedFile::getClientFullPath()`.  PHP 8.1 added a new file upload property (not included in PSR-7)
 
-### Utilties
-* HttpFoundationBridge: create ServerRequeset and Response from HttpFoundation request and response
+### Installation 
+
+`composer require bdk/http-message`
+
+### 3 maintained versions:
+
+| Version | http-message | php | note |
+|--|--|--|--|
+|3.x | ^1.1 \| ^2.0 | >= 8.0 | `static` returns
+|2.x | ^1.1 \| ^2.0 | >= 7.2 | `self` returns
+|1.x | ~1.0.1 | >= 5.4 | &nbsp; |
+
+### Utilities
 * ContentType: common mime-type constants
-* ParseStr: parse URL-encoded string (query / post-body) without converting "." and " " (spaces) in keys
-* Response: `emit`; `codePhrase()` - get standard code phrase for given HTTP status code
-* ServerRequest: `fromGlobals()`
-* Uri: `fromGlobals()`; `parseUrl()`; `isCrossOrigin()`; `resolve()`
+* HttpFoundationBridge: create ServerRequest and Response from HttpFoundation request and response
+* ParseStr: PHP's `parse_str()`, but does not convert dots and spaces to '_' by default
+* Response: 
+  * `emit(ResponseInterface $response)` - Output response headers and body 
+  * `codePhrase(int|string $code): string` - Get standard code phrase for given HTTP status code
+* ServerRequest:
+  * `fromGlobals(): ServerRequestInterface`
+* Uri: 
+  * `fromGlobals(): UriInterface`
+  * `isCrossOrigin(UriInterface $uri1, UriInterface $uri2): bool`
+  * `parseUrl(string|UriInterface): array` - like php's `parse_url` but with bug fixes backported 
+  * `resolve(UriInterface $base, UriInterface $rel): UriInterface` - Converts the relative URI into a new URI that is resolved against the base URI.
 
 ## Tests / Quality
 

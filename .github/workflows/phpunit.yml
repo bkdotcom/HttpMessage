@@ -1,9 +1,5 @@
 name: PHPUnit
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push, pull_request]
 jobs:
   run:
     runs-on: ${{ matrix.operating-system }}
@@ -11,24 +7,25 @@ jobs:
       matrix:
         # windows-latest, macOS-latest
         operating-system: [ubuntu-latest]
-        php-version: ['5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3']
+        php-version: ['8.0', '8.1', '8.2', '8.3']
     name: PHP ${{ matrix.php-version }} Test on ${{ matrix.operating-system }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Install PHP
       uses: shivammathur/setup-php@v2 # https://github.com/marketplace/actions/setup-php-action
       with:
         php-version: ${{ matrix.php-version }}
         extensions: intl
-        ini-values: post_max_size=256M, memory_limit=512M
+        ini-values: memory_limit=512M, post_max_size=256M
         coverage: xdebug #optional
     - name: Check PHP Version
-      run: php -v
+      run: |
+        php -v
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
     - name: Cache composer packages
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       id: composer-cache
       with:
         path: vendor
@@ -42,8 +39,8 @@ jobs:
     - name: Unit test
       run: composer run test
     - name: Publish code coverage
-      uses: paambaati/codeclimate-action@v3.0.0
-      if: ${{ matrix.php-version == '7.4' && github.ref_name == 'main' }}
+      if: ${{ matrix.php-version == '8.3' && github.ref_name == 'main' }}
+      uses: paambaati/codeclimate-action@v5.0.0
       continue-on-error: true
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
@@ -52,6 +49,6 @@ jobs:
         coverageCommand: vendor/bin/phpunit --coverage-clover coverage/clover.xml
         coverageLocations: coverage/clover.xml:clover
     - name: Coverage summary
-      if: ${{ matrix.php-version == '7.4' && github.ref_name == 'main' }}
+      if: ${{ matrix.php-version == '8.3' && github.ref_name == 'main' }}
       continue-on-error: true
       run: php -f vendor/bdk/devutil/src/coverageChecker.php -- coverage/clover.xml

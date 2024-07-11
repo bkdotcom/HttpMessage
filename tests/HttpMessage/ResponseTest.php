@@ -4,8 +4,9 @@ namespace bdk\Test\HttpMessage;
 
 use bdk\HttpMessage\Message;
 use bdk\HttpMessage\Response;
-use bdk\PhpUnitPolyfill\ExpectExceptionTrait;
-use PHPUnit\Framework\TestCase;
+use Exception;
+use PHPUnit\Framework\AssertionFailedError;
+use TypeError;
 
 /**
  * @covers \bdk\HttpMessage\AssertionTrait
@@ -13,10 +14,6 @@ use PHPUnit\Framework\TestCase;
  */
 class ResponseTest extends TestCase
 {
-    use DataProviderTrait;
-    use ExpectExceptionTrait;
-    use FactoryTrait;
-
     public function testConstruct()
     {
         $response = new Response();
@@ -50,9 +47,17 @@ class ResponseTest extends TestCase
      */
     public function testRejectInvalidStatusCode($statusCode)
     {
-        $this->expectException('InvalidArgumentException');
-        $response = $this->createResponse();
-        $response->withStatus($statusCode, 'Custom reason phrase');
+        try {
+            $response = $this->createResponse();
+            $response->withStatus($statusCode, 'Custom reason phrase');
+        } catch (Exception $e) {
+            self::assertSame(\get_class($e), 'InvalidArgumentException');
+            return;
+        } catch (TypeError $e) {
+            self::assertSame(\get_class($e), 'TypeError');
+            return;
+        }
+        throw new AssertionFailedError('Exception not thrown');
     }
 
     /**
@@ -62,8 +67,16 @@ class ResponseTest extends TestCase
      */
     public function testRejectInvalidReasonPhrase($reasonPhrase)
     {
-        $this->expectException('InvalidArgumentException');
-        $response = $this->createResponse();
-        $response->withStatus(200, $reasonPhrase);
+        try {
+            $response = $this->createResponse();
+            $response->withStatus(200, $reasonPhrase);
+        } catch (Exception $e) {
+            self::assertSame(\get_class($e), 'InvalidArgumentException');
+            return;
+        } catch (TypeError $e) {
+            self::assertSame(\get_class($e), 'TypeError');
+            return;
+        }
+        throw new AssertionFailedError('Exception not thrown');
     }
 }

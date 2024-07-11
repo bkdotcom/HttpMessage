@@ -86,7 +86,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return array
      */
-    public function getServerParams()
+    public function getServerParams(): array
     {
         return $this->server;
     }
@@ -96,7 +96,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return array
      */
-    public function getCookieParams()
+    public function getCookieParams(): array
     {
         return $this->cookie;
     }
@@ -108,7 +108,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withCookieParams(array $cookies)
+    public function withCookieParams(array $cookies): static
     {
         $this->assertCookieParams($cookies);
         $new = clone $this;
@@ -121,7 +121,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return array
      */
-    public function getQueryParams()
+    public function getQueryParams(): array
     {
         return $this->get;
     }
@@ -133,7 +133,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withQueryParams(array $query)
+    public function withQueryParams(array $query): static
     {
         $this->assertQueryParams($query);
         $new = clone $this;
@@ -149,7 +149,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return array An array tree of UploadedFileInterface instances (or an empty array)
      */
-    public function getUploadedFiles()
+    public function getUploadedFiles(): array
     {
         return $this->files;
     }
@@ -162,7 +162,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @return static
      * @throws InvalidArgumentException if an invalid structure is provided.
      */
-    public function withUploadedFiles(array $uploadedFiles)
+    public function withUploadedFiles(array $uploadedFiles): static
     {
         $this->assertUploadedFiles($uploadedFiles);
         $new = clone $this;
@@ -188,7 +188,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withParsedBody($data)
+    public function withParsedBody($data): static
     {
         $this->assertParsedBody($data);
         $new = clone $this;
@@ -207,7 +207,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return mixed[] Attributes derived from the request.
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -220,7 +220,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return mixed
      */
-    public function getAttribute($name, $default = null)
+    public function getAttribute(string $name, $default = null)
     {
         if (\array_key_exists($name, $this->attributes) === false) {
             return $default;
@@ -236,7 +236,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withAttribute($name, $value)
+    public function withAttribute(string $name, $value): static
     {
         $this->assertAttributeName($name);
         $new = clone $this;
@@ -251,7 +251,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withoutAttribute($name)
+    public function withoutAttribute(string $name): static
     {
         if ($this->assertAttributeName($name, false) === false) {
             return $this;

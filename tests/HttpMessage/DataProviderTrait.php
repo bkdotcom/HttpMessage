@@ -2,10 +2,25 @@
 
 namespace bdk\Test\HttpMessage;
 
+use ReflectionClass;
 use stdClass;
 
 trait DataProviderTrait
 {
+    protected static $hasParamTypes = null;
+
+    protected static function hasParamTypes()
+    {
+        if (PHP_VERSION_ID >= 70000 && isset(self::$hasParamTypes) === false) {
+            $refClass = new ReflectionClass('Psr\Http\Message\MessageInterface');
+            $refMethod = $refClass->getMethod('withProtocolVersion');
+            $refParams = $refMethod->getParameters();
+            $refParam = $refParams[0];
+            self::$hasParamTypes = $refParam->hasType();
+        }
+        return self::$hasParamTypes;
+    }
+
     /**
      * Generate a random string
      *
@@ -15,8 +30,8 @@ trait DataProviderTrait
      */
     public function randomBytes($length = 70)
     {
-        $length = min($length, 70);
-        $length = max($length, 1);
+        $length = \min($length, 70);
+        $length = \max($length, 1);
         return \sha1(
             \rand(0, 32000) . \microtime(true) .  \uniqid('', true),
             true // binary
@@ -36,7 +51,7 @@ trait DataProviderTrait
             'nullChar' => ["\0"],
             'bool' => [false],
             'object' => [new stdClass()],
-            'lambda' => [function () {}],
+            'closure' => [static function () {}],
             'array' => [['2.0']],
         ];
     }
@@ -57,21 +72,21 @@ trait DataProviderTrait
     {
         return [
             'lowercase'         => ['host'],
-            'mixed-4'           => ['hosT'],
-            'mixed-3-4'         => ['hoST'],
-            'reverse-titlecase' => ['hOST'],
-            'uppercase'         => ['HOST'],
             'mixed-1-2-3'       => ['HOSt'],
-            'mixed-1-2'         => ['HOst'],
-            'titlecase'         => ['Host'],
-            'mixed-1-4'         => ['HosT'],
             'mixed-1-2-4'       => ['HOsT'],
+            'mixed-1-2'         => ['HOst'],
             'mixed-1-3-4'       => ['HoST'],
             'mixed-1-3'         => ['HoSt'],
+            'mixed-1-4'         => ['HosT'],
             'mixed-2-3'         => ['hOSt'],
             'mixed-2-4'         => ['hOsT'],
             'mixed-2'           => ['hOst'],
+            'mixed-3-4'         => ['hoST'],
             'mixed-3'           => ['hoSt'],
+            'mixed-4'           => ['hosT'],
+            'reverse-titlecase' => ['hOST'],
+            'titlecase'         => ['Host'],
+            'uppercase'         => ['HOST'],
         ];
     }
 
@@ -144,21 +159,28 @@ trait DataProviderTrait
 
     public function invalidHeaderNames()
     {
-        return [
+        $tests = [
             // 'int' => [233],
             // 'numeric' => ['123'],
-            'null' => [null],
-            'space' => ['hey dude'],
+            'array' => [['Header-Name']],
+            'carriageReturn' => ["va\rlue"],
+            'closure' => [static function () {}],
             'colon' => ['Location:'],
             'emptyString' => [''],
-            'non-ascii' => ['This-is-a-cyrillic-о'],
+            'false' => [false],
             'linefeed' => ["va\nlue"],
-            'carriageReturn' => ["va\rlue"],
-            'array' => [['Header-Name']],
-            'bool' => [true],
+            'non-ascii' => ['This-is-a-cyrillic-о'],
+            'null' => [null],
             'object' => [new stdClass()],
-            'lambda' => [function () {}],
+            'space' => ['hey dude'],
+            'true' => [true],
         ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'true',
+            ]));
+        }
+        return $tests;
     }
 
     public function validHeaderValues()
@@ -176,14 +198,14 @@ trait DataProviderTrait
     public function invalidHeaderValues()
     {
         return [
-            'cr'    => ["value\rinjection"],
-            'lf'    => ["value\ninjection"],
-            'null' => [null],
-            'true' => [true],
-            'false' => [false],
+            'closure' => [static function () {}],
+            'cr' => ["value\rinjection"],
             'emptyArray' => [[]],
+            'false' => [false],
+            'lf' => ["value\ninjection"],
+            'null' => [null],
             'object' => [new stdClass()],
-            'lambda' => [function () {}],
+            'true' => [true],
         ];
     }
 
@@ -281,18 +303,18 @@ trait DataProviderTrait
     public function invalidUris()
     {
         return [
-            ['http://'],
-            ['urn://host:with:colon'],
-            // [null],
-            [1],
-            [[]],
-            [1.1],
-            [false],
-            [new stdClass()],
-            [function () {}],
-            // ['//example.com:0'], // @todo for whatever reason php is flaky about this
-            ['//example.com:10000000'],
+            'array' => [[]],
             'bogusScheme' => ['0scheme://host/path?query#fragment'],
+            'closure' => [static function () {}],
+            'false' => [false],
+            'float' => [1.1],
+            'host with colon' => ['urn://host:with:colon'],
+            'int' => [1],
+            'invalid port' => ['//example.com:10000000'],
+            'object' => [new stdClass()],
+            'scheme only' => ['http://'],
+            // ['//example.com:0'], // @todo for whatever reason php is flaky about this
+            // [null],
         ];
     }
 
@@ -604,7 +626,7 @@ trait DataProviderTrait
             'float' => [7.4],
             'bool' => [true],
             'object' => [new stdClass()],
-            'lambda' => [function () {}],
+            'closure' => [static function () {}],
             'port' => [':80'],
             'string' => ['80 but not always'],
         ];
@@ -612,79 +634,127 @@ trait DataProviderTrait
 
     public function invalidUriUserInfos()
     {
-        return [
-            [0, null],
-            [null, null],
-            [true, null],
-            [new stdClass(), null],
-            ['user', true],
-            ['user', new stdClass()],
+        $tests = [
+            'password closure' => ['user', new stdClass()],
+            'password true' => ['user', true],
+            'user int' => [0, null],
+            'user null' => [null, null],
+            'user object' => [new stdClass(), null],
+            'user true' => [true, null],
         ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'password true',
+                'user int', // string typeHint coerces to "0"
+                'user true',
+            ]));
+        }
+        return $tests;
     }
 
     public function invalidUriHosts()
     {
-        return [
+        $tests = [
+            'array' => [['example.com']],
+            'closure' => [static function () {}],
+            'float' => [7.4],
+            'null' => [null],
+            'object' => [new stdClass()],
+            'true' => [true],
             'underscore' => ['example_test.com'],
             'zero' => [0],
-            'null' => [null],
-            'float' => [7.4],
-            'bool' => [true],
-            'object' => [new stdClass()],
-            'array' => [['example.com']],
-            'lambda' => [function() {}],
         ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'float',
+                'true',
+                'zero',
+            ]));
+        }
+        return $tests;
     }
 
     public function invalidUriPorts()
     {
-        return [
-            'zero' => [0],
-            'negative' => [-2],
+        $tests = [
+            'false' => [false],
+            'float' => [7.4],
             'max' => [PHP_INT_MAX],
             'min' => [PHP_INT_MIN],
-            'outOfRange' => [0xffff + 1],
-            'outOfRange 2' => [\rand(0xffff + 1, 0xfffff)],
-            // ['100'],
-            'float' => [7.4],
-            'bool' => [true],
+            'negative' => [-2],
             'object' => [new stdClass()],
-            'withColon' => [':80'],
+            'outOfRange 1' => [0xffff + 1],
+            'outOfRange 2' => [\rand(0xffff + 1, 0xfffff)],
             'string' => ['80 but not always'],
+            'true' => [true],
+            'withColon' => [':80'],
+            'zero' => [0],
         ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'float',
+                'true',
+            ]));
+        }
+        return $tests;
     }
 
     public function invalidUriPaths()
     {
-        return [
-            'null' => [null],
+        $tests = [
+            'false' => [true],
             'float' => [7.4],
-            'bool' => [true],
+            'null' => [null],
             'object' => [new stdClass()],
+            'true' => [true],
         ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'false',
+                'float',
+                'true',
+            ]));
+        }
+        return $tests;
     }
 
     public function invalidUriQueries()
     {
-        return [
+        $tests = [
+            'false' => [false],
             'null' => [null],
-            'bool' => [true],
+            'true' => [true],
             'object' => [new stdClass()],
         ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'false',
+                'true',
+            ]));
+        }
+        return $tests;
     }
 
     public function invalidUriFragments()
     {
-        return [
-            'array' => [[]],
-            'array' => [['/path']],
-            'null' => [null],
-            'bool' => [true],
-            'object' => [new stdClass()],
+        $tests = [
+            'array closure' => [[static function () {}]],
+            'array empty' => [[]],
             'array obj' => [[new stdClass()]],
-            'lambda' => [function () {}],
-            'array lambda' => [[function () {}]],
+            'array path' => [['/path']],
+            'closure' => [static function () {}],
+            'false' => [false],
+            'null' => [null],
+            'object' => [new stdClass()],
+            'true' => [true],
         ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'false',
+                'true',
+            ]));
+        }
+        return $tests;
     }
 
     public function uriComponents()
@@ -752,14 +822,15 @@ trait DataProviderTrait
     public function validAttributeNamesAndValues()
     {
         return [
-            ['name', null],
-            ['name', 1],
-            ['name', [1, 2, 3]],
-            ['name', false],
-            ['name', 1.1],
-            ['name', 'string'],
-            ['name', new stdClass()],
-            ['another name !', function () {}],
+            'null' => ['name', null],
+            'int' => ['name', 42],
+            'array' => ['name', [1, 2, 3]],
+            'false' => ['name', false],
+            'true' => ['name', true],
+            'float' => ['name', 3.14],
+            'string' => ['name', 'string'],
+            'object' => ['name', new stdClass()],
+            'closure' => ['another name !', static function () {}],
         ];
     }
 
@@ -772,7 +843,7 @@ trait DataProviderTrait
             'float' => [['a' => 1.1]],
             'bool' => [['a' => false]],
             'object' => [['a' => new stdClass()]],
-            'lambda' => [['x' => function () {}]],
+            'closure' => [['x' => static function () {}]],
         ];
     }
 
@@ -788,7 +859,7 @@ trait DataProviderTrait
             // [['value']],
             'value bool' => [['a' => false]],
             'value object' => [['obj' => new stdClass()]],
-            'value lambda' => [['x' => function () {}]],
+            'value closure' => [['x' => static function () {}]],
         ];
     }
 
@@ -801,7 +872,7 @@ trait DataProviderTrait
             'float' => [[1.1]],
             'bool' => [[false]],
             'obj' => [[new stdClass()]],
-            'lambda' => [[function () {}]],
+            'closure' => [[static function () {}]],
         ];
     }
 
@@ -817,14 +888,18 @@ trait DataProviderTrait
 
     public function invalidAttributeNamesAndValues()
     {
-        return [
-            [null, 1],
-            // [1, 2],
-            // [1.1, 'test'],
-            [false, null],
-            [new stdClass(), 1],
-            [function () {}, 'value'],
+        $tests = [
+            'null' => [null, 1],
+            'false' => [false, null],
+            'object' => [new stdClass(), 1],
+            'closure' => [static function () {}, 'value'],
         ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'false',
+            ]));
+        }
+        return $tests;
     }
 
     public function invalidResources()
@@ -900,7 +975,7 @@ trait DataProviderTrait
     public function statusPhrases()
     {
         return [
-            ['500', null, 'Internal Server Error'],
+            ['500', '', 'Internal Server Error'],
             [103, '', ''],
             [200, "tab\ttab", "tab\ttab"],
         ];
@@ -908,7 +983,7 @@ trait DataProviderTrait
 
     public function invalidStatusCodes()
     {
-        return [
+        $tests = [
             'true'     => [true],
             'false'    => [false],
             'array'    => [[200]],
@@ -919,20 +994,35 @@ trait DataProviderTrait
             'null'     => [null],
             'string'   => ['foo'],
         ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'float',
+            ]));
+        }
+        return $tests;
     }
 
     public function invalidReasonPhrases()
     {
-        return [
-            'nl'      => ["Custom reason phrase\n\rThe next line"],
-            'true'    => [true],
-            'false'   => [false],
+        $tests = [
             'array'   => [[200]],
-            'object'  => [(object) ['reasonPhrase' => 'Ok']],
-            'integer' => [99],
+            'closure' => [static function () {}],
+            'false'   => [false],
             'float'   => [400.5],
-            'lambda'  => [function () {}],
+            'integer' => [99],
+            'newline' => ["Custom reason phrase\n\rThe next line"],
+            'object'  => [(object) ['reasonPhrase' => 'Ok']],
+            'true'    => [true],
         ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'false',
+                'float',
+                'integer',
+                'true',
+            ]));
+        }
+        return $tests;
     }
 
     /*
@@ -958,30 +1048,38 @@ trait DataProviderTrait
     public function invalidStreams()
     {
         return [
-            'null'   => [null],
-            'true'   => [true],
-            'false'  => [false],
-            'int'    => [1],
-            'float'  => [1.1],
             'array'  => [['filename']],
+            'closure' => [static function () {}],
+            'false'  => [false],
+            'float'  => [1.1],
+            'int'    => [1],
+            'null'   => [null],
             'object' => [(object) ['filename']],
-            'lambda' => [function () {}],
+            'true'   => [true],
         ];
     }
 
     public function invalidTargetPaths()
     {
-        return [
-            'null'   => [null],
-            'true'   => [true],
-            'false'  => [false],
-            'int'    => [1],
-            'float'  => [1.1],
-            'empty'  => [''],
+        $tests = [
             'array'  => [['filename']],
+            'closure' => [static function () {}],
+            'empty'  => [''],
+            'false'  => [false],
+            'float'  => [1.1],
+            'int'    => [1],
+            'null'   => [null],
             'object' => [(object) ['filename']],
-            'lambda' => [function () {}],
+            'true'   => [true],
         ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'float',
+                'int',
+                'true',
+            ]));
+        }
+        return $tests;
     }
 
     public function invalidFileSizes()
@@ -1037,19 +1135,19 @@ trait DataProviderTrait
     public function invalidMediaTypes()
     {
         return [
-            'true'   => [true],
-            'false'  => [false],
-            'int'    => [1],
-            'float'  => [1.1],
             'array'  => [['filename']],
-            'object' => [(object) ['filename']],
-            'lambda' => [function () {}],
             'backslash' => ['test\\test'],
-            'invalidType' => ['some+monster+media+type/here'],
-            'invalidSubType' => ['text/bogus/subtype'],
-            'moreThanOneSuffix' => ['text/html+foo+bar'],
+            'closure' => [static function () {}],
+            'false'  => [false],
+            'float'  => [1.1],
+            'int'    => [1],
             'invalidParam1' => ['text/html charset=UTF-8'],
             'invalidParam2' => ['text/html; char-set=UTF-8'],
+            'invalidSubType' => ['text/bogus/subtype'],
+            'invalidType' => ['some+monster+media+type/here'],
+            'moreThanOneSuffix' => ['text/html+foo+bar'],
+            'object' => [(object) ['filename']],
+            'true'   => [true],
         ];
     }
 

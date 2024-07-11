@@ -15,7 +15,7 @@ namespace bdk\HttpMessage\Utility;
 use InvalidArgumentException;
 
 /**
- * PHP's parse_str(), but does not convert dots and spaces to '_' by default
+ * PHP's `parse_str()`, but does not convert dots and spaces to '_' by default
  *
  * @psalm-api
  */
@@ -38,7 +38,7 @@ class ParseStr
      *
      * @see https://github.com/api-platform/core/blob/main/src/Core/Util/RequestParser.php#L50
      */
-    public static function parse($str, $opts = array())
+    public static function parse($str, array $opts = array()): array
     {
         $str = (string) $str;
         $opts = \array_merge(self::$parseStrOpts, $opts);

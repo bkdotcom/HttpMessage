@@ -136,11 +136,11 @@ class Response
     /**
      * Get the "phrase" associated with the status code
      *
-     * @param string|int $code 3-digit status code
+     * @param int|string $code 3-digit status code
      *
      * @return string (empty string if unknown code)
      */
-    public static function codePhrase($code)
+    public static function codePhrase($code): string
     {
         $code = (int) $code;
         return isset(self::$phrases[$code])

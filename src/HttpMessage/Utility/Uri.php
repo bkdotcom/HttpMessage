@@ -29,7 +29,7 @@ class Uri
      *
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    public static function fromGlobals()
+    public static function fromGlobals(): PsrUri
     {
         $uri = new PsrUri();
         $parts = \array_filter(\array_merge(
@@ -64,7 +64,7 @@ class Uri
      *
      * @return bool
      */
-    public static function isCrossOrigin(UriInterface $uri1, UriInterface $uri2)
+    public static function isCrossOrigin(UriInterface $uri1, UriInterface $uri2): bool
     {
         if (\strcasecmp($uri1->getHost(), $uri2->getHost()) !== 0) {
             return true;
@@ -78,6 +78,33 @@ class Uri
     }
 
     /**
+     * Parse URL (multi-byte safe)
+     *
+     * @param string|UriInterface $url The URL to parse.
+     *
+     * @return array<string,int|string>|false
+     */
+    public static function parseUrl($url)
+    {
+        if ($url instanceof UriInterface) {
+            return self::uriInterfaceToParts($url);
+        }
+        // reserved chars
+        $chars = '!*\'();:@&=$,/?#[]';
+        $entities = \str_split(\urlencode($chars), 3);
+        $chars = \str_split($chars);
+        $urlEnc = \str_replace($entities, $chars, \urlencode($url));
+        $parts = self::parseUrlPatched($urlEnc);
+        return \is_array($parts)
+            ? \array_map(static function ($val) {
+                return \is_string($val)
+                    ? \urldecode($val)
+                    : $val;
+            }, $parts)
+            : $parts;
+    }
+
+    /**
      * Converts the relative URI into a new URI that is resolved against the base URI.
      *
      * @param UriInterface $base Base URI
@@ -87,7 +114,7 @@ class Uri
      *
      * @link http://tools.ietf.org/html/rfc3986#section-5.2
      */
-    public static function resolve(UriInterface $base, UriInterface $rel)
+    public static function resolve(UriInterface $base, UriInterface $rel): UriInterface
     {
         if ((string) $rel === '') {
             // we can simply return the same base URI instance for this same-document reference
@@ -118,33 +145,6 @@ class Uri
             ->withPath(self::pathRemoveDots($targetPath))
             ->withQuery($rel->getQuery())
             ->withFragment($rel->getFragment());
-    }
-
-    /**
-     * Parse URL (multi-byte safe)
-     *
-     * @param string|UriInterface $url The URL to parse.
-     *
-     * @return array<string,int|string>|false
-     */
-    public static function parseUrl($url)
-    {
-        if ($url instanceof UriInterface) {
-            return self::uriInterfaceToParts($url);
-        }
-        // reserved chars
-        $chars = '!*\'();:@&=$,/?#[]';
-        $entities = \str_split(\urlencode($chars), 3);
-        $chars = \str_split($chars);
-        $urlEnc = \str_replace($entities, $chars, \urlencode($url));
-        $parts = self::parseUrlPatched($urlEnc);
-        return \is_array($parts)
-            ? \array_map(static function ($val) {
-                return \is_string($val)
-                    ? \urldecode($val)
-                    : $val;
-            }, $parts)
-            : $parts;
     }
 
     /**

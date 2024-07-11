@@ -4,8 +4,10 @@ namespace bdk\Test\HttpMessage;
 
 use bdk\HttpMessage\Uri;
 use bdk\PhpUnitPolyfill\ExpectExceptionTrait;
-use PHPUnit\Framework\TestCase;
+use Exception;
+use PHPUnit\Framework\AssertionFailedError;
 use ReflectionObject;
+use TypeError;
 
 /**
  * @covers \bdk\HttpMessage\AbstractUri
@@ -242,9 +244,18 @@ class UriTest extends TestCase
      */
     public function testWithSchemeRejectsInvalid($scheme)
     {
-        $this->expectException('InvalidArgumentException');
-        $uri = $this->createUri()->withScheme($scheme);
-        $uri->getScheme();
+        // $this->expectException('InvalidArgumentException');
+        try {
+            $uri = $this->createUri()->withScheme($scheme);
+            $uri->getScheme();
+        } catch (Exception $e) {
+            self::assertSame(\get_class($e), 'InvalidArgumentException');
+            return;
+        } catch (TypeError $e) {
+            self::assertSame(\get_class($e), 'TypeError');
+            return;
+        }
+        throw new AssertionFailedError('Exception not thrown');
     }
 
     /**
@@ -255,9 +266,18 @@ class UriTest extends TestCase
      */
     public function testWithUserInfoRejectsInvalid($user, $password)
     {
-        $this->expectException('InvalidArgumentException');
-        $uri = $this->createUri()->withUserInfo($user, $password);
-        $uri->getUserInfo();
+        // $this->expectException('InvalidArgumentException');
+        try {
+            $uri = $this->createUri()->withUserInfo($user, $password);
+            $uri->getUserInfo();
+        } catch (Exception $e) {
+            self::assertSame(\get_class($e), 'InvalidArgumentException');
+            return;
+        } catch (TypeError $e) {
+            self::assertSame(\get_class($e), 'TypeError');
+            return;
+        }
+        throw new AssertionFailedError('Exception not thrown');
     }
 
     /**
@@ -267,9 +287,18 @@ class UriTest extends TestCase
      */
     public function testWithHostRejectsInvalid($host)
     {
-        $this->expectException('InvalidArgumentException');
-        $uri = $this->createUri()->withHost($host);
-        $uri->getHost();
+        // $this->expectException('InvalidArgumentException');
+        try {
+            $uri = $this->createUri()->withHost($host);
+            $uri->getHost();
+        } catch (Exception $e) {
+            self::assertSame(\get_class($e), 'InvalidArgumentException');
+            return;
+        } catch (TypeError $e) {
+            self::assertSame(\get_class($e), 'TypeError');
+            return;
+        }
+        throw new AssertionFailedError('Exception not thrown');
     }
 
     /**
@@ -279,9 +308,18 @@ class UriTest extends TestCase
      */
     public function testWithPortRejectsInvalid($port)
     {
-        $this->expectException('InvalidArgumentException');
-        $uri = $this->createUri()->withPort($port);
-        $uri->getPort();
+        // $this->expectException('InvalidArgumentException');
+        try {
+            $uri = $this->createUri()->withPort($port);
+            $uri->getPort();
+        } catch (Exception $e) {
+            self::assertSame(\get_class($e), 'InvalidArgumentException');
+            return;
+        } catch (TypeError $e) {
+            self::assertSame(\get_class($e), 'TypeError');
+            return;
+        }
+        throw new AssertionFailedError('Exception not thrown');
     }
 
     /**
@@ -291,9 +329,18 @@ class UriTest extends TestCase
      */
     public function testWithPathRejectsInvalid($path)
     {
-        $this->expectException('InvalidArgumentException');
-        $uri = $this->createUri()->withPath($path);
-        $uri->getPath();
+        // $this->expectException('InvalidArgumentException');
+        try {
+            $uri = $this->createUri()->withPath($path);
+            $uri->getPath();
+        } catch (Exception $e) {
+            self::assertSame(\get_class($e), 'InvalidArgumentException');
+            return;
+        } catch (TypeError $e) {
+            self::assertSame(\get_class($e), 'TypeError');
+            return;
+        }
+        throw new AssertionFailedError('Exception not thrown');
     }
 
     /**
@@ -303,9 +350,18 @@ class UriTest extends TestCase
      */
     public function testWithQueryRejectsInvalidValues($query)
     {
-        $this->expectException('InvalidArgumentException');
-        $uri = $this->createUri()->withQuery($query);
-        $uri->getQuery();
+        // $this->expectException('InvalidArgumentException');
+        try {
+            $uri = $this->createUri()->withQuery($query);
+            $uri->getQuery();
+        } catch (Exception $e) {
+            self::assertSame(\get_class($e), 'InvalidArgumentException');
+            return;
+        } catch (TypeError $e) {
+            self::assertSame(\get_class($e), 'TypeError');
+            return;
+        }
+        throw new AssertionFailedError('Exception not thrown');
     }
 
     /**
@@ -315,8 +371,17 @@ class UriTest extends TestCase
      */
     public function testWithFragmentRejectsInvalidValues($fragment)
     {
-        $this->expectException('InvalidArgumentException');
-        $uri = $this->createUri()->withFragment($fragment);
-        $uri->getFragment();
+        // $this->expectException('InvalidArgumentException');
+        try {
+            $uri = $this->createUri()->withFragment($fragment);
+            $uri->getFragment();
+        } catch (Exception $e) {
+            self::assertSame(\get_class($e), 'InvalidArgumentException');
+            return;
+        } catch (TypeError $e) {
+            self::assertSame(\get_class($e), 'TypeError');
+            return;
+        }
+        throw new AssertionFailedError('Exception not thrown');
     }
 }

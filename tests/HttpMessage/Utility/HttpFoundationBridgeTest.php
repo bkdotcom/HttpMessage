@@ -1,24 +1,20 @@
 <?php
 
-namespace bdk\Test\HttpMessage;
+namespace bdk\Test\HttpMessage\Utility;
 
-use bdk\HttpMessage\HttpFoundationBridge;
 use bdk\HttpMessage\UploadedFile;
-use bdk\PhpUnitPolyfill\AssertionTrait;
-use bdk\PhpUnitPolyfill\ExpectExceptionTrait;
+use bdk\HttpMessage\Utility\HttpFoundationBridge;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request as HttpFoundationRequest;
 use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
+
 /**
- * @covers \bdk\HttpMessage\HttpFoundationBridge
+ * @covers \bdk\HttpMessage\Utility\HttpFoundationBridge
  */
 class HttpFoundationBridgeTest extends TestCase
 {
-    use AssertionTrait;
-    use ExpectExceptionTrait;
-
     public function testCreateRequest()
     {
         $serverParams = array(

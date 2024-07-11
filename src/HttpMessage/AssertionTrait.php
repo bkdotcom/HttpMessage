@@ -492,7 +492,7 @@ trait AssertionTrait
     }
 
     /**
-     * Test if hostname is a fully-qualified domain naim
+     * Test if hostname is a fully-qualified domain name (FQDN)
      *
      * @param string $host Hostname to test
      *

@@ -5,9 +5,9 @@ namespace bdk\Test\HttpMessage;
 use bdk\HttpMessage\Message;
 use bdk\HttpMessage\Request;
 use bdk\HttpMessage\Uri;
-use bdk\PhpUnitPolyfill\AssertionTrait;
-use bdk\PhpUnitPolyfill\ExpectExceptionTrait;
-use PHPUnit\Framework\TestCase;
+use Exception;
+use PHPUnit\Framework\AssertionFailedError;
+use TypeError;
 
 /**
  * @covers \bdk\HttpMessage\AssertionTrait
@@ -15,11 +15,6 @@ use PHPUnit\Framework\TestCase;
  */
 class RequestTest extends TestCase
 {
-    use AssertionTrait;
-    use ExpectExceptionTrait;
-    use DataProviderTrait;
-    use FactoryTrait;
-
     public function testConstruct()
     {
         $request = $this->createRequest();
@@ -181,10 +176,18 @@ class RequestTest extends TestCase
 
     public function testExceptionRequestTargetInvalidType()
     {
-        $this->expectException('InvalidArgumentException');
-        $request = new Request('GET', 'http://www.bradkent.com/');
-        // Exception => A request target must be a string.
-        $request->withRequestTarget(['foo' => 'bar']);
+        try {
+            $request = new Request('GET', 'http://www.bradkent.com/');
+            // Exception => A request target must be a string.
+            $request->withRequestTarget(['foo' => 'bar']);
+        } catch (Exception $e) {
+            self::assertSame(\get_class($e), 'InvalidArgumentException');
+            return;
+        } catch (TypeError $e) {
+            self::assertSame(\get_class($e), 'TypeError');
+            return;
+        }
+        throw new AssertionFailedError('Exception not thrown');
     }
 
     /**
@@ -206,8 +209,16 @@ class RequestTest extends TestCase
      */
     public function testWithMethodInvalidThrowsException($method)
     {
-        $this->expectException('InvalidArgumentException');
-        $this->createRequest()
-            ->withMethod($method);
+        try {
+            $this->createRequest()
+                ->withMethod($method);
+        } catch (Exception $e) {
+            self::assertSame(\get_class($e), 'InvalidArgumentException');
+            return;
+        } catch (TypeError $e) {
+            self::assertSame(\get_class($e), 'TypeError');
+            return;
+        }
+        throw new AssertionFailedError('Exception not thrown');
     }
 }

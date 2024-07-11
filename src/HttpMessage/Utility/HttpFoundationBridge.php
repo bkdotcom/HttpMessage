@@ -10,8 +10,9 @@
  * @version   v1.0
  */
 
-namespace bdk\HttpMessage;
+namespace bdk\HttpMessage\Utility;
 
+use bdk\HttpMessage\Response;
 use bdk\HttpMessage\ServerRequest;
 use bdk\HttpMessage\Stream;
 use bdk\HttpMessage\UploadedFile;
@@ -38,7 +39,7 @@ class HttpFoundationBridge
      *
      * @psalm-suppress ReservedWord complains about HttpFoundations' : mixed return spec
      */
-    public static function createRequest(HttpFoundationRequest $request)
+    public static function createRequest(HttpFoundationRequest $request): ServerRequest
     {
         /** @psalm-var string  */
         $query = $request->server->get('QUERY_STRING', '');
@@ -74,7 +75,7 @@ class HttpFoundationBridge
      *
      * @return Response
      */
-    public static function createResponse(HttpFoundationResponse $response)
+    public static function createResponse(HttpFoundationResponse $response): Response
     {
         $statusCode = $response->getStatusCode();
         $protocolVersion = $response->getProtocolVersion();
@@ -105,7 +106,7 @@ class HttpFoundationBridge
      *
      * @return Stream
      */
-    private static function createResponseStream(HttpFoundationResponse $response)
+    private static function createResponseStream(HttpFoundationResponse $response): Stream
     {
         if ($response instanceof BinaryFileResponse && !$response->headers->has('Content-Range')) {
             $pathName = $response->getFile()->getPathname();
@@ -143,7 +144,7 @@ class HttpFoundationBridge
      *
      * @return UploadedFile
      */
-    private static function createUploadedFile(HttpFoundationUploadedFile $uploadedFile)
+    private static function createUploadedFile(HttpFoundationUploadedFile $uploadedFile): UploadedFile
     {
         return new UploadedFile(
             $uploadedFile->getRealPath(),
@@ -161,7 +162,7 @@ class HttpFoundationBridge
      *
      * @return array
      */
-    private static function getFiles(array $uploadedFiles)
+    private static function getFiles(array $uploadedFiles): array
     {
         return \array_map(static function ($value) {
             if ($value === null) {

@@ -3,10 +3,10 @@
 namespace bdk\Test\HttpMessage;
 
 use bdk\HttpMessage\Message;
-use bdk\PhpUnitPolyfill\AssertionTrait;
-use bdk\PhpUnitPolyfill\ExpectExceptionTrait;
-use PHPUnit\Framework\TestCase;
+use Exception;
+use PHPUnit\Framework\AssertionFailedError;
 use ReflectionObject;
+use TypeError;
 
 /**
  * @covers \bdk\HttpMessage\AssertionTrait
@@ -14,11 +14,6 @@ use ReflectionObject;
  */
 class MessageTest extends TestCase
 {
-    use AssertionTrait;
-    use ExpectExceptionTrait;
-    use DataProviderTrait;
-    use FactoryTrait;
-
     public function testConstruct()
     {
         $message = $this->createMessage();
@@ -180,9 +175,18 @@ class MessageTest extends TestCase
      */
     public function testWithInvalidProtocolVersionThrowsException($version)
     {
-        $this->expectException('InvalidArgumentException');
-        $this->createMessage()
-            ->withProtocolVersion($version)->getProtocolVersion();
+        try {
+            $this->createMessage()
+                ->withProtocolVersion($version)
+                ->getProtocolVersion();
+        } catch (Exception $e) {
+            self::assertSame(\get_class($e), 'InvalidArgumentException');
+            return;
+        } catch (TypeError $e) {
+            self::assertSame(\get_class($e), 'TypeError');
+            return;
+        }
+        throw new AssertionFailedError('Exception not thrown');
     }
 
     /**
@@ -241,10 +245,18 @@ class MessageTest extends TestCase
      */
     public function testInvalidHeaderNameThrowsException($name)
     {
-        $this->expectException('InvalidArgumentException');
-        $value = \base64_encode($this->randomBytes(12));
-        $this->createMessage()
-            ->withHeader($name, $value);
+        try {
+            $value = \base64_encode($this->randomBytes(12));
+            $this->createMessage()
+                ->withHeader($name, $value);
+        } catch (Exception $e) {
+            self::assertSame(\get_class($e), 'InvalidArgumentException');
+            return;
+        } catch (TypeError $e) {
+            self::assertSame(\get_class($e), 'TypeError');
+            return;
+        }
+        throw new AssertionFailedError('Exception not thrown');
     }
 
     /**
@@ -254,10 +266,18 @@ class MessageTest extends TestCase
      */
     public function testInvalidAddedHeaderNameThrowException($name)
     {
-        $this->expectException('InvalidArgumentException');
-        $value = \base64_encode($this->randomBytes(12));
-        $this->createMessage()
-            ->withAddedHeader($name, $value);
+        try {
+            $value = \base64_encode($this->randomBytes(12));
+            $this->createMessage()
+                ->withAddedHeader($name, $value);
+        } catch (Exception $e) {
+            self::assertSame(\get_class($e), 'InvalidArgumentException');
+            return;
+        } catch (TypeError $e) {
+            self::assertSame(\get_class($e), 'TypeError');
+            return;
+        }
+        throw new AssertionFailedError('Exception not thrown');
     }
 
     /**

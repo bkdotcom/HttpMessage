@@ -33,7 +33,7 @@ class Message implements MessageInterface
     private $body;
 
     /**
-     * @var array<stringstring[]> Map of all registered headers, as name => array of values
+     * @var array<string,string[]> Map of all registered headers, as name => array of values
      */
     private $headers = array();
 
@@ -50,7 +50,7 @@ class Message implements MessageInterface
      *
      * @return string HTTP protocol version (e.g., "1.1", "1.0").
      */
-    public function getProtocolVersion()
+    public function getProtocolVersion(): string
     {
         return $this->protocolVersion;
     }
@@ -64,10 +64,9 @@ class Message implements MessageInterface
      *
      * @return static
      */
-    public function withProtocolVersion($version)
+    public function withProtocolVersion(string $version): static
     {
         $this->assertProtocolVersion($version);
-        $version = $version;
         if ($version === $this->protocolVersion) {
             return $this;
         }
@@ -82,7 +81,7 @@ class Message implements MessageInterface
      * @return string[][] Returns an associative array of the message's headers. Each
      *     key is a header name, and each value is an array of strings for that header.
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }
@@ -96,7 +95,7 @@ class Message implements MessageInterface
      *     name using a case-insensitive string comparison. Returns false if
      *     no matching header name is found in the message.
      */
-    public function hasHeader($name)
+    public function hasHeader(string $name): bool
     {
         $nameLower = \strtolower($name);
         return isset($this->headerNames[$nameLower]);
@@ -113,7 +112,7 @@ class Message implements MessageInterface
      * @return string[] An array of string values as provided for the given
      *    header. If the header does not appear in the message, an empty array is returned.
      */
-    public function getHeader($name)
+    public function getHeader(string $name): array
     {
         $nameLower = \strtolower($name);
         if (!isset($this->headerNames[$nameLower])) {
@@ -143,7 +142,7 @@ class Message implements MessageInterface
      *    concatenated together using a comma. If the header does not appear in
      *    the message, this method will return an empty string.
      */
-    public function getHeaderLine($name)
+    public function getHeaderLine(string $name): string
     {
         return \implode(', ', $this->getHeader($name));
     }
@@ -157,7 +156,7 @@ class Message implements MessageInterface
      * @return static
      * @throws InvalidArgumentException for invalid header names or values.
      */
-    public function withHeader($name, $value)
+    public function withHeader(string $name, $value): static
     {
         $this->assertHeaderName($name);
         $name = $this->normalizeHeaderName($name);
@@ -192,7 +191,7 @@ class Message implements MessageInterface
      * @throws InvalidArgumentException for invalid header names.
      * @throws InvalidArgumentException for invalid header values.
      */
-    public function withAddedHeader($name, $value)
+    public function withAddedHeader(string $name, $value): static
     {
         // assert before using as array key (which will typecast)
         $this->assertHeaderName($name);
@@ -210,7 +209,7 @@ class Message implements MessageInterface
      *
      * @return static
      */
-    public function withoutHeader($name)
+    public function withoutHeader(string $name): static
     {
         $nameLower = \strtolower($name);
         if (!isset($this->headerNames[$nameLower])) {
@@ -226,7 +225,7 @@ class Message implements MessageInterface
      *
      * @return StreamInterface The body as a stream.
      */
-    public function getBody()
+    public function getBody(): StreamInterface
     {
         if (!$this->body) {
             $this->body = new Stream();
@@ -242,7 +241,7 @@ class Message implements MessageInterface
      * @return static
      * @throws \InvalidArgumentException
      */
-    public function withBody(StreamInterface $body)
+    public function withBody(StreamInterface $body): static
     {
         if ($body === $this->body) {
             return $this;
@@ -322,7 +321,7 @@ class Message implements MessageInterface
      *
      * @return void
      */
-    protected function setHeaders($headers = array())
+    protected function setHeaders(array $headers)
     {
         \array_walk($headers, function ($value, $name) {
             if (\is_int($name)) {
