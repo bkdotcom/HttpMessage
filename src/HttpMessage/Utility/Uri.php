@@ -29,7 +29,7 @@ class Uri
      *
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    public static function fromGlobals(): PsrUri
+    public static function fromGlobals()
     {
         $uri = new PsrUri();
         $parts = \array_filter(\array_merge(
@@ -64,7 +64,7 @@ class Uri
      *
      * @return bool
      */
-    public static function isCrossOrigin(UriInterface $uri1, UriInterface $uri2): bool
+    public static function isCrossOrigin(UriInterface $uri1, UriInterface $uri2)
     {
         if (\strcasecmp($uri1->getHost(), $uri2->getHost()) !== 0) {
             return true;
@@ -114,7 +114,7 @@ class Uri
      *
      * @link http://tools.ietf.org/html/rfc3986#section-5.2
      */
-    public static function resolve(UriInterface $base, UriInterface $rel): UriInterface
+    public static function resolve(UriInterface $base, UriInterface $rel)
     {
         if ((string) $rel === '') {
             // we can simply return the same base URI instance for this same-document reference

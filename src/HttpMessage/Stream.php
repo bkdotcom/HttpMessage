@@ -98,7 +98,7 @@ class Stream extends AbstractStream implements StreamInterface
      *
      * @see http://php.net/manual/en/language.oop5.magic.php#object.tostring
      */
-    public function __toString(): string
+    public function __toString()
     {
         if ($this->isResourceOpen() === false) {
             return '';
@@ -117,7 +117,7 @@ class Stream extends AbstractStream implements StreamInterface
      *
      * @return void
      */
-    public function close(): void
+    public function close()
     {
         if (isset($this->resource)) {
             if ($this->isResourceOpen() === true) {
@@ -157,7 +157,7 @@ class Stream extends AbstractStream implements StreamInterface
      *
      * @return int|null Returns the size in bytes if known, or null if unknown.
      */
-    public function getSize(): ?int
+    public function getSize()
     {
         if ($this->size !== null) {
             return $this->size;
@@ -187,7 +187,7 @@ class Stream extends AbstractStream implements StreamInterface
      * @return int Position of the file pointer
      * @throws RuntimeException on error.
      */
-    public function tell(): int
+    public function tell()
     {
         if ($this->isResourceOpen() === false) {
             throw new RuntimeException($this->strings['detached']);
@@ -206,7 +206,7 @@ class Stream extends AbstractStream implements StreamInterface
      * @return bool
      * @throws RuntimeException
      */
-    public function eof(): bool
+    public function eof()
     {
         if ($this->isResourceOpen() === false) {
             throw new RuntimeException($this->strings['detached']);
@@ -220,7 +220,7 @@ class Stream extends AbstractStream implements StreamInterface
      *
      * @return bool
      */
-    public function isSeekable(): bool
+    public function isSeekable()
     {
         return $this->seekable;
     }
@@ -241,7 +241,7 @@ class Stream extends AbstractStream implements StreamInterface
      *
      * @return void
      */
-    public function seek(int $offset, int $whence = SEEK_SET): void
+    public function seek($offset, $whence = SEEK_SET)
     {
         $whence = (int) $whence;
         if ($this->isResourceOpen() === false) {
@@ -272,7 +272,7 @@ class Stream extends AbstractStream implements StreamInterface
      *
      * @return void
      */
-    public function rewind(): void
+    public function rewind()
     {
         $this->seek(0);
     }
@@ -282,7 +282,7 @@ class Stream extends AbstractStream implements StreamInterface
      *
      * @return bool
      */
-    public function isWritable(): bool
+    public function isWritable()
     {
         return $this->writable;
     }
@@ -295,7 +295,7 @@ class Stream extends AbstractStream implements StreamInterface
      * @return int Returns the number of bytes written to the stream.
      * @throws RuntimeException on failure.
      */
-    public function write(string $string): int
+    public function write($string)
     {
         if ($this->isResourceOpen() === false) {
             throw new RuntimeException($this->strings['detached']);
@@ -319,7 +319,7 @@ class Stream extends AbstractStream implements StreamInterface
      *
      * @return bool
      */
-    public function isReadable(): bool
+    public function isReadable()
     {
         return $this->readable;
     }
@@ -336,7 +336,7 @@ class Stream extends AbstractStream implements StreamInterface
      * @throws RuntimeException if an error occurs.
      * @throws InvalidArgumentException if negative length specified
      */
-    public function read(int $length): string
+    public function read($length)
     {
         if ($this->isResourceOpen() === false) {
             throw new RuntimeException($this->strings['detached']);
@@ -366,7 +366,7 @@ class Stream extends AbstractStream implements StreamInterface
      * @throws RuntimeException if unable to read or an error occurs while
      *     reading.
      */
-    public function getContents(): string
+    public function getContents()
     {
         if ($this->isResourceOpen() === false) {
             throw new RuntimeException($this->strings['detached']);
@@ -398,7 +398,7 @@ class Stream extends AbstractStream implements StreamInterface
      *
      * @psalm-suppress PossiblyInvalidArgument we know resource is open
      */
-    public function getMetadata(?string $key = null)
+    public function getMetadata($key = null)
     {
         if ($this->isResourceOpen() === false) {
             return $key !== null

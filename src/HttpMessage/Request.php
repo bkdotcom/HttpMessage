@@ -75,7 +75,7 @@ class Request extends Message implements RequestInterface
      *
      * @return string
      */
-    public function getRequestTarget(): string
+    public function getRequestTarget()
     {
         if ($this->requestTarget !== null) {
             return $this->requestTarget;
@@ -111,7 +111,7 @@ class Request extends Message implements RequestInterface
      * @return static
      * @throws InvalidArgumentException
      */
-    public function withRequestTarget(string $requestTarget): RequestInterface
+    public function withRequestTarget($requestTarget)
     {
         if (\is_string($requestTarget) === false) {
             throw new InvalidArgumentException(
@@ -133,7 +133,7 @@ class Request extends Message implements RequestInterface
      *
      * @return string Returns the request method.
      */
-    public function getMethod(): string
+    public function getMethod()
     {
         return $this->method;
     }
@@ -162,7 +162,7 @@ class Request extends Message implements RequestInterface
      *
      * @see https://datatracker.ietf.org/doc/html/rfc7231
      */
-    public function withMethod(string $method): RequestInterface
+    public function withMethod($method)
     {
         $this->assertMethod($method);
         $new = clone $this;
@@ -180,7 +180,7 @@ class Request extends Message implements RequestInterface
      *
      * @see https://datatracker.ietf.org/doc/html/rfc3986#section-4.3
      */
-    public function getUri(): UriInterface
+    public function getUri()
     {
         return $this->uri;
     }
@@ -219,7 +219,7 @@ class Request extends Message implements RequestInterface
      *
      * @throws InvalidArgumentException
      */
-    public function withUri(UriInterface $uri, bool $preserveHost = false): RequestInterface
+    public function withUri(UriInterface $uri, $preserveHost = false)
     {
         if ($uri === $this->uri) {
             return $this;
@@ -235,7 +235,7 @@ class Request extends Message implements RequestInterface
      * {@inheritDoc}
      */
     #[\Override]
-    public function withoutHeader(string $name): MessageInterface
+    public function withoutHeader($name)
     {
         $new = parent::withoutHeader($name);
         return \strtolower($name) === 'host'
@@ -250,7 +250,7 @@ class Request extends Message implements RequestInterface
      *
      * @return static
      */
-    private function updateHostHeader(): RequestInterface
+    private function updateHostHeader()
     {
         $uri = $this->getUri();
         $host = $uri->getHost();

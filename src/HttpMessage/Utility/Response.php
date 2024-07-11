@@ -140,7 +140,7 @@ class Response
      *
      * @return string (empty string if unknown code)
      */
-    public static function codePhrase($code): string
+    public static function codePhrase($code)
     {
         $code = (int) $code;
         return isset(self::$phrases[$code])

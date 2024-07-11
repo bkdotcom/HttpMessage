@@ -39,7 +39,7 @@ class HttpFoundationBridge
      *
      * @psalm-suppress ReservedWord complains about HttpFoundations' : mixed return spec
      */
-    public static function createRequest(HttpFoundationRequest $request): ServerRequest
+    public static function createRequest(HttpFoundationRequest $request)
     {
         /** @psalm-var string  */
         $query = $request->server->get('QUERY_STRING', '');
@@ -75,7 +75,7 @@ class HttpFoundationBridge
      *
      * @return Response
      */
-    public static function createResponse(HttpFoundationResponse $response): Response
+    public static function createResponse(HttpFoundationResponse $response)
     {
         $statusCode = $response->getStatusCode();
         $protocolVersion = $response->getProtocolVersion();
@@ -106,7 +106,7 @@ class HttpFoundationBridge
      *
      * @return Stream
      */
-    private static function createResponseStream(HttpFoundationResponse $response): Stream
+    private static function createResponseStream(HttpFoundationResponse $response)
     {
         if ($response instanceof BinaryFileResponse && !$response->headers->has('Content-Range')) {
             $pathName = $response->getFile()->getPathname();
@@ -144,7 +144,7 @@ class HttpFoundationBridge
      *
      * @return UploadedFile
      */
-    private static function createUploadedFile(HttpFoundationUploadedFile $uploadedFile): UploadedFile
+    private static function createUploadedFile(HttpFoundationUploadedFile $uploadedFile)
     {
         return new UploadedFile(
             $uploadedFile->getRealPath(),
@@ -162,7 +162,7 @@ class HttpFoundationBridge
      *
      * @return array
      */
-    private static function getFiles(array $uploadedFiles): array
+    private static function getFiles(array $uploadedFiles)
     {
         return \array_map(static function ($value) {
             if ($value === null) {

@@ -52,7 +52,7 @@ class Response extends Message implements ResponseInterface
      *
      * @return int Status code.
      */
-    public function getStatusCode(): int
+    public function getStatusCode()
     {
         return $this->statusCode;
     }
@@ -65,7 +65,7 @@ class Response extends Message implements ResponseInterface
      * @see https://datatracker.ietf.org/doc/html/rfc7231#section-6
      * @see http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
      */
-    public function getReasonPhrase(): string
+    public function getReasonPhrase()
     {
         return $this->reasonPhrase;
     }
@@ -89,7 +89,7 @@ class Response extends Message implements ResponseInterface
      *
      * @throws InvalidArgumentException For invalid status code arguments.
      */
-    public function withStatus(int $code, string $reasonPhrase = ''): ResponseInterface
+    public function withStatus($code, $reasonPhrase = '')
     {
         list($code, $reasonPhrase) = $this->filterCodePhrase($code, $reasonPhrase);
         $new = clone $this;
@@ -108,7 +108,7 @@ class Response extends Message implements ResponseInterface
      *
      * @throws InvalidArgumentException
      */
-    private function filterCodePhrase(int $code, string $phrase)
+    private function filterCodePhrase($code, $phrase)
     {
         $this->assertStatusCode($code);
         $code = (int) $code;
