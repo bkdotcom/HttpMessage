@@ -18,8 +18,8 @@ PSR-7 (HttpMessage) Implementation
 
 | Version | http-message | php | note |
 |--|--|--|--|
-|3.x | ^1.1 \| ^2.0 | >= 8.0 | `static` returns
-|2.x | ^1.1 \| ^2.0 | >= 7.2 | `self` returns
+|3.x | ^1.1 \| ^2.0 | >= 8.0 | `static` returns |
+|2.x | ^1.1 \| ^2.0 | >= 7.2 | &nbsp; |
 |1.x | ~1.0.1 | >= 5.4 | &nbsp; |
 
 ### Utilities

@@ -64,7 +64,7 @@ class Message implements MessageInterface
      *
      * @return static
      */
-    public function withProtocolVersion(string $version): self
+    public function withProtocolVersion(string $version): MessageInterface
     {
         $this->assertProtocolVersion($version);
         if ($version === $this->protocolVersion) {
@@ -156,7 +156,7 @@ class Message implements MessageInterface
      * @return static
      * @throws InvalidArgumentException for invalid header names or values.
      */
-    public function withHeader(string $name, $value): self
+    public function withHeader(string $name, $value): MessageInterface
     {
         $this->assertHeaderName($name);
         $name = $this->normalizeHeaderName($name);
@@ -191,7 +191,7 @@ class Message implements MessageInterface
      * @throws InvalidArgumentException for invalid header names.
      * @throws InvalidArgumentException for invalid header values.
      */
-    public function withAddedHeader(string $name, $value): self
+    public function withAddedHeader(string $name, $value): MessageInterface
     {
         // assert before using as array key (which will typecast)
         $this->assertHeaderName($name);
@@ -209,7 +209,7 @@ class Message implements MessageInterface
      *
      * @return static
      */
-    public function withoutHeader(string $name): self
+    public function withoutHeader(string $name): MessageInterface
     {
         $nameLower = \strtolower($name);
         if (!isset($this->headerNames[$nameLower])) {
@@ -241,7 +241,7 @@ class Message implements MessageInterface
      * @return static
      * @throws \InvalidArgumentException
      */
-    public function withBody(StreamInterface $body): self
+    public function withBody(StreamInterface $body): MessageInterface
     {
         if ($body === $this->body) {
             return $this;

@@ -108,7 +108,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withCookieParams(array $cookies): self
+    public function withCookieParams(array $cookies): ServerRequestInterface
     {
         $this->assertCookieParams($cookies);
         $new = clone $this;
@@ -133,7 +133,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withQueryParams(array $query): self
+    public function withQueryParams(array $query): ServerRequestInterface
     {
         $this->assertQueryParams($query);
         $new = clone $this;
@@ -162,7 +162,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @return static
      * @throws InvalidArgumentException if an invalid structure is provided.
      */
-    public function withUploadedFiles(array $uploadedFiles): self
+    public function withUploadedFiles(array $uploadedFiles): ServerRequestInterface
     {
         $this->assertUploadedFiles($uploadedFiles);
         $new = clone $this;
@@ -188,7 +188,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withParsedBody($data): self
+    public function withParsedBody($data): ServerRequestInterface
     {
         $this->assertParsedBody($data);
         $new = clone $this;
@@ -236,7 +236,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withAttribute(string $name, $value): self
+    public function withAttribute(string $name, $value): ServerRequestInterface
     {
         $this->assertAttributeName($name);
         $new = clone $this;
@@ -251,7 +251,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withoutAttribute(string $name): self
+    public function withoutAttribute(string $name): ServerRequestInterface
     {
         if ($this->assertAttributeName($name, false) === false) {
             return $this;
