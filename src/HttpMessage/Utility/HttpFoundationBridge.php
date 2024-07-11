@@ -16,7 +16,7 @@ use bdk\HttpMessage\Response as ResponseImplementation;
 use bdk\HttpMessage\ServerRequest;
 use bdk\HttpMessage\Stream;
 use bdk\HttpMessage\UploadedFile;
-use bdk\HttpMessage\Uri;
+use bdk\HttpMessage\Uri as UriImplementation;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile as HttpFoundationUploadedFile;
 use Symfony\Component\HttpFoundation\Request as HttpFoundationRequest;
@@ -47,7 +47,7 @@ class HttpFoundationBridge
             . $request->getBaseUrl()
             . $request->getPathInfo()
             . ($query !== '' ? '?' . $query : '');
-        $uri = new Uri($uri);
+        $uri = new UriImplementation($uri);
 
         $bodyContentResource = $request->getContent(true);
         $stream = new Stream($bodyContentResource);
