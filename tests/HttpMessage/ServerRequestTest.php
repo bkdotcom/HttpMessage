@@ -6,11 +6,8 @@ use bdk\HttpMessage\Message;
 use bdk\HttpMessage\Request;
 use bdk\HttpMessage\ServerRequest;
 use bdk\HttpMessage\Utility\ParseStr;
-use Exception;
-use PHPUnit\Framework\AssertionFailedError;
 use ReflectionObject;
 use RuntimeException;
-use TypeError;
 
 /**
  * @covers \bdk\HttpMessage\AssertionTrait
@@ -308,17 +305,10 @@ class ServerRequestTest extends TestCase
      */
     public function testWithAttributeRejectsInvalidValues($name, $value)
     {
-        try {
+        self::assertExceptionOrTypeError(function () use ($name, $value) {
             $this->createServerRequest()
                 ->withAttribute($name, $value);
-        } catch (Exception $e) {
-            self::assertSame(\get_class($e), 'InvalidArgumentException');
-            return;
-        } catch (TypeError $e) {
-            self::assertSame(\get_class($e), 'TypeError');
-            return;
-        }
-        throw new AssertionFailedError('Exception not thrown');
+        });
     }
 
     /*

@@ -3,10 +3,7 @@
 namespace bdk\Test\HttpMessage;
 
 use bdk\HttpMessage\Message;
-use Exception;
-use PHPUnit\Framework\AssertionFailedError;
 use ReflectionObject;
-use TypeError;
 
 /**
  * @covers \bdk\HttpMessage\AssertionTrait
@@ -175,18 +172,11 @@ class MessageTest extends TestCase
      */
     public function testWithInvalidProtocolVersionThrowsException($version)
     {
-        try {
+        self::assertExceptionOrTypeError(function () use ($version) {
             $this->createMessage()
                 ->withProtocolVersion($version)
                 ->getProtocolVersion();
-        } catch (Exception $e) {
-            self::assertSame(\get_class($e), 'InvalidArgumentException');
-            return;
-        } catch (TypeError $e) {
-            self::assertSame(\get_class($e), 'TypeError');
-            return;
-        }
-        throw new AssertionFailedError('Exception not thrown');
+        });
     }
 
     /**
@@ -245,18 +235,11 @@ class MessageTest extends TestCase
      */
     public function testInvalidHeaderNameThrowsException($name)
     {
-        try {
+        self::assertExceptionOrTypeError(function () use ($name) {
             $value = \base64_encode($this->randomBytes(12));
             $this->createMessage()
                 ->withHeader($name, $value);
-        } catch (Exception $e) {
-            self::assertSame(\get_class($e), 'InvalidArgumentException');
-            return;
-        } catch (TypeError $e) {
-            self::assertSame(\get_class($e), 'TypeError');
-            return;
-        }
-        throw new AssertionFailedError('Exception not thrown');
+        });
     }
 
     /**
@@ -266,18 +249,11 @@ class MessageTest extends TestCase
      */
     public function testInvalidAddedHeaderNameThrowException($name)
     {
-        try {
+        self::assertExceptionOrTypeError(function () use ($name) {
             $value = \base64_encode($this->randomBytes(12));
             $this->createMessage()
                 ->withAddedHeader($name, $value);
-        } catch (Exception $e) {
-            self::assertSame(\get_class($e), 'InvalidArgumentException');
-            return;
-        } catch (TypeError $e) {
-            self::assertSame(\get_class($e), 'TypeError');
-            return;
-        }
-        throw new AssertionFailedError('Exception not thrown');
+        });
     }
 
     /**
