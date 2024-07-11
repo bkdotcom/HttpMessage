@@ -12,7 +12,7 @@
 
 namespace bdk\HttpMessage\Utility;
 
-use bdk\HttpMessage\Response;
+use bdk\HttpMessage\Response as ResponseImplementation;
 use bdk\HttpMessage\ServerRequest;
 use bdk\HttpMessage\Stream;
 use bdk\HttpMessage\UploadedFile;
@@ -73,7 +73,7 @@ class HttpFoundationBridge
      *
      * @param HttpFoundationResponse $response HttpFoundationResponse instance
      *
-     * @return Response
+     * @return ResponseImplementation
      */
     public static function createResponse(HttpFoundationResponse $response)
     {
@@ -81,7 +81,7 @@ class HttpFoundationBridge
         $protocolVersion = $response->getProtocolVersion();
         $stream = self::createResponseStream($response);
 
-        $psr7response = new Response($statusCode);
+        $psr7response = new ResponseImplementation($statusCode);
         $psr7response = $psr7response
             ->withProtocolVersion($protocolVersion)
             ->withBody($stream);
