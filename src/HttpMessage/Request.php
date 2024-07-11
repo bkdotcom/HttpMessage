@@ -15,6 +15,7 @@ namespace bdk\HttpMessage;
 use bdk\HttpMessage\Message;
 use bdk\HttpMessage\Uri;
 use InvalidArgumentException;
+use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
 
@@ -234,7 +235,7 @@ class Request extends Message implements RequestInterface
      * {@inheritDoc}
      */
     #[\Override]
-    public function withoutHeader(string $name): RequestInterface
+    public function withoutHeader(string $name): MessageInterface
     {
         $new = parent::withoutHeader($name);
         return \strtolower($name) === 'host'
