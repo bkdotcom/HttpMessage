@@ -27,7 +27,7 @@ class TestCase extends TestCaseBase
 
     protected static $errorHandler;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$errorHandler = \set_error_handler(static function ($type, $msg) {
             if ($type & E_USER_DEPRECATED) {
@@ -37,7 +37,7 @@ class TestCase extends TestCaseBase
         });
     }
 
-    public static function tearDownAfter()
+    public static function tearDownAfter(): void
     {
         \set_error_handler(self::$errorHandler);
     }
