@@ -89,7 +89,7 @@ class Response extends Message implements ResponseInterface
      *
      * @throws InvalidArgumentException For invalid status code arguments.
      */
-    public function withStatus(int $code, string $reasonPhrase = ''): static
+    public function withStatus(int $code, string $reasonPhrase = ''): self
     {
         list($code, $reasonPhrase) = $this->filterCodePhrase($code, $reasonPhrase);
         $new = clone $this;

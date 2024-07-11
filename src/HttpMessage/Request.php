@@ -110,7 +110,7 @@ class Request extends Message implements RequestInterface
      * @return static
      * @throws InvalidArgumentException
      */
-    public function withRequestTarget(string $requestTarget): static
+    public function withRequestTarget(string $requestTarget): self
     {
         if (\is_string($requestTarget) === false) {
             throw new InvalidArgumentException(
@@ -161,7 +161,7 @@ class Request extends Message implements RequestInterface
      *
      * @see https://datatracker.ietf.org/doc/html/rfc7231
      */
-    public function withMethod(string $method): static
+    public function withMethod(string $method): self
     {
         $this->assertMethod($method);
         $new = clone $this;
@@ -218,7 +218,7 @@ class Request extends Message implements RequestInterface
      *
      * @throws InvalidArgumentException
      */
-    public function withUri(UriInterface $uri, bool $preserveHost = false): static
+    public function withUri(UriInterface $uri, bool $preserveHost = false): self
     {
         if ($uri === $this->uri) {
             return $this;
@@ -234,7 +234,7 @@ class Request extends Message implements RequestInterface
      * {@inheritDoc}
      */
     #[\Override]
-    public function withoutHeader(string $name): static
+    public function withoutHeader(string $name): self
     {
         $new = parent::withoutHeader($name);
         return \strtolower($name) === 'host'
@@ -249,7 +249,7 @@ class Request extends Message implements RequestInterface
      *
      * @return static
      */
-    private function updateHostHeader(): static
+    private function updateHostHeader(): self
     {
         $uri = $this->getUri();
         $host = $uri->getHost();

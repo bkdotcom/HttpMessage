@@ -276,7 +276,7 @@ class Uri extends AbstractUri implements UriInterface
      * @throws InvalidArgumentException for invalid schemes.
      * @throws InvalidArgumentException for unsupported schemes.
      */
-    public function withScheme(string $scheme): static
+    public function withScheme(string $scheme): self
     {
         $this->assertScheme($scheme);
         $scheme = self::lowercase($scheme);
@@ -301,7 +301,7 @@ class Uri extends AbstractUri implements UriInterface
      *
      * @return static A new instance with the specified user information.
      */
-    public function withUserInfo(string $user, ?string $password = null): static
+    public function withUserInfo(string $user, ?string $password = null): self
     {
         $this->assertString($user, 'user');
         $info = $user;
@@ -328,7 +328,7 @@ class Uri extends AbstractUri implements UriInterface
      *
      * @throws InvalidArgumentException for invalid hostnames.
      */
-    public function withHost(string $host): static
+    public function withHost(string $host): self
     {
         $this->assertHost($host);
         $host = self::lowercase($host);
@@ -351,7 +351,7 @@ class Uri extends AbstractUri implements UriInterface
      * @return static A new instance with the specified port.
      * @throws InvalidArgumentException for invalid ports.
      */
-    public function withPort(?int $port): static
+    public function withPort(?int $port): self
     {
         $port = $this->filterPort($port);
         if ($port === $this->port) {
@@ -383,7 +383,7 @@ class Uri extends AbstractUri implements UriInterface
      *
      * @throws InvalidArgumentException for invalid paths.
      */
-    public function withPath(string $path): static
+    public function withPath(string $path): self
     {
         $path = $this->filterPath($path);
         if ($path === $this->path) {
@@ -406,7 +406,7 @@ class Uri extends AbstractUri implements UriInterface
      * @return static A new instance with the specified query string.
      * @throws InvalidArgumentException for invalid query strings.
      */
-    public function withQuery(string $query): static
+    public function withQuery(string $query): self
     {
         $this->assertString($query, 'query');
         $query = $this->filterQueryAndFragment($query);
@@ -429,7 +429,7 @@ class Uri extends AbstractUri implements UriInterface
      *
      * @return static A new instance with the specified fragment.
      */
-    public function withFragment(string $fragment): static
+    public function withFragment(string $fragment): self
     {
         $this->assertString($fragment, 'fragment');
         $fragment = $this->filterQueryAndFragment($fragment);
