@@ -2,25 +2,10 @@
 
 namespace bdk\Test\HttpMessage;
 
-use ReflectionClass;
 use stdClass;
 
 trait DataProviderTrait
 {
-    protected static $hasParamTypes;
-
-    protected static function hasParamTypes()
-    {
-        if (PHP_VERSION_ID >= 70000 && isset(self::$hasParamTypes) === false) {
-            $refClass = new ReflectionClass('Psr\Http\Message\MessageInterface');
-            $refMethod = $refClass->getMethod('withProtocolVersion');
-            $refParams = $refMethod->getParameters();
-            $refParam = $refParams[0];
-            self::$hasParamTypes = $refParam->hasType();
-        }
-        return self::$hasParamTypes;
-    }
-
     /**
      * Generate a random string
      *
