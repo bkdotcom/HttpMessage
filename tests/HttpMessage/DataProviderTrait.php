@@ -7,7 +7,7 @@ use stdClass;
 
 trait DataProviderTrait
 {
-    protected static $hasParamTypes = null;
+    protected static $hasParamTypes;
 
     protected static function hasParamTypes()
     {
