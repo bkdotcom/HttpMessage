@@ -12,7 +12,7 @@
 
 namespace bdk\HttpMessage\Utility;
 
-use bdk\HttpMessage\Uri as PsrUri;
+use bdk\HttpMessage\Uri as UriImplementation;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -25,13 +25,13 @@ class Uri
     /**
      * Get a Uri populated with values from $_SERVER.
      *
-     * @return PsrUri
+     * @return UriImplementation
      *
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    public static function fromGlobals(): PsrUri
+    public static function fromGlobals(): UriImplementation
     {
-        $uri = new PsrUri();
+        $uri = new UriImplementation();
         $parts = \array_filter(\array_merge(
             array(
                 'scheme' => isset($_SERVER['HTTPS']) && \filter_var($_SERVER['HTTPS'], FILTER_VALIDATE_BOOLEAN)
@@ -50,7 +50,7 @@ class Uri
         );
         foreach ($parts as $name => $value) {
             $method = $methods[$name];
-            /** @var PsrUri */
+            /** @var UriImplementation */
             $uri = $uri->{$method}($value);
         }
         return $uri;

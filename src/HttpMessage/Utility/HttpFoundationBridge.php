@@ -12,11 +12,11 @@
 
 namespace bdk\HttpMessage\Utility;
 
-use bdk\HttpMessage\Response;
+use bdk\HttpMessage\Response as ResponseImplementation;
 use bdk\HttpMessage\ServerRequest;
 use bdk\HttpMessage\Stream;
 use bdk\HttpMessage\UploadedFile;
-use bdk\HttpMessage\Uri;
+use bdk\HttpMessage\Uri as UriImplementation;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile as HttpFoundationUploadedFile;
 use Symfony\Component\HttpFoundation\Request as HttpFoundationRequest;
@@ -47,7 +47,7 @@ class HttpFoundationBridge
             . $request->getBaseUrl()
             . $request->getPathInfo()
             . ($query !== '' ? '?' . $query : '');
-        $uri = new Uri($uri);
+        $uri = new UriImplementation($uri);
 
         $bodyContentResource = $request->getContent(true);
         $stream = new Stream($bodyContentResource);
@@ -73,15 +73,15 @@ class HttpFoundationBridge
      *
      * @param HttpFoundationResponse $response HttpFoundationResponse instance
      *
-     * @return Response
+     * @return ResponseImplementation
      */
-    public static function createResponse(HttpFoundationResponse $response): Response
+    public static function createResponse(HttpFoundationResponse $response): ResponseImplementation
     {
         $statusCode = $response->getStatusCode();
         $protocolVersion = $response->getProtocolVersion();
         $stream = self::createResponseStream($response);
 
-        $psr7response = new Response($statusCode);
+        $psr7response = new ResponseImplementation($statusCode);
         $psr7response = $psr7response
             ->withProtocolVersion($protocolVersion)
             ->withBody($stream);

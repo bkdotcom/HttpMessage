@@ -22,8 +22,25 @@ class TestCase extends TestCaseBase
     use DataProviderTrait;
     use FactoryTrait;
 
-    // defining this in DataProviderTrait -> fatal error on php 8.0
+    // defining this in DataProviderTrait -> fatal error on php 8.0 (but not 8.1+)
     protected static $hasParamTypes = null;
+
+    protected static $errorHandler;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$errorHandler = \set_error_handler(static function ($type, $msg) {
+            if ($type & E_USER_DEPRECATED) {
+                return true;
+            }
+            throw new RuntimeException($msg);
+        });
+    }
+
+    public static function tearDownAfter(): void
+    {
+        \set_error_handler(self::$errorHandler);
+    }
 
     protected static function hasParamTypes()
     {

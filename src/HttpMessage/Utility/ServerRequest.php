@@ -12,7 +12,7 @@
 
 namespace bdk\HttpMessage\Utility;
 
-use bdk\HttpMessage\ServerRequest as PsrServerRequest;
+use bdk\HttpMessage\ServerRequest as ServerRequestImplementation;
 use bdk\HttpMessage\Stream;
 use bdk\HttpMessage\UploadedFile;
 use bdk\HttpMessage\Uri as UriImplementation; // https://bugs.php.net/bug.php?id=66773
@@ -33,18 +33,18 @@ class ServerRequest
      *
      * @param array $parseStrOpts Parse options (default: {convDot:false, convSpace:false})
      *
-     * @return PsrServerRequest
+     * @return ServerRequestImplementation
      *
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    public static function fromGlobals($parseStrOpts = array()): PsrServerRequest
+    public static function fromGlobals($parseStrOpts = array()): ServerRequestImplementation
     {
         $method = isset($_SERVER['REQUEST_METHOD'])
             ? $_SERVER['REQUEST_METHOD']
             : 'GET';
         $uri = UriImplementation::fromGlobals();
         $files = self::filesFromGlobals($_FILES);
-        $serverRequest = new PsrServerRequest($method, $uri, $_SERVER);
+        $serverRequest = new ServerRequestImplementation($method, $uri, $_SERVER);
         $contentType = $serverRequest->getHeaderLine('Content-Type');
         // note: php://input not available with content-type = "multipart/form-data".
         $parsedBody = $method !== 'GET'
