@@ -13,7 +13,7 @@
 namespace bdk\HttpMessage\Utility;
 
 use bdk\HttpMessage\Response as ResponseImplementation;
-use bdk\HttpMessage\ServerRequest;
+use bdk\HttpMessage\ServerRequest as ServerRequestImplementation;
 use bdk\HttpMessage\Stream;
 use bdk\HttpMessage\UploadedFile;
 use bdk\HttpMessage\Uri as UriImplementation;
@@ -35,7 +35,7 @@ class HttpFoundationBridge
      *
      * @param HttpFoundationRequest $request HttpFoundation\Request obj
      *
-     * @return ServerRequest
+     * @return ServerRequestImplementation
      *
      * @psalm-suppress ReservedWord complains about HttpFoundations' : mixed return spec
      */
@@ -52,7 +52,7 @@ class HttpFoundationBridge
         $bodyContentResource = $request->getContent(true);
         $stream = new Stream($bodyContentResource);
 
-        $psr7request = new ServerRequest($request->getMethod(), $uri, $request->server->all());
+        $psr7request = new ServerRequestImplementation($request->getMethod(), $uri, $request->server->all());
         $psr7request = $psr7request
             ->withBody($stream)
             ->withUploadedFiles(self::getFiles($request->files->all()))
