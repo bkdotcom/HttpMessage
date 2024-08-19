@@ -3,9 +3,6 @@ PSR-7 (HttpMessage) Implementation
 
 ## Notable features
 
-* Supported and tested on 
-  * PHP 5.4 - 8.3
-  * psr/http-message 1.0.1, 1.1, & 2.0
 * Preserves "." and space in query params (GET) and "parsedBody" (POST) keys.
 * `ServerRequest::fromGlobals()` - Populates ServerRequest's parsed body when application/x-www-form-urlencoded, application/json, or non-empty `$_POST`
 * `UploadedFile::getClientFullPath()`.  PHP 8.1 added a new file upload property (not included in PSR-7)

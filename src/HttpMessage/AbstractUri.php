@@ -26,7 +26,18 @@ abstract class AbstractUri
 {
     use AssertionTrait;
 
+    /**
+     * @var string
+     * 
+     * @internal
+     */
     const CHAR_SUB_DELIMS = '!\$&\'\(\)\*\+,;=';
+
+    /**
+     * @var string
+     * 
+     * @internal
+     */
     const CHAR_UNRESERVED = 'a-zA-Z0-9_\-\.~';
 
     /** @var array<string,int> */

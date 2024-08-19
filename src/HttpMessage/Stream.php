@@ -18,21 +18,31 @@ use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 
 /**
- * Psr\Http\Message\Stream implementation
- *
+ * Describes a data stream.
+ * 
  * @psalm-api
  */
 class Stream extends AbstractStream implements StreamInterface
 {
     /**
-     * Resource modes.
-     *
-     * @var string
+     * @var string Readable modes regex
      *
      * @see http://php.net/manual/function.fopen.php
      * @see http://php.net/manual/en/function.gzopen.php
+     * 
+     * @internal
      */
     const READABLE_MODES = '/r|a\+|ab\+|w\+|wb\+|x\+|xb\+|c\+|cb\+/';
+
+
+    /**
+     * @var string Writable modes regex
+     *
+     * @see http://php.net/manual/function.fopen.php
+     * @see http://php.net/manual/en/function.gzopen.php
+     * 
+     * @internal
+     */
     const WRITABLE_MODES = '/a|w|r\+|rb\+|rw|x|c/';
 
     /** @var int|null */

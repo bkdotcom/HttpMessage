@@ -21,7 +21,7 @@ use bdk\HttpMessage\Utility\ParseStr;
 use InvalidArgumentException;
 
 /**
- * Build ServerRequest from globals ($_SERVER, $_COOKIE, $_POST, $_FILES)
+ * Build ServerRequest from globals (`$_SERVER`, `$_COOKIE`, `$_POST`, `$_FILES`)
  */
 class ServerRequest
 {
@@ -29,7 +29,7 @@ class ServerRequest
     public static $inputStream = 'php://input';
 
     /**
-     * Instantiate self from superglobals
+     * Instantiate ServerRequest instance from superglobals
      *
      * @param array $parseStrOpts Parse options (default: {convDot:false, convSpace:false})
      *

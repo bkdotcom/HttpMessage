@@ -23,7 +23,7 @@ use Psr\Http\Message\UriInterface;
 class Uri
 {
     /**
-     * Get a Uri populated with values from $_SERVER.
+     * Get a Uri populated with values from `$_SERVER`.
      *
      * @return UriImplementation
      *
@@ -60,7 +60,7 @@ class Uri
      * Determines if two Uri's should be considered cross-origin
      *
      * @param UriInterface $uri1 Uri 1
-     * @param UriInterface $uri2 Uri2
+     * @param UriInterface $uri2 Uri 2
      *
      * @return bool
      */
@@ -292,6 +292,8 @@ class Uri
     }
 
     /**
+     * `parse_url`, but for UriInterface
+     * 
      * @param UriInterface $url Uri instance
      *
      * @return array<string,int|string>
@@ -316,7 +318,7 @@ class Uri
     }
 
     /**
-     * Get host and port from $_SERVER vals
+     * Get host and port from `$_SERVER` vals
      *
      * @return array{host:string|null,port:int|null} host & port
      *
@@ -364,7 +366,7 @@ class Uri
     }
 
     /**
-     * Get request uri and query from $_SERVER
+     * Get request uri and query from `$_SERVER`
      *
      * @return array{path:string,query:string} path & query
      *

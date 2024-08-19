@@ -20,6 +20,20 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * Http Response
  *
+ * Representation of an outgoing, server-side response.
+ *
+ * Per the HTTP specification, this class includes properties for
+ * each of the following:
+ *
+ * - Protocol version
+ * - Status code and reason phrase
+ * - Headers
+ * - Message body
+ *
+ * Responses are considered immutable; all methods that might change state are
+ * implemented such that they retain the internal state of the current
+ * message and return an instance that contains the changed state.
+ * 
  * @psalm-consistent-constructor
  */
 class Response extends Message implements ResponseInterface

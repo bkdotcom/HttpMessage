@@ -20,6 +20,17 @@ use Psr\Http\Message\StreamInterface;
 
 /**
  * Http Message
+ * 
+ * HTTP messages consist of requests from a client to a server and responses
+ * from a server to a client. This interface defines the methods common to
+ * each.
+ *
+ * Messages are considered immutable; all methods that might change state are
+ * implemented such that they retain the internal state of the current
+ * message and return an instance that contains the changed state.
+ *
+ * @link http://www.ietf.org/rfc/rfc7230.txt
+ * @link http://www.ietf.org/rfc/rfc7231.txt
  *
  * @psalm-consistent-constructor
  */
@@ -129,8 +140,8 @@ class Message implements MessageInterface
      * case-insensitive header name as a string concatenated together using
      * a comma.
      *
-     * NOTE: Not all header values may be appropriately represented using
-     * comma concatenation. For such headers, use getHeader() instead
+     * *NOTE*: Not all header values may be appropriately represented using
+     * comma concatenation. For such headers, use `getHeader()` instead
      * and supply your own delimiter when concatenating.
      *
      * If the header does not appear in the message, this method will return
@@ -154,7 +165,7 @@ class Message implements MessageInterface
      * @param string|string[] $value Header value(s).
      *
      * @return static
-     * @throws InvalidArgumentException for invalid header names or values.
+     * @throws InvalidArgumentException for invalid header name or value
      */
     public function withHeader(string $name, $value): MessageInterface
     {
@@ -188,8 +199,7 @@ class Message implements MessageInterface
      * @param string|string[] $value Header value(s).
      *
      * @return static
-     * @throws InvalidArgumentException for invalid header names.
-     * @throws InvalidArgumentException for invalid header values.
+     * @throws InvalidArgumentException for invalid header name or value
      */
     public function withAddedHeader(string $name, $value): MessageInterface
     {
@@ -239,7 +249,6 @@ class Message implements MessageInterface
      * @param StreamInterface $body Body
      *
      * @return static
-     * @throws \InvalidArgumentException
      */
     public function withBody(StreamInterface $body): MessageInterface
     {

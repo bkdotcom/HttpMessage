@@ -134,11 +134,11 @@ class Response
     }
 
     /**
-     * Get the "phrase" associated with the status code
+     * Get the standard "phrase" associated with the status code
      *
      * @param int|string $code 3-digit status code
      *
-     * @return string (empty string if unknown code)
+     * @return string empty string if unknown code
      */
     public static function codePhrase($code): string
     {

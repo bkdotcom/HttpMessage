@@ -28,8 +28,9 @@ class ParseStr
     );
 
     /**
-     * like PHP's parse_str()
-     *   key difference: by default this does not convert root key dots and spaces to '_'
+     * like PHP's `parse_str()`
+     * 
+     * Key difference: by default this does not convert root key dots and spaces to '_'
      *
      * @param string|null $str  input string
      * @param array       $opts parse options (default: {convDot:false, convSpace:false})
@@ -58,8 +59,10 @@ class ParseStr
     /**
      * Set default parseStr option(s)
      *
-     *    parseStrOpts('convDot', true)
-     *    parseStrOpts(array('convDot'=>true, 'convSpace'=>true))
+     * 
+     *     parseStrOpts('convDot', true)
+     *     parseStrOpts(array('convDot' => true, 'convSpace' => true))
+     * 
      *
      * @param array|string $mixed key=>value array or key
      * @param mixed        $val   new value

@@ -476,6 +476,8 @@ trait AssertionTrait
      *
      * @return void
      * @throws InvalidArgumentException
+     * 
+     * @psalm-assert string $scheme
      */
     protected function assertScheme($scheme)
     {
