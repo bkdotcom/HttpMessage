@@ -7,12 +7,12 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage\Utility;
 
-use bdk\HttpMessage\Uri as UriImplementation;
+use bdk\HttpMessage\Uri as BdkUri;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -25,13 +25,13 @@ class Uri
     /**
      * Get a Uri populated with values from `$_SERVER`.
      *
-     * @return UriImplementation
+     * @return BdkUri
      *
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    public static function fromGlobals(): UriImplementation
+    public static function fromGlobals(): BdkUri
     {
-        $uri = new UriImplementation();
+        $uri = new BdkUri();
         $parts = \array_filter(\array_merge(
             array(
                 'scheme' => isset($_SERVER['HTTPS']) && \filter_var($_SERVER['HTTPS'], FILTER_VALIDATE_BOOLEAN)
@@ -50,7 +50,7 @@ class Uri
         );
         foreach ($parts as $name => $value) {
             $method = $methods[$name];
-            /** @var UriImplementation */
+            /** @var BdkUri */
             $uri = $uri->{$method}($value);
         }
         return $uri;
@@ -293,7 +293,7 @@ class Uri
 
     /**
      * `parse_url`, but for UriInterface
-     * 
+     *
      * @param UriInterface $url Uri instance
      *
      * @return array<string,int|string>

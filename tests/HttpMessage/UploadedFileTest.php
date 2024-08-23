@@ -326,7 +326,7 @@ class UploadedFileTest extends TestCase
     /**
      * @param $status
      *
-     * @dataProvider invalidFileUploadErrorStatuses
+     * @dataProvider fileUploadErrorStatusesInvalid
      */
     public function testSettingInvalidErrorRaisesException($error)
     {
@@ -366,7 +366,7 @@ class UploadedFileTest extends TestCase
     /**
      * @param $size
      *
-     * @dataProvider invalidFileSizes
+     * @dataProvider fileSizesInvalid
      */
     public function testSettingInvalidFileSizeThrowException($size)
     {
@@ -378,7 +378,7 @@ class UploadedFileTest extends TestCase
     /**
      * @param $fileName
      *
-     * @dataProvider invalidFileNames
+     * @dataProvider fileNamesInvalid
      */
     public function testInvalidClientFileNamesThrowException($fileName)
     {
@@ -390,7 +390,7 @@ class UploadedFileTest extends TestCase
     /**
      * @param $mediaType
      *
-     * @dataProvider validMediaTypes
+     * @dataProvider fileMediaTypesValid
      */
     public function testValidMediaTypesAreAccepted($mediaType)
     {
@@ -402,7 +402,7 @@ class UploadedFileTest extends TestCase
     /**
      * @param $mediaType
      *
-     * @dataProvider invalidMediaTypes
+     * @dataProvider fileMediaTypesInvalid
      */
     public function testInvalidClientMediaTypeRaiseAnException($mediaType)
     {
@@ -428,7 +428,7 @@ class UploadedFileTest extends TestCase
     /**
      * @param $path
      *
-     * @dataProvider invalidTargetPaths
+     * @dataProvider targetPathsInvalid
      */
     public function testMovingToInvalidPathThrowsException($path)
     {

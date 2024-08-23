@@ -7,7 +7,7 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage\Utility;
@@ -16,6 +16,29 @@ use InvalidArgumentException;
 
 /**
  * PHP's `parse_str()`, but does not convert dots and spaces to '_' by default
+ *
+ * PHP's maintains a side-effect of the long-removed register_globals directive that affects `$_POST` and `$_GET`
+ * Spaces and '.'s are converted to '_' for top level keys.
+ *
+ *     $input = 'foo_bar=baz+1&foo+bar=baz+2&foo%2Bbar=baz+3&foo.bar=baz+4';
+ *     parse_str($input, $vals);
+ *     var_dump($vals);
+ *
+ *     $vals = \bdk\HttpMessage\Utility\ParseStr::parse($input);
+ *     var_dump($vals);
+ *
+ * **Output:**
+ *
+ *     array(
+ *        'foo_bar' => 'baz 4',
+ *        'foo+bar' => 'baz 3',
+ *     )
+ *     array(
+ *        'foo_bar' => 'baz 1',
+ *        'foo bar' => 'baz 2',
+ *        'foo+bar' => 'baz 3',
+ *        'foo.bar' => 'baz 4',
+ *     )
  *
  * @psalm-api
  */
@@ -29,7 +52,7 @@ class ParseStr
 
     /**
      * like PHP's `parse_str()`
-     * 
+     *
      * Key difference: by default this does not convert root key dots and spaces to '_'
      *
      * @param string|null $str  input string
@@ -59,10 +82,8 @@ class ParseStr
     /**
      * Set default parseStr option(s)
      *
-     * 
      *     parseStrOpts('convDot', true)
      *     parseStrOpts(array('convDot' => true, 'convSpace' => true))
-     * 
      *
      * @param array|string $mixed key=>value array or key
      * @param mixed        $val   new value

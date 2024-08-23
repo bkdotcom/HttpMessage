@@ -41,7 +41,7 @@
     },
     "scripts": {
         "cs" : [
-            "vendor/bin/phpcs -p --colors ./src"
+            "vendor/bin/phpcs -p -s --colors ./src"
         ],
         "test" : [
             "vendor/bin/phpunit -v"

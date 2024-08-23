@@ -7,12 +7,13 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage;
 
 use bdk\HttpMessage\Request;
+use bdk\HttpMessage\Utility\ContentType;
 use bdk\HttpMessage\Utility\ParseStr;
 use bdk\HttpMessage\Utility\ServerRequest as ServerRequestUtil;
 use InvalidArgumentException;
@@ -73,11 +74,14 @@ class ServerRequest extends Request implements ServerRequestInterface
     /** @var array $_GET */
     private $get = array();
 
-    /** @var null|array|object $_POST */
-    private $post = null;
+    /** @var null|array|object typically $_POST */
+    private $parsedBody = null;
 
     /** @var array $_SERVER */
     private $server = array();
+
+    /** @var array<string,callable> */
+    protected array $bodyParsers = array();
 
     /**
      * Constructor
@@ -90,18 +94,29 @@ class ServerRequest extends Request implements ServerRequestInterface
     public function __construct($method = 'GET', $uri = '', array $serverParams = array())
     {
         parent::__construct($method, $uri);
-        $headers = $this->getHeadersViaServer($serverParams);
-        $query = $this->getUri()->getQuery();
-        $this->get = $query !== ''
-            ? ParseStr::parse($query)
-            : array();
+
         $this->server = \array_merge(array(
             'REQUEST_METHOD' => $method,
         ), $serverParams);
+
         $this->protocolVersion = isset($serverParams['SERVER_PROTOCOL'])
             ? \str_replace('HTTP/', '', (string) $serverParams['SERVER_PROTOCOL'])
             : '1.1';
+
+        $headers = $this->getHeadersViaServer($serverParams);
         $this->setHeaders($headers);
+
+        $this->registerMediaTypeParser(ContentType::FORM, static function ($input) {
+            return ParseStr::parse($input);
+        });
+        $this->registerMediaTypeParser(ContentType::JSON, static function ($input) {
+            $parsed = \json_decode($input, true);
+            return \is_array($parsed)
+                ? $parsed
+                : null;
+        });
+        $this->registerMediaTypeParser(ContentType::XML_APP, array(__CLASS__, 'parseXml'));
+        $this->registerMediaTypeParser(ContentType::XML, array(__CLASS__, 'parseXml'));
     }
 
     /**
@@ -110,7 +125,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @param array $parseStrOpts Parse options (default: {convDot:false, convSpace:false})
      *
      * @return self
-     * 
+     *
      * @deprecated Use `\bdk\HttpMessage\Utility\ServerRequest::fromGlobals` instead
      */
     public static function fromGlobals($parseStrOpts = array())
@@ -160,13 +175,19 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getQueryParams(): array
     {
-        return $this->get;
+        if ($this->get !== array()) {
+            return $this->get;
+        }
+        $query = $this->getUri()->getQuery();
+        return $query !== ''
+            ? ParseStr::parse($query)
+            : array();
     }
 
     /**
      * Return an instance with the specified query string arguments.
      *
-     * @param array $query $_GET params
+     * @param array $query Array of query string arguments, typically from $_GET.
      *
      * @return static
      */
@@ -214,7 +235,42 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getParsedBody()
     {
-        return $this->post;
+        if ($this->parsedBody !== null) {
+            return $this->parsedBody;
+        }
+
+        $contentType = $this->getHeaderLine('Content-Type');
+        $parser = $this->getBodyParser($contentType);
+        if ($parser === null) {
+            return $this->parsedBody;
+        }
+
+        $body = (string) $this->getBody();
+        $parsed = $parser($body);
+
+        $this->assertParsedBody($parsed);
+
+        $this->parsedBody = $parsed;
+
+        return $parsed;
+    }
+
+    /**
+     * Register media type parser.
+     *
+     * Define a custom body parser for a specific media type.
+     *
+     * Note: This method is not part of the PSR-7 standard.
+     *
+     * @param string   $contentType A HTTP media type (excluding content-type params).
+     * @param callable $callable    A callable that returns parsed contents for media type.
+     *
+     * @return static
+     */
+    public function registerMediaTypeParser($contentType, callable $callable): ServerRequestInterface
+    {
+        $this->bodyParsers[$contentType] = $callable;
+        return $this;
     }
 
     /**
@@ -229,7 +285,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     {
         $this->assertParsedBody($data);
         $new = clone $this;
-        $new->post = $data;
+        $new->parsedBody = $data;
         return $new;
     }
 
@@ -291,6 +347,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     public function withoutAttribute(string $name): ServerRequestInterface
     {
         if ($this->assertAttributeName($name, false) === false) {
+            // for versions with string type hint (2.x & 3.x), this will never be reached
             return $this;
         }
         if (\array_key_exists($name, $this->attributes) === false) {
@@ -299,6 +356,31 @@ class ServerRequest extends Request implements ServerRequestInterface
         $new = clone $this;
         unset($new->attributes[$name]);
         return $new;
+    }
+
+    /**
+     * Get parser for specified Content-Type
+     *
+     * @param string $contentType Content-Type header value
+     *
+     * @return callable|null
+     */
+    private function getBodyParser($contentType)
+    {
+        $contentType = \preg_replace('/\s*[;,].*$/', '', $contentType);
+        $contentType = \strtolower($contentType);
+        if (isset($this->bodyParsers[$contentType])) {
+            return $this->bodyParsers[$contentType];
+        }
+        // If not, look for a media type with a structured syntax suffix (RFC 6839)
+        $parts = \explode('+', $contentType);
+        if (\count($parts) >= 2) {
+            $contentType = 'application/' . $parts[\count($parts) - 1];
+        }
+        if (isset($this->bodyParsers[$contentType])) {
+            return $this->bodyParsers[$contentType];
+        }
+        return null;
     }
 
     /**
@@ -360,5 +442,45 @@ class ServerRequest extends Request implements ServerRequestInterface
             return (string) $serverParams['PHP_AUTH_DIGEST'];
         }
         return '';
+    }
+
+    /**
+     * Parse XML
+     *
+     * @param string $input XML string
+     *
+     * @return \SimpleXMLElement|null
+     */
+    private static function parseXml($input)
+    {
+        $backupEntityLoader = self::disableXmlEntityLoader(true);
+        $backupErrors = \libxml_use_internal_errors(true);
+
+        $result = \simplexml_load_string($input);
+
+        self::disableXmlEntityLoader($backupEntityLoader);
+        \libxml_clear_errors();
+        \libxml_use_internal_errors($backupErrors);
+
+        return $result !== false
+            ? $result
+            : null;
+    }
+
+    /**
+     * Disable/enable the ability to load external entities
+     *
+     * Wrapper for `libxml_disable_entity_loader` (which is deprecated in PHP 8)
+     *
+     * @param bool $disable Disable (`true`) or enable (`false`) libxml extensions
+     *     (such as DOM, XMLWriter and XMLReader) to load external entities.
+     *
+     * @return bool previous value
+     */
+    private static function disableXmlEntityLoader(bool $disable): bool
+    {
+        return PHP_VERSION_ID < 80000
+            ? \libxml_disable_entity_loader($disable)
+            : true;
     }
 }

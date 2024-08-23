@@ -7,7 +7,7 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage;
@@ -20,7 +20,7 @@ use Psr\Http\Message\StreamInterface;
 
 /**
  * Http Message
- * 
+ *
  * HTTP messages consist of requests from a client to a server and responses
  * from a server to a client. This interface defines the methods common to
  * each.
@@ -237,7 +237,7 @@ class Message implements MessageInterface
      */
     public function getBody(): StreamInterface
     {
-        if (!$this->body) {
+        if ($this->body === null) {
             $this->body = new Stream();
         }
         return $this->body;

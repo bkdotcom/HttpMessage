@@ -299,7 +299,7 @@ class StreamTest extends TestCase
     /**
      * @param string $mode
      *
-     * @dataProvider nonReadableModes
+     * @dataProvider modesNonReadable
      */
     public function testIsReadableReturnsFalseIfStreamIsNotReadable($mode)
     {
@@ -313,7 +313,7 @@ class StreamTest extends TestCase
     /**
      * @param string $mode
      *
-     * @dataProvider nonWritableModes
+     * @dataProvider modesNonWritable
      */
     public function testIsWritableReturnsFalseIfStreamIsNotWritable($mode)
     {
@@ -326,7 +326,7 @@ class StreamTest extends TestCase
     /**
      * @param mixed $handle
      *
-     * @dataProvider invalidResources
+     * @dataProvider resourcesInvalid
      */
     public function testPassingInvalidStreamResourceToConstructorThrowsException($handle)
     {
@@ -337,7 +337,7 @@ class StreamTest extends TestCase
     /**
      * @param string $mode
      *
-     * @dataProvider nonWritableModes
+     * @dataProvider modesNonWritable
      */
     public function testWriteRaisesExceptionWhenStreamIsNotWritable($mode)
     {
@@ -350,7 +350,7 @@ class StreamTest extends TestCase
     /**
      * @param string $mode
      *
-     * @dataProvider nonReadableModes
+     * @dataProvider modesNonReadable
      */
     public function testGetContentsRaisesExceptionIfStreamIsNotReadable($mode)
     {

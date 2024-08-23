@@ -7,13 +7,15 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage;
 
 use InvalidArgumentException;
 use Psr\Http\Message\UploadedFileInterface;
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
 
 /**
  * Assertions for Message, Request, ServerRequest, & Response
@@ -249,6 +251,7 @@ trait AssertionTrait
         try {
             $this->assertString($name, 'Attribute name', true);
         } catch (InvalidArgumentException $e) {
+            // for versions with string type hint (2.x & 3.x), this will never be reached
             if ($throw) {
                 throw $e;
             }
@@ -291,6 +294,9 @@ trait AssertionTrait
     /**
      * Assert valid query parameters
      *
+     * typically $_GET and parse_str will only return arrays of strings.
+     *  We'll allow numeric, bool, and null values
+     *
      * @param array $get Query parameters
      *
      * @return void
@@ -298,9 +304,22 @@ trait AssertionTrait
      */
     protected function assertQueryParams($get)
     {
-        \array_walk_recursive($get, function ($value) {
-            $this->assertString($value, 'Query param value');
-        });
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveArrayIterator($get),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+        foreach ($iterator as $value) {
+            // treat object as an invalid leaf
+            $hasChildren = $iterator->hasChildren() && \is_object($value) === false;
+            if ($hasChildren || $value === null || \is_scalar($value)) {
+                continue;
+            }
+            throw new InvalidArgumentException(\sprintf(
+                'Query params must only contain scalar values, %s contains %s.',
+                $this->iteratorPath($iterator),
+                $this->getDebugType($value)
+            ));
+        }
     }
 
     /**
@@ -412,104 +431,25 @@ trait AssertionTrait
     }
 
     /*
-        Uri assertions
+        Helper methods
     */
 
     /**
-     * Throw exception if invalid host string.
+     * Get the path to the current position of an iterator
      *
-     * @param string $host The host string to of a URI.
+     * @param RecursiveIteratorIterator $iterator Iterator instance
      *
-     * @return void
-     *
-     * @throws InvalidArgumentException
+     * @return string Path to current position as a string
      */
-    protected function assertHost($host)
+    private function iteratorPath(RecursiveIteratorIterator $iterator)
     {
-        $this->assertString($host, 'host');
-        if (\in_array($host, array('', 'localhost'), true)) {
-            // An empty host value is equivalent to removing the host.
-            // No validation required
-            return;
+        $path = array();
+        for ($i = 0, $depth = $iterator->getDepth(); $i <= $depth; $i++) {
+            $key = $iterator->getSubIterator($i)->key();
+            $path[] = $i > 0
+                ? '["' . \addslashes($key) . '"]'
+                : $key;
         }
-        if ($this->isFqdn($host)) {
-            return;
-        }
-        if (\filter_var($host, FILTER_VALIDATE_IP)) {
-            // only if php < 7.0
-            return;
-        }
-        throw new InvalidArgumentException(\sprintf(
-            '"%s" is not a valid host',
-            $host
-        ));
-    }
-
-    /**
-     * Throw exception if invalid port value
-     *
-     * @param mixed $port port value
-     *
-     * @return void
-     *
-     * @throws InvalidArgumentException
-     *
-     * @psalm-assert int $port
-     */
-    protected function assertPort($port)
-    {
-        if (\is_int($port) === false) {
-            throw new InvalidArgumentException(\sprintf(
-                'Port must be a int, %s provided.',
-                $this->getDebugType($port)
-            ));
-        }
-        if ($port < 1 || $port > 0xffff) {
-            throw new InvalidArgumentException(\sprintf('Invalid port: %d. Must be between 0 and 65535', $port));
-        }
-    }
-
-    /**
-     * Assert valid scheme
-     *
-     * @param string $scheme Scheme to validate
-     *
-     * @return void
-     * @throws InvalidArgumentException
-     * 
-     * @psalm-assert string $scheme
-     */
-    protected function assertScheme($scheme)
-    {
-        $this->assertString($scheme, 'scheme');
-        if ($scheme === '') {
-            return;
-        }
-        if (\preg_match('/^[a-z][-a-z0-9.+]*$/i', $scheme) !== 1) {
-            throw new InvalidArgumentException(\sprintf(
-                'Invalid scheme: "%s"',
-                $scheme
-            ));
-        }
-    }
-
-    /**
-     * Test if hostname is a fully-qualified domain name (FQDN)
-     *
-     * @param string $host Hostname to test
-     *
-     * @return bool
-     *
-     * @see https://www.regextester.com/103452
-     */
-    private function isFqdn($host)
-    {
-        if (PHP_VERSION_ID >= 70000) {
-            return \filter_var($host, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) !== false;
-        }
-        $regexPartialHostname = '(?!-)[a-zA-Z0-9-]{0,62}[a-zA-Z0-9]';
-        $regex1 = '/(?=^.{4,253}$)(^(' . $regexPartialHostname . '\.)+[a-zA-Z]{2,63}$)/';
-        $regex2 = '/^' . $regexPartialHostname . '$/';
-        return \preg_match($regex1, $host) === 1 || \preg_match($regex2, $host) === 1;
+        return \implode('', $path);
     }
 }

@@ -2,80 +2,188 @@
 
 namespace bdk\Test\HttpMessage;
 
+use bdk\HttpMessage\Utility\ContentType;
 use stdClass;
 
 trait DataProviderTrait
 {
-    /**
-     * Generate a random string
-     *
-     * @param int $length (70) length between 1 and 70 inclusive
-     *
-     * @return string
-     */
-    public function randomBytes($length = 70)
+    public function attributeNamesAndValuesInvalid()
     {
-        $length = \min($length, 70);
-        $length = \max($length, 1);
-        return \sha1(
-            \rand(0, 32000) . \microtime(true) .  \uniqid('', true),
-            true // binary
-        );
+        $tests = [
+            'null' => [null, 1],
+            'false' => [false, null],
+            'object' => [new stdClass(), 1],
+            'closure' => [static function () {}, 'value'],
+        ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'false',
+            ]));
+        }
+        return $tests;
     }
 
-    public function invalidProtocolVersions()
+    public function attributeNamesAndValuesValid()
     {
         return [
-            'nonNumeric' => ['a'],
-            'null' => [null],
-            'alpha 1' => ['1.a'],
-            'alpha 2' => ['1.1 enhanced'],
-            'alpha 3' => ['x1.5'],
-            [1.],
-            ['2.'],
-            'nullChar' => ["\0"],
-            'bool' => [false],
-            'object' => [new stdClass()],
+            'null' => ['name', null],
+            'int' => ['name', 42],
+            'array' => ['name', [1, 2, 3]],
+            'false' => ['name', false],
+            'true' => ['name', true],
+            'float' => ['name', 3.14],
+            'string' => ['name', 'string'],
+            'object' => ['name', new stdClass()],
+            'closure' => ['another name !', static function () {}],
+        ];
+    }
+
+    public function cookieParamsInvalid()
+    {
+        return [
+            'not array' => [new stdClass()],
+            'name empty' => [['' => 'value']],
+            'name quote' => [['"a"' => 'value']],
+            'value null' => [['a' => null]],
+            // [['a' => 1]],
+            // [['a' => 1.1]],
+            // [['value']],
+            'value bool' => [['a' => false]],
+            'value object' => [['obj' => new stdClass()]],
+            'value closure' => [['x' => static function () {}]],
+        ];
+    }
+
+    public function cookieParamsValid()
+    {
+        return [
+            [[]],
+            [['a' => '1']],
+            [['a' => 'value']],
+            [['pi' => 3.14]],
+        ];
+    }
+
+    public function fileMediaTypesValid()
+    {
+        return [
+            ['application/epub+zip'],
+            ['application/java-archive'],
+            ['application/octet-stream'],
+            ['application/octet-stream'],
+            ['application/vnd.amazon.ebook'],
+            ['application/vnd.apple.installer+xml'],
+            ['application/vnd.ms-excel'],
+            ['application/vnd.ms-fontobject'],
+            ['application/vnd.ms-powerpoint'],
+            ['application/vnd.oasis.opendocument.presentation'],
+            ['application/vnd.openxmlformats-officedocument.presentationml.presentation'],
+            ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+            ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+            ['application/vnd.visio'],
+            ['application/x-abiword'],
+            ['application/x-rar-compressed'],
+            ['application/x-sh'],
+            ['application/x-shockwave-flash'],
+            ['application/xhtml+xml'],
+            ['audio/aac'],
+            ['audio/midi'],
+            ['audio/x-midi'],
+            ['font/woff'],
+            ['font/woff2'],
+            ['image/svg+xml'],
+            ['text/html; charset=UTF-8'],
+            ['text/plain'],
+            ['video/mpeg'],
+            ['video/x-msvideo'],
+        ];
+    }
+
+    public function fileMediaTypesInvalid()
+    {
+        return [
+            'array'  => [['filename']],
+            'backslash' => ['test\\test'],
             'closure' => [static function () {}],
-            'array' => [['2.0']],
+            'false'  => [false],
+            'float'  => [1.1],
+            'int'    => [1],
+            'invalidParam1' => ['text/html charset=UTF-8'],
+            'invalidParam2' => ['text/html; char-set=UTF-8'],
+            'invalidSubType' => ['text/bogus/subtype'],
+            'invalidType' => ['some+monster+media+type/here'],
+            'moreThanOneSuffix' => ['text/html+foo+bar'],
+            'object' => [(object) ['filename']],
+            'true'   => [true],
         ];
     }
 
-    public function validProtocolVersions()
+    public function fileNamesInvalid()
     {
         return [
-            ['0.9'],
-            ['1.0'],
-            ['1.1'],
-            ['2.0'],
-            ['2'],
-            ['3'],
+            'directory-separator' => ['this/is/not/valid'],
+            '0-char'              => ["this is \0 not good either"],
         ];
     }
 
-    public function hostHeaderVariations()
+    public function fileSizesInvalid()
     {
         return [
-            'lowercase'         => ['host'],
-            'mixed-1-2-3'       => ['HOSt'],
-            'mixed-1-2-4'       => ['HOsT'],
-            'mixed-1-2'         => ['HOst'],
-            'mixed-1-3-4'       => ['HoST'],
-            'mixed-1-3'         => ['HoSt'],
-            'mixed-1-4'         => ['HosT'],
-            'mixed-2-3'         => ['hOSt'],
-            'mixed-2-4'         => ['hOsT'],
-            'mixed-2'           => ['hOst'],
-            'mixed-3-4'         => ['hoST'],
-            'mixed-3'           => ['hoSt'],
-            'mixed-4'           => ['hosT'],
-            'reverse-titlecase' => ['hOST'],
-            'titlecase'         => ['Host'],
-            'uppercase'         => ['HOST'],
+            'negative' => [-1],
         ];
     }
 
-    public function validHeaderNames()
+    public function fileUploadErrorStatusesInvalid()
+    {
+        return [
+            [-1],
+            [74],
+            [10000],
+            [PHP_INT_MIN],
+            [PHP_INT_MAX],
+        ];
+    }
+
+    public function fileUploadErrorCodes()
+    {
+        return [
+            [UPLOAD_ERR_INI_SIZE],
+            [UPLOAD_ERR_FORM_SIZE],
+            [UPLOAD_ERR_PARTIAL],
+            [UPLOAD_ERR_NO_FILE],
+            [UPLOAD_ERR_NO_TMP_DIR],
+            [UPLOAD_ERR_CANT_WRITE],
+            [UPLOAD_ERR_EXTENSION],
+        ];
+    }
+
+    public function headerNamesInvalid()
+    {
+        $tests = [
+            // 'int' => [233],
+            // 'numeric' => ['123'],
+            'array' => [['Header-Name']],
+            'carriageReturn' => ["va\rlue"],
+            'closure' => [static function () {}],
+            'colon' => ['Location:'],
+            'emptyString' => [''],
+            'false' => [false],
+            'linefeed' => ["va\nlue"],
+            'non-ascii' => ['This-is-a-cyrillic-о'],
+            'null' => [null],
+            'object' => [new stdClass()],
+            'space' => ['hey dude'],
+            'true' => [true],
+        ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'true',
+            ]));
+        }
+        return $tests;
+    }
+
+    public function headerNamesValid()
     {
         return [
             'int' => [123],
@@ -142,45 +250,7 @@ trait DataProviderTrait
         ];
     }
 
-    public function invalidHeaderNames()
-    {
-        $tests = [
-            // 'int' => [233],
-            // 'numeric' => ['123'],
-            'array' => [['Header-Name']],
-            'carriageReturn' => ["va\rlue"],
-            'closure' => [static function () {}],
-            'colon' => ['Location:'],
-            'emptyString' => [''],
-            'false' => [false],
-            'linefeed' => ["va\nlue"],
-            'non-ascii' => ['This-is-a-cyrillic-о'],
-            'null' => [null],
-            'object' => [new stdClass()],
-            'space' => ['hey dude'],
-            'true' => [true],
-        ];
-        if (self::hasParamTypes()) {
-            $tests = \array_diff_key($tests, \array_flip([
-                'true',
-            ]));
-        }
-        return $tests;
-    }
-
-    public function validHeaderValues()
-    {
-        return [
-            [1234],
-            ['text/plain'],
-            ['PHP 9.1'],
-            ['text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'],
-            ['gzip, deflate, br'],
-            ['Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'],
-        ];
-    }
-
-    public function invalidHeaderValues()
+    public function headerValuesInvalid()
     {
         return [
             'closure' => [static function () {}],
@@ -194,40 +264,269 @@ trait DataProviderTrait
         ];
     }
 
-    public function validRequestTargets()
+    public function headerValuesValid()
     {
         return [
-            'asterisk-form'         => ['*'],
-            'authority-form'        => ['api.example.com'],
-            'absolute-form'         => ['https://api.example.com/users'],
-            'absolute-form-query'   => ['https://api.example.com/users?foo=bar'],
-            'origin-form-path-only' => ['/users'],
-            'origin-form'           => ['/users?id=foo'],
+            [1234],
+            ['text/plain'],
+            ['PHP 9.1'],
+            ['text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'],
+            ['gzip, deflate, br'],
+            ['Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'],
         ];
     }
 
-    public function invalidRequestTargets()
+    public function hostHeaderVariations()
     {
         return [
-            'with-space'   => ['foo bar baz'],
-            'invalid-type' => [12],
-            'null'         => [null],
-            'object'       => [new stdClass()],
-            'newline'      => ["request\ntarget"],
-            'tab'          => ["request\ttarget"],
+            'lowercase'         => ['host'],
+            'mixed-1-2-3'       => ['HOSt'],
+            'mixed-1-2-4'       => ['HOsT'],
+            'mixed-1-2'         => ['HOst'],
+            'mixed-1-3-4'       => ['HoST'],
+            'mixed-1-3'         => ['HoSt'],
+            'mixed-1-4'         => ['HosT'],
+            'mixed-2-3'         => ['hOSt'],
+            'mixed-2-4'         => ['hOsT'],
+            'mixed-2'           => ['hOst'],
+            'mixed-3-4'         => ['hoST'],
+            'mixed-3'           => ['hoSt'],
+            'mixed-4'           => ['hosT'],
+            'reverse-titlecase' => ['hOST'],
+            'titlecase'         => ['Host'],
+            'uppercase'         => ['HOST'],
         ];
     }
 
-    public function urisWithRequestTargets()
+    public function modesAll()
     {
         return [
-            ['http://foo.com/baz?bar=bam', '/baz?bar=bam'],
-            ['http://example.com', '/'],
-            ['http://example.com#proceed', '/'],
+            // mode readable writable
+            ['a',   false,  true],
+            ['a+',   true,  true],
+            ['a+b',  true,  true],
+            ['ab',  false,  true],
+            ['c',   false,  true],
+            ['c+',   true,  true],
+            ['c+b',  true,  true],
+            ['c+t',  true,  true],
+            ['cb',  false,  true],
+            ['r',    true, false],
+            ['r+',   true,  true],
+            ['r+b',  true,  true],
+            ['r+t',  true,  true],
+            ['rb',   true, false],
+            ['rt',   true, false],
+            ['rw',   true,  true],
+            ['w',   false,  true],
+            ['w+',   true,  true],
+            ['w+b',  true,  true],
+            ['w+t',  true,  true],
+            ['wb',  false,  true],
+            ['x',   false,  true],
+            ['x+',   true,  true],
+            ['x+b',  true,  true],
+            ['x+t',  true,  true],
+            ['xb',  false,  true],
         ];
     }
 
-    public function validRequestMethods()
+    public function modesNonReadable()
+    {
+        $nonReadable = array();
+        foreach ($this->modesAll() as $info) {
+            if ($info[1] === false) {
+                $nonReadable[] = [$info[0]];
+            }
+        }
+        return $nonReadable;
+    }
+
+    public function modesNonWritable()
+    {
+        $nonWritable = array();
+        foreach ($this->modesAll() as $info) {
+            if ($info[2] === false) {
+                $nonWritable[] = [$info[0]];
+            }
+        }
+        return $nonWritable;
+    }
+
+    public function parsedBodyProvider()
+    {
+        return array(
+            'form' => array(
+                ContentType::FORM,
+                \http_build_query(array(
+                    'foo_bar' => 'baz 1',
+                    'foo bar' => 'baz 2',
+                    'foo.bar' => 'baz 3',
+                    'foo+bar' => 'baz 4',
+                )),
+                array(
+                    'foo_bar' => 'baz 1',
+                    'foo bar' => 'baz 2',
+                    'foo.bar' => 'baz 3',
+                    'foo+bar' => 'baz 4',
+                ),
+            ),
+            'form.multipart' => array(
+                ContentType::FORM,
+                \http_build_query(array(
+                    'foo_bar' => 'baz 1',
+                    'foo bar' => 'baz 2',
+                    'foo.bar' => 'baz 3',
+                    'foo+bar' => 'baz 4',
+                )),
+                // if created from globals this would only contain 'foo_bar' => 'bar 4'
+                array(
+                    'foo_bar' => 'baz 1',
+                    'foo bar' => 'baz 2',
+                    'foo.bar' => 'baz 3',
+                    'foo+bar' => 'baz 4',
+                ),
+            ),
+            'json' => array(
+                ContentType::JSON,
+                '{"name":"John"}',
+                array('name' => 'John'),
+            ),
+            'xml' => array(
+                ContentType::XML,
+                '<person><name attrib="given">John</name></person>',
+                (object) array('name' => 'John'),
+            ),
+            'xml.application' => array(
+                ContentType::XML_APP . ';charset=utf8',
+                '<person><name attrib="given">John</name></person>',
+                (object) array('name' => 'John'),
+            ),
+            'xml.suffix' => array(
+                'application/hal+xml;charset=utf8',
+                '<person><name attrib="given">John</name></person>',
+                (object) array('name' => 'John'),
+            ),
+            'xml.invalid' => array(
+                ContentType::XML,
+                '<person><name>John</name></invalid>',
+                null,
+            ),
+        );
+    }
+
+    public function protocolVersionsInvalid()
+    {
+        return [
+            'nonNumeric' => ['a'],
+            'null' => [null],
+            'alpha 1' => ['1.a'],
+            'alpha 2' => ['1.1 enhanced'],
+            'alpha 3' => ['x1.5'],
+            [1.],
+            ['2.'],
+            'nullChar' => ["\0"],
+            'bool' => [false],
+            'object' => [new stdClass()],
+            'closure' => [static function () {}],
+            'array' => [['2.0']],
+        ];
+    }
+
+    public function protocolVersionsValid()
+    {
+        return [
+            ['0.9'],
+            ['1.0'],
+            ['1.1'],
+            ['2.0'],
+            ['2'],
+            ['3'],
+        ];
+    }
+
+    /**
+     * Test method will parse if string
+     *
+     * @return array
+     */
+    public function queryParamsValid()
+    {
+        return [
+            ['0='],
+            ['&&&&a=example'],
+            [[
+                'x' => '',
+                'y' => array(
+                    42,
+                    3.14,
+                    null,
+                    true,
+                    false,
+                ),
+            ]],
+            [''],
+            ['x=&y[]=2&y[xxx]=null&0=false&[1]=23'],
+            ['x=&y[][]=2&y[][1]=null&y[][][]=0&false=-1'],
+        ];
+    }
+
+    public function queryParamsInvalid()
+    {
+        return [
+            'not array' => [new stdClass()],
+            // $_GET may not naturally contain these, but we'll allow em
+            // 'bool' => [['a' => false]],
+            // 'float' => [['a' => 1.1]],
+            // 'int' => [['a' => 1]],
+            // 'null' => [['a' => null]],
+            'object' => [
+                ['a' => array(
+                    'stdClass' => new stdClass(),
+                )],
+                'Query params must only contain scalar values, a["stdClass"] contains stdClass.',
+            ],
+            'closure' => [
+                ['x' => array(
+                    'closure' => static function () {},
+                )],
+                'Query params must only contain scalar values, x["closure"] contains Closure.',
+            ],
+        ];
+    }
+
+    /**
+     * Generate a random string
+     *
+     * @param int $length (70) length between 1 and 70 inclusive
+     *
+     * @return string
+     */
+    public function randomBytes($length = 70)
+    {
+        $length = \min($length, 70);
+        $length = \max($length, 1);
+        return \sha1(
+            \rand(0, 32000) . \microtime(true) .  \uniqid('', true),
+            true // binary
+        );
+    }
+
+    public function requestMethodsInvalid()
+    {
+        return [
+            'emptyString'                => [''],
+            'number'                     => [123],
+            'numeric'                    => ['123'],
+            'contains-space'             => ['hey dude'],
+            'contains-special-character' => ['POST!'],
+            'contains-numbers'           => ['GET1'],
+            'null'                       => [null],
+            'bool'                       => [true],
+        ];
+    }
+
+    public function requestMethodsValid()
     {
         return [
             'HEAD'      => ['HEAD'],
@@ -249,21 +548,207 @@ trait DataProviderTrait
         ];
     }
 
-    public function invalidRequestMethods()
+    public function requestTargetsValid()
     {
         return [
-            'emptyString'                => [''],
-            'number'                     => [123],
-            'numeric'                    => ['123'],
-            'contains-space'             => ['hey dude'],
-            'contains-special-character' => ['POST!'],
-            'contains-numbers'           => ['GET1'],
-            'null'                       => [null],
-            'bool'                       => [true],
+            'asterisk-form'         => ['*'],
+            'authority-form'        => ['api.example.com'],
+            'absolute-form'         => ['https://api.example.com/users'],
+            'absolute-form-query'   => ['https://api.example.com/users?foo=bar'],
+            'origin-form-path-only' => ['/users'],
+            'origin-form'           => ['/users?id=foo'],
         ];
     }
 
-    public function validUris()
+    public function requestTargetsInvalid()
+    {
+        return [
+            'with-space'   => ['foo bar baz'],
+            'invalid-type' => [12],
+            'null'         => [null],
+            'object'       => [new stdClass()],
+            'newline'      => ["request\ntarget"],
+            'tab'          => ["request\ttarget"],
+        ];
+    }
+
+    public function resourcesInvalid()
+    {
+        $name = tempnam(sys_get_temp_dir(), 'psr-7');
+        return [
+            // 'null'                => [ null ],
+            'false'               => [ false ],
+            'true'                => [ true ],
+            'int'                 => [ 1 ],
+            'float'               => [ 1.1 ],
+            // 'string-non-resource' => [ 'foo-bar-baz' ],
+            'array'               => [ [ \fopen($name, 'r+') ] ],
+            'object'              => [ (object) [ 'resource' => fopen($name, 'r+') ] ],
+        ];
+    }
+
+    public function statusCodesInvalid()
+    {
+        $tests = [
+            'true'     => [true],
+            'false'    => [false],
+            'array'    => [[200]],
+            'object'   => [(object) ['statusCode' => 200]],
+            'too-low'  => [99],
+            'float'    => [400.5],
+            'too-high' => [600],
+            'null'     => [null],
+            'string'   => ['foo'],
+        ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'float',
+            ]));
+        }
+        return $tests;
+    }
+
+    public function statusPhrasesInvalid()
+    {
+        $tests = [
+            'array'   => [[200]],
+            'closure' => [static function () {}],
+            'false'   => [false],
+            'float'   => [400.5],
+            'integer' => [99],
+            'newline' => ["Custom reason phrase\n\rThe next line"],
+            'object'  => [(object) ['reasonPhrase' => 'Ok']],
+            'true'    => [true],
+        ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'false',
+                'float',
+                'integer',
+                'true',
+            ]));
+        }
+        return $tests;
+    }
+
+    public function statusPhrasesValid()
+    {
+        return [
+            ['500', '', 'Internal Server Error'],
+            [103, '', ''],
+            [200, "tab\ttab", "tab\ttab"],
+        ];
+    }
+
+    public function uploadedFilesInvalid()
+    {
+        return [
+            'null' => [[null]],
+            'string' => [['file']],
+            'int' => [[1]],
+            'float' => [[1.1]],
+            'bool' => [[false]],
+            'obj' => [[new stdClass()]],
+            'closure' => [[static function () {}]],
+        ];
+    }
+
+    public function uploadedFilesValid()
+    {
+        return [
+            [[]],
+        ];
+    }
+
+    public function uriComponents()
+    {
+        $unreserved = 'a-zA-Z0-9.-_~!$&\'()*+,;=:@';
+        return [
+            // Percent encode spaces
+            ['/pa th?q=va lue#frag ment', '/pa%20th', 'q=va%20lue', 'frag%20ment', '/pa%20th?q=va%20lue#frag%20ment'],
+            // Percent encode multibyte
+            ['/€?€#€', '/%E2%82%AC', '%E2%82%AC', '%E2%82%AC', '/%E2%82%AC?%E2%82%AC#%E2%82%AC'],
+            // Don't encode something that's already encoded
+            ['/pa%20th?q=va%20lue#frag%20ment', '/pa%20th', 'q=va%20lue', 'frag%20ment', '/pa%20th?q=va%20lue#frag%20ment'],
+            // Percent encode invalid percent encodings
+            ['/pa%2-th?q=va%2-lue#frag%2-ment', '/pa%252-th', 'q=va%252-lue', 'frag%252-ment', '/pa%252-th?q=va%252-lue#frag%252-ment'],
+            // Don't encode path segments
+            ['/pa/th//two?q=va/lue#frag/ment', '/pa/th//two', 'q=va/lue', 'frag/ment', '/pa/th//two?q=va/lue#frag/ment'],
+            // Don't encode unreserved chars or sub-delimiters
+            [
+                '/' . $unreserved . '?' . $unreserved . '#' . $unreserved,
+                '/' . $unreserved,
+                $unreserved,
+                $unreserved,
+                '/' . $unreserved . '?' . $unreserved . '#' . $unreserved],
+            // Encoded unreserved chars are not decoded
+            ['/p%61th?q=v%61lue#fr%61gment', '/p%61th', 'q=v%61lue', 'fr%61gment', '/p%61th?q=v%61lue#fr%61gment'],
+        ];
+    }
+
+    public function uriFragmentsInvalid()
+    {
+        $tests = [
+            'array closure' => [[static function () {}]],
+            'array empty' => [[]],
+            'array obj' => [[new stdClass()]],
+            'array path' => [['/path']],
+            'closure' => [static function () {}],
+            'false' => [false],
+            'null' => [null],
+            'object' => [new stdClass()],
+            'true' => [true],
+        ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'false',
+                'true',
+            ]));
+        }
+        return $tests;
+    }
+
+    public function uriHostsInvalid()
+    {
+        $tests = [
+            'array' => [['example.com']],
+            'closure' => [static function () {}],
+            'float' => [7.4],
+            'null' => [null],
+            'object' => [new stdClass()],
+            'true' => [true],
+            'underscore' => ['example_test.com'],
+            'zero' => [0],
+        ];
+        if (self::hasParamTypes()) {
+            $tests = \array_diff_key($tests, \array_flip([
+                'float',
+                'true',
+                'zero',
+            ]));
+        }
+        return $tests;
+    }
+
+    public function urisInvalid()
+    {
+        return [
+            'array' => [[]],
+            'bogusScheme' => ['0scheme://host/path?query#fragment'],
+            'closure' => [static function () {}],
+            'false' => [false],
+            'float' => [1.1],
+            'host with colon' => ['urn://host:with:colon'],
+            'int' => [1],
+            'invalid port' => ['//example.com:10000000'],
+            'object' => [new stdClass()],
+            'scheme only' => ['http://'],
+            // ['//example.com:0'], // @todo for whatever reason php is flaky about this
+            // [null],
+        ];
+    }
+
+    public function urisValid()
     {
         return [
             ['urn:path-rootless'],
@@ -285,25 +770,21 @@ trait DataProviderTrait
         ];
     }
 
-    public function invalidUris()
+    public function uriSchemesInvalid()
     {
         return [
-            'array' => [[]],
-            'bogusScheme' => ['0scheme://host/path?query#fragment'],
-            'closure' => [static function () {}],
-            'false' => [false],
-            'float' => [1.1],
-            'host with colon' => ['urn://host:with:colon'],
-            'int' => [1],
-            'invalid port' => ['//example.com:10000000'],
+            'zero' => [0],
+            'null' => [null],
+            'float' => [7.4],
+            'bool' => [true],
             'object' => [new stdClass()],
-            'scheme only' => ['http://'],
-            // ['//example.com:0'], // @todo for whatever reason php is flaky about this
-            // [null],
+            'closure' => [static function () {}],
+            'port' => [':80'],
+            'string' => ['80 but not always'],
         ];
     }
 
-    public function validUriSchemes()
+    public function uriSchemesValid()
     {
         $schemes = [
             '', // same as removing scheme
@@ -603,21 +1084,7 @@ trait DataProviderTrait
         }, \array_combine($schemes, $schemes));
     }
 
-    public function invalidUriSchemes()
-    {
-        return [
-            'zero' => [0],
-            'null' => [null],
-            'float' => [7.4],
-            'bool' => [true],
-            'object' => [new stdClass()],
-            'closure' => [static function () {}],
-            'port' => [':80'],
-            'string' => ['80 but not always'],
-        ];
-    }
-
-    public function invalidUriUserInfos()
+    public function uriUserInfosInvalid()
     {
         $tests = [
             'password closure' => ['user', new stdClass()],
@@ -637,29 +1104,7 @@ trait DataProviderTrait
         return $tests;
     }
 
-    public function invalidUriHosts()
-    {
-        $tests = [
-            'array' => [['example.com']],
-            'closure' => [static function () {}],
-            'float' => [7.4],
-            'null' => [null],
-            'object' => [new stdClass()],
-            'true' => [true],
-            'underscore' => ['example_test.com'],
-            'zero' => [0],
-        ];
-        if (self::hasParamTypes()) {
-            $tests = \array_diff_key($tests, \array_flip([
-                'float',
-                'true',
-                'zero',
-            ]));
-        }
-        return $tests;
-    }
-
-    public function invalidUriPorts()
+    public function uriPortsInvalid()
     {
         $tests = [
             'false' => [false],
@@ -684,7 +1129,7 @@ trait DataProviderTrait
         return $tests;
     }
 
-    public function invalidUriPaths()
+    public function uriPathsInvalid()
     {
         $tests = [
             'false' => [true],
@@ -703,7 +1148,7 @@ trait DataProviderTrait
         return $tests;
     }
 
-    public function invalidUriQueries()
+    public function uriQueriesInvalid()
     {
         $tests = [
             'false' => [false],
@@ -720,81 +1165,16 @@ trait DataProviderTrait
         return $tests;
     }
 
-    public function invalidUriFragments()
-    {
-        $tests = [
-            'array closure' => [[static function () {}]],
-            'array empty' => [[]],
-            'array obj' => [[new stdClass()]],
-            'array path' => [['/path']],
-            'closure' => [static function () {}],
-            'false' => [false],
-            'null' => [null],
-            'object' => [new stdClass()],
-            'true' => [true],
-        ];
-        if (self::hasParamTypes()) {
-            $tests = \array_diff_key($tests, \array_flip([
-                'false',
-                'true',
-            ]));
-        }
-        return $tests;
-    }
-
-    public function uriComponents()
-    {
-        $unreserved = 'a-zA-Z0-9.-_~!$&\'()*+,;=:@';
-        return [
-            // Percent encode spaces
-            ['/pa th?q=va lue#frag ment', '/pa%20th', 'q=va%20lue', 'frag%20ment', '/pa%20th?q=va%20lue#frag%20ment'],
-            // Percent encode multibyte
-            ['/€?€#€', '/%E2%82%AC', '%E2%82%AC', '%E2%82%AC', '/%E2%82%AC?%E2%82%AC#%E2%82%AC'],
-            // Don't encode something that's already encoded
-            ['/pa%20th?q=va%20lue#frag%20ment', '/pa%20th', 'q=va%20lue', 'frag%20ment', '/pa%20th?q=va%20lue#frag%20ment'],
-            // Percent encode invalid percent encodings
-            ['/pa%2-th?q=va%2-lue#frag%2-ment', '/pa%252-th', 'q=va%252-lue', 'frag%252-ment', '/pa%252-th?q=va%252-lue#frag%252-ment'],
-            // Don't encode path segments
-            ['/pa/th//two?q=va/lue#frag/ment', '/pa/th//two', 'q=va/lue', 'frag/ment', '/pa/th//two?q=va/lue#frag/ment'],
-            // Don't encode unreserved chars or sub-delimiters
-            [
-                '/' . $unreserved . '?' . $unreserved . '#' . $unreserved,
-                '/' . $unreserved,
-                $unreserved,
-                $unreserved,
-                '/' . $unreserved . '?' . $unreserved . '#' . $unreserved],
-            // Encoded unreserved chars are not decoded
-            ['/p%61th?q=v%61lue#fr%61gment', '/p%61th', 'q=v%61lue', 'fr%61gment', '/p%61th?q=v%61lue#fr%61gment'],
-        ];
-    }
-
-    public function validQueryParams()
+    public function urisWithRequestTargets()
     {
         return [
-            ['0='],
-            ['&&&&a=example'],
-            ['x=&y[]=2&y[xxx]=null&0=false'],
-            ['x=&y[]=2&y[xxx]=null&0=false&[1]=23'],
-            ['x=&y[][]=2&y[][1]=null&y[][][]=0&false=-1'],
+            ['http://foo.com/baz?bar=bam', '/baz?bar=bam'],
+            ['http://example.com', '/'],
+            ['http://example.com#proceed', '/'],
         ];
     }
 
-    public function validCookieParams()
-    {
-        return [
-            [[]],
-            [['a' => '1']],
-            [['a' => 'value']],
-        ];
-    }
-
-    public function validUploadedFiles()
-    {
-        return [
-            [[]],
-        ];
-    }
-
+    /*
     public function validParsedBodies()
     {
         return [
@@ -803,64 +1183,9 @@ trait DataProviderTrait
             [new stdClass()],
         ];
     }
+    */
 
-    public function validAttributeNamesAndValues()
-    {
-        return [
-            'null' => ['name', null],
-            'int' => ['name', 42],
-            'array' => ['name', [1, 2, 3]],
-            'false' => ['name', false],
-            'true' => ['name', true],
-            'float' => ['name', 3.14],
-            'string' => ['name', 'string'],
-            'object' => ['name', new stdClass()],
-            'closure' => ['another name !', static function () {}],
-        ];
-    }
-
-    public function invalidQueryParams()
-    {
-        return [
-            'not array' => [new stdClass()],
-            'null' => [['a' => null]],
-            'int' => [['a' => 1]],
-            'float' => [['a' => 1.1]],
-            'bool' => [['a' => false]],
-            'object' => [['a' => new stdClass()]],
-            'closure' => [['x' => static function () {}]],
-        ];
-    }
-
-    public function invalidCookieParams()
-    {
-        return [
-            'not array' => [new stdClass()],
-            'name empty' => [['' => 'value']],
-            'name quote' => [['"a"' => 'value']],
-            'value null' => [['a' => null]],
-            // [['a' => 1]],
-            // [['a' => 1.1]],
-            // [['value']],
-            'value bool' => [['a' => false]],
-            'value object' => [['obj' => new stdClass()]],
-            'value closure' => [['x' => static function () {}]],
-        ];
-    }
-
-    public function invalidUploadedFiles()
-    {
-        return [
-            'null' => [[null]],
-            'string' => [['file']],
-            'int' => [[1]],
-            'float' => [[1.1]],
-            'bool' => [[false]],
-            'obj' => [[new stdClass()]],
-            'closure' => [[static function () {}]],
-        ];
-    }
-
+    /*
     public function invalidParsedBodies()
     {
         return [
@@ -870,145 +1195,7 @@ trait DataProviderTrait
             ['value'],
         ];
     }
-
-    public function invalidAttributeNamesAndValues()
-    {
-        $tests = [
-            'null' => [null, 1],
-            'false' => [false, null],
-            'object' => [new stdClass(), 1],
-            'closure' => [static function () {}, 'value'],
-        ];
-        if (self::hasParamTypes()) {
-            $tests = \array_diff_key($tests, \array_flip([
-                'false',
-            ]));
-        }
-        return $tests;
-    }
-
-    public function invalidResources()
-    {
-        $name = tempnam(sys_get_temp_dir(), 'psr-7');
-        return [
-            // 'null'                => [ null ],
-            'false'               => [ false ],
-            'true'                => [ true ],
-            'int'                 => [ 1 ],
-            'float'               => [ 1.1 ],
-            // 'string-non-resource' => [ 'foo-bar-baz' ],
-            'array'               => [ [ \fopen($name, 'r+') ] ],
-            'object'              => [ (object) [ 'resource' => fopen($name, 'r+') ] ],
-        ];
-    }
-
-    public function allModes()
-    {
-        return [
-            // mode readable writable
-            ['a',   false,  true],
-            ['a+',   true,  true],
-            ['a+b',  true,  true],
-            ['ab',  false,  true],
-            ['c',   false,  true],
-            ['c+',   true,  true],
-            ['c+b',  true,  true],
-            ['c+t',  true,  true],
-            ['cb',  false,  true],
-            ['r',    true, false],
-            ['r+',   true,  true],
-            ['r+b',  true,  true],
-            ['r+t',  true,  true],
-            ['rb',   true, false],
-            ['rt',   true, false],
-            ['rw',   true,  true],
-            ['w',   false,  true],
-            ['w+',   true,  true],
-            ['w+b',  true,  true],
-            ['w+t',  true,  true],
-            ['wb',  false,  true],
-            ['x',   false,  true],
-            ['x+',   true,  true],
-            ['x+b',  true,  true],
-            ['x+t',  true,  true],
-            ['xb',  false,  true],
-        ];
-    }
-
-    public function nonReadableModes()
-    {
-        $nonReadable = array();
-        foreach ($this->allModes() as $info) {
-            if ($info[1] === false) {
-                $nonReadable[] = [$info[0]];
-            }
-        }
-        return $nonReadable;
-    }
-
-    public function nonWritableModes()
-    {
-        $nonWritable = array();
-        foreach ($this->allModes() as $info) {
-            if ($info[2] === false) {
-                $nonWritable[] = [$info[0]];
-            }
-        }
-        return $nonWritable;
-    }
-
-    public function statusPhrases()
-    {
-        return [
-            ['500', '', 'Internal Server Error'],
-            [103, '', ''],
-            [200, "tab\ttab", "tab\ttab"],
-        ];
-    }
-
-    public function invalidStatusCodes()
-    {
-        $tests = [
-            'true'     => [true],
-            'false'    => [false],
-            'array'    => [[200]],
-            'object'   => [(object) ['statusCode' => 200]],
-            'too-low'  => [99],
-            'float'    => [400.5],
-            'too-high' => [600],
-            'null'     => [null],
-            'string'   => ['foo'],
-        ];
-        if (self::hasParamTypes()) {
-            $tests = \array_diff_key($tests, \array_flip([
-                'float',
-            ]));
-        }
-        return $tests;
-    }
-
-    public function invalidReasonPhrases()
-    {
-        $tests = [
-            'array'   => [[200]],
-            'closure' => [static function () {}],
-            'false'   => [false],
-            'float'   => [400.5],
-            'integer' => [99],
-            'newline' => ["Custom reason phrase\n\rThe next line"],
-            'object'  => [(object) ['reasonPhrase' => 'Ok']],
-            'true'    => [true],
-        ];
-        if (self::hasParamTypes()) {
-            $tests = \array_diff_key($tests, \array_flip([
-                'false',
-                'float',
-                'integer',
-                'true',
-            ]));
-        }
-        return $tests;
-    }
+    */
 
     /*
     public function headersWithInjectionVectors()
@@ -1030,7 +1217,7 @@ trait DataProviderTrait
     }
     */
 
-    public function invalidStreams()
+    public function streamsInvalid()
     {
         return [
             'array'  => [['filename']],
@@ -1044,7 +1231,7 @@ trait DataProviderTrait
         ];
     }
 
-    public function invalidTargetPaths()
+    public function targetPathsInvalid()
     {
         $tests = [
             'array'  => [['filename']],
@@ -1065,98 +1252,5 @@ trait DataProviderTrait
             ]));
         }
         return $tests;
-    }
-
-    public function invalidFileSizes()
-    {
-        return [
-            'negative' => [-1],
-        ];
-    }
-
-    public function invalidFileNames()
-    {
-        return [
-            'directory-separator' => ['this/is/not/valid'],
-            '0-char'              => ["this is \0 not good either"],
-        ];
-    }
-
-    public function validMediaTypes()
-    {
-        return [
-            ['application/epub+zip'],
-            ['application/java-archive'],
-            ['application/octet-stream'],
-            ['application/octet-stream'],
-            ['application/vnd.amazon.ebook'],
-            ['application/vnd.apple.installer+xml'],
-            ['application/vnd.ms-excel'],
-            ['application/vnd.ms-fontobject'],
-            ['application/vnd.ms-powerpoint'],
-            ['application/vnd.oasis.opendocument.presentation'],
-            ['application/vnd.openxmlformats-officedocument.presentationml.presentation'],
-            ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
-            ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
-            ['application/vnd.visio'],
-            ['application/x-abiword'],
-            ['application/x-rar-compressed'],
-            ['application/x-sh'],
-            ['application/x-shockwave-flash'],
-            ['application/xhtml+xml'],
-            ['audio/aac'],
-            ['audio/midi'],
-            ['audio/x-midi'],
-            ['font/woff'],
-            ['font/woff2'],
-            ['image/svg+xml'],
-            ['text/html; charset=UTF-8'],
-            ['text/plain'],
-            ['video/mpeg'],
-            ['video/x-msvideo'],
-        ];
-    }
-
-    public function invalidMediaTypes()
-    {
-        return [
-            'array'  => [['filename']],
-            'backslash' => ['test\\test'],
-            'closure' => [static function () {}],
-            'false'  => [false],
-            'float'  => [1.1],
-            'int'    => [1],
-            'invalidParam1' => ['text/html charset=UTF-8'],
-            'invalidParam2' => ['text/html; char-set=UTF-8'],
-            'invalidSubType' => ['text/bogus/subtype'],
-            'invalidType' => ['some+monster+media+type/here'],
-            'moreThanOneSuffix' => ['text/html+foo+bar'],
-            'object' => [(object) ['filename']],
-            'true'   => [true],
-        ];
-    }
-
-    public function invalidFileUploadErrorStatuses()
-    {
-        return [
-            [-1],
-            [74],
-            [10000],
-            [PHP_INT_MIN],
-            [PHP_INT_MAX],
-        ];
-    }
-
-    public function fileUploadErrorCodes()
-    {
-        return [
-            [UPLOAD_ERR_INI_SIZE],
-            [UPLOAD_ERR_FORM_SIZE],
-            [UPLOAD_ERR_PARTIAL],
-            [UPLOAD_ERR_NO_FILE],
-            [UPLOAD_ERR_NO_TMP_DIR],
-            [UPLOAD_ERR_CANT_WRITE],
-            [UPLOAD_ERR_EXTENSION],
-        ];
     }
 }

@@ -7,7 +7,7 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage;
@@ -19,7 +19,7 @@ use RuntimeException;
 
 /**
  * Describes a data stream.
- * 
+ *
  * @psalm-api
  */
 class Stream extends AbstractStream implements StreamInterface
@@ -29,7 +29,7 @@ class Stream extends AbstractStream implements StreamInterface
      *
      * @see http://php.net/manual/function.fopen.php
      * @see http://php.net/manual/en/function.gzopen.php
-     * 
+     *
      * @internal
      */
     const READABLE_MODES = '/r|a\+|ab\+|w\+|wb\+|x\+|xb\+|c\+|cb\+/';
@@ -40,7 +40,7 @@ class Stream extends AbstractStream implements StreamInterface
      *
      * @see http://php.net/manual/function.fopen.php
      * @see http://php.net/manual/en/function.gzopen.php
-     * 
+     *
      * @internal
      */
     const WRITABLE_MODES = '/a|w|r\+|rb\+|rw|x|c/';

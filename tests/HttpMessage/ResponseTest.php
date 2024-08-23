@@ -18,12 +18,19 @@ class ResponseTest extends TestCase
         $this->assertTrue($response instanceof Message);
     }
 
+    public function testConstructException()
+    {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Status code must to be an integer, string provided.');
+        $this->createResponse('bogusCode');
+    }
+
     /**
      * @param mixed  $code         status code to test
      * @param mixed  $phrase       phrase to test
      * @param string $phraseExpect expected phrase
      *
-     * @dataProvider statusPhrases
+     * @dataProvider statusPhrasesValid
      */
     public function testStatusPhrases($code, $phrase, $phraseExpect)
     {
@@ -40,9 +47,9 @@ class ResponseTest extends TestCase
     /**
      * @param mixed $statusCode status code to test
      *
-     * @dataProvider invalidStatusCodes
+     * @dataProvider statusCodesInvalid
      */
-    public function testRejectInvalidStatusCode($statusCode)
+    public function testStatusCodeRejected($statusCode)
     {
         self::assertExceptionOrTypeError(function () use ($statusCode) {
             $response = $this->createResponse();
@@ -53,13 +60,13 @@ class ResponseTest extends TestCase
     /**
      * @param mixed $reasonPhrase reason phrase to test
      *
-     * @dataProvider invalidReasonPhrases
+     * @dataProvider statusPhrasesInvalid
      */
-    public function testRejectInvalidReasonPhrase($reasonPhrase)
+    public function testStatusPhraseRejected($phrase)
     {
-        self::assertExceptionOrTypeError(function () use ($reasonPhrase) {
+        self::assertExceptionOrTypeError(function () use ($phrase) {
             $response = $this->createResponse();
-            $response->withStatus(200, $reasonPhrase);
+            $response->withStatus(200, $phrase);
         });
     }
 }

@@ -7,7 +7,6 @@ use bdk\HttpMessage\Request;
 use bdk\HttpMessage\ServerRequest;
 use bdk\HttpMessage\Utility\ParseStr;
 use ReflectionObject;
-use RuntimeException;
 
 /**
  * @covers \bdk\HttpMessage\AssertionTrait
@@ -98,7 +97,7 @@ class ServerRequestTest extends TestCase
             'attributes' => array(),
             'cookie' => array(),
             'get' => array(),
-            'post' => null,
+            'parsedBody' => null,
             'server' => array(
                 'REQUEST_METHOD' => 'GET',
             ),
@@ -160,6 +159,27 @@ class ServerRequestTest extends TestCase
         );
     }
 
+    /**
+     * @param string       $contentType Request content type
+     * @param string       $body        Request body
+     * @param array|object $expect      Expected parsed body
+     *
+     * @dataProvider parsedBodyProvider
+     */
+    public function testParsedBody($contentType, $body, $expect)
+    {
+        $serverRequest = $this->createServerRequest('POST', '', array(
+            'CONTENT_TYPE' => $contentType,
+        ));
+        $serverRequest = $serverRequest->withBody($this->createStream($body));
+        $parsedBody = $serverRequest->getParsedBody();
+        if (\is_object($expect) && \is_object($parsedBody)) {
+            $expect = (array) $expect;
+            $parsedBody = (array) $parsedBody;
+        }
+        $this->assertSame($expect, $parsedBody);
+    }
+
     public function testWithMethods()
     {
         $new = $this->createServerRequest()
@@ -191,7 +211,8 @@ class ServerRequestTest extends TestCase
             $new->getUploadedFiles()
         );
 
-        $new2 = $new->withoutAttribute('foo8');
+        $new2 = $new->withoutAttribute('foo8')
+            ->withoutAttribute(false);
 
         $this->assertEquals(null, $new2->getAttribute('foo8'));
         $this->assertSame($new2, $new2->withoutAttribute('noSuch'));
@@ -201,12 +222,14 @@ class ServerRequestTest extends TestCase
     /**
      * @param $value
      *
-     * @dataProvider validQueryParams
+     * @dataProvider queryParamsValid
      */
     public function testWithQueryParamsAcceptsValidValues($value)
     {
-        $params = null;
-        \parse_str($value, $params);
+        $params = $value;
+        if (\is_string($params)) {
+            \parse_str($value, $params);
+        }
         $request = $this->createServerRequest()
             ->withQueryParams($params);
         $this->assertSame($params, $request->getQueryParams());
@@ -215,9 +238,9 @@ class ServerRequestTest extends TestCase
     /**
      * @param $value
      *
-     * @dataProvider invalidQueryParams
+     * @dataProvider queryParamsInvalid
      */
-    public function testWithQueryParamsRejectsInvalidValues($value)
+    public function testWithQueryParamsRejectsInvalidValues($value, $message = null)
     {
         $exceptionClass = \is_array($value)
             ? 'InvalidArgumentException'
@@ -225,6 +248,9 @@ class ServerRequestTest extends TestCase
                 ? 'TypeError'
                 : 'RuntimeException');
         $this->expectException($exceptionClass);
+        if ($message) {
+            $this->expectExceptionMessage($message);
+        }
         $this->createServerRequest()
             ->withQueryParams($value);
     }
@@ -232,7 +258,7 @@ class ServerRequestTest extends TestCase
     /**
      * @param $value
      *
-     * @dataProvider validCookieParams
+     * @dataProvider cookieParamsValid
      */
     public function testWithCookieParamsAcceptsValidValues($value)
     {
@@ -244,7 +270,7 @@ class ServerRequestTest extends TestCase
     /**
      * @param $value
      *
-     * @dataProvider invalidCookieParams
+     * @dataProvider cookieParamsInvalid
      */
     public function testWithCookieParamsRejectsInvalidValues($value)
     {
@@ -262,7 +288,7 @@ class ServerRequestTest extends TestCase
      * @param $name
      * @param $value
      *
-     * @dataProvider validAttributeNamesAndValues
+     * @dataProvider attributeNamesAndValuesValid
      */
     public function testWithAttributeAcceptsValidNamesAndValues($name, $value)
     {
@@ -275,7 +301,7 @@ class ServerRequestTest extends TestCase
      * @param $name
      * @param $value
      *
-     * @dataProvider invalidAttributeNamesAndValues
+     * @dataProvider attributeNamesAndValuesInvalid
      */
     public function testWithAttributeRejectsInvalidValues($name, $value)
     {
@@ -329,42 +355,5 @@ class ServerRequestTest extends TestCase
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage('parseStrOpts expects string or array. boolean provided.');
         ParseStr::setOpts(false);
-    }
-
-    /*
-        Methods that help for testing.
-    */
-
-    /**
-     * Moke a uploadedFiles array
-     *
-     * @param int $item which array to return
-     *
-     * @return array
-     */
-    private static function mockFiles($item = 1)
-    {
-        if ($item === 1) {
-            return array(
-                'file1' => self::createUploadedFile(
-                    '/tmp/php1234.tmp',
-                    100000,
-                    UPLOAD_ERR_OK,
-                    'file1.jpg',
-                    'image/jpeg'
-                ),
-            );
-        }
-        if ($item === 2) {
-            return array(
-                'file2' => self::createUploadedFile(
-                    '/tmp/php1235',
-                    123456,
-                    UPLOAD_ERR_OK,
-                    'file2.png',
-                    'image/png'
-                ),
-            );
-        }
     }
 }

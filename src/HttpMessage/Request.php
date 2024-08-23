@@ -7,7 +7,7 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage;
@@ -122,11 +122,7 @@ class Request extends Message implements RequestInterface
      */
     public function withRequestTarget(string $requestTarget): RequestInterface
     {
-        if (\is_string($requestTarget) === false) {
-            throw new InvalidArgumentException(
-                'Request target must be a string.'
-            );
-        }
+        $this->assertString($requestTarget, 'Request target');
         if (\preg_match('#\s#', $requestTarget)) {
             throw new InvalidArgumentException(
                 'Request target cannot contain whitespace'

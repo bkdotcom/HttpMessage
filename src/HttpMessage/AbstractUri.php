@@ -7,7 +7,7 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage;
@@ -28,14 +28,14 @@ abstract class AbstractUri
 
     /**
      * @var string
-     * 
+     *
      * @internal
      */
     const CHAR_SUB_DELIMS = '!\$&\'\(\)\*\+,;=';
 
     /**
      * @var string
-     * 
+     *
      * @internal
      */
     const CHAR_UNRESERVED = 'a-zA-Z0-9_\-\.~';
@@ -46,6 +46,86 @@ abstract class AbstractUri
         'http' => 80,
         'https' => 443,
     );
+
+
+    /**
+     * Throw exception if invalid host string.
+     *
+     * @param string $host The host string to of a URI.
+     *
+     * @return void
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function assertHost($host)
+    {
+        $this->assertString($host, 'host');
+        if (\in_array($host, array('', 'localhost'), true)) {
+            // An empty host value is equivalent to removing the host.
+            // No validation required
+            return;
+        }
+        if ($this->isFqdn($host)) {
+            return;
+        }
+        if (\filter_var($host, FILTER_VALIDATE_IP)) {
+            // only if php < 7.0
+            return;
+        }
+        throw new InvalidArgumentException(\sprintf(
+            '"%s" is not a valid host',
+            $host
+        ));
+    }
+
+    /**
+     * Throw exception if invalid port value
+     *
+     * @param mixed $port port value
+     *
+     * @return void
+     *
+     * @throws InvalidArgumentException
+     *
+     * @psalm-assert int $port
+     */
+    protected function assertPort($port)
+    {
+        if (\is_int($port) === false) {
+            // for versions with int type-hint, this will never be reached
+            throw new InvalidArgumentException(\sprintf(
+                'Port must be a int, %s provided.',
+                $this->getDebugType($port)
+            ));
+        }
+        if ($port < 1 || $port > 0xffff) {
+            throw new InvalidArgumentException(\sprintf('Invalid port: %d. Must be between 0 and 65535', $port));
+        }
+    }
+
+    /**
+     * Assert valid scheme
+     *
+     * @param string $scheme Scheme to validate
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     *
+     * @psalm-assert string $scheme
+     */
+    protected function assertScheme($scheme)
+    {
+        $this->assertString($scheme, 'scheme');
+        if ($scheme === '') {
+            return;
+        }
+        if (\preg_match('/^[a-z][-a-z0-9.+]*$/i', $scheme) !== 1) {
+            throw new InvalidArgumentException(\sprintf(
+                'Invalid scheme: "%s"',
+                $scheme
+            ));
+        }
+    }
 
     /**
      * Create path component of Uri
@@ -123,6 +203,26 @@ abstract class AbstractUri
         $encodePattern = '%(?![A-Fa-f0-9]{2})';
         $regex = '/(?:[^' . self::CHAR_UNRESERVED . self::CHAR_SUB_DELIMS . $specPattern . ']+|' . $encodePattern . ')/';
         return $this->regexEncode($regex, $str);
+    }
+
+    /**
+     * Test if hostname is a fully-qualified domain name (FQDN)
+     *
+     * @param string $host Hostname to test
+     *
+     * @return bool
+     *
+     * @see https://www.regextester.com/103452
+     */
+    private function isFqdn($host)
+    {
+        if (PHP_VERSION_ID >= 70000) {
+            return \filter_var($host, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) !== false;
+        }
+        $regexPartialHostname = '(?!-)[a-zA-Z0-9-]{0,62}[a-zA-Z0-9]';
+        $regex1 = '/(?=^.{4,253}$)(^(' . $regexPartialHostname . '\.)+[a-zA-Z]{2,63}$)/';
+        $regex2 = '/^' . $regexPartialHostname . '$/';
+        return \preg_match($regex1, $host) === 1 || \preg_match($regex2, $host) === 1;
     }
 
     /**
