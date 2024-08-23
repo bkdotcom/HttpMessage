@@ -81,7 +81,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     private $server = array();
 
     /** @var array<string,callable> */
-    protected array $bodyParsers = array();
+    protected $bodyParsers = array();
 
     /**
      * Constructor
