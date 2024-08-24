@@ -39,10 +39,10 @@ use Psr\Http\Message\ResponseInterface;
 class Response extends Message implements ResponseInterface
 {
     /** @var string */
-    private $reasonPhrase = '';
+    private string $reasonPhrase = '';
 
     /** @var int */
-    private $statusCode = 200;
+    private int $statusCode = 200;
 
     /**
      * Constructor
@@ -103,7 +103,7 @@ class Response extends Message implements ResponseInterface
      *
      * @throws InvalidArgumentException For invalid status code arguments.
      */
-    public function withStatus(int $code, string $reasonPhrase = ''): ResponseInterface
+    public function withStatus(int $code, string $reasonPhrase = ''): static
     {
         list($code, $reasonPhrase) = $this->filterCodePhrase($code, $reasonPhrase);
         $new = clone $this;

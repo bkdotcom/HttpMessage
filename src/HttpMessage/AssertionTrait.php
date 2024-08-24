@@ -27,7 +27,7 @@ trait AssertionTrait
      *
      * @var numeric-string[]
      */
-    protected $validProtocolVers = array(
+    protected array $validProtocolVers = array(
         '0.9',
         '1.0',
         '1.1',

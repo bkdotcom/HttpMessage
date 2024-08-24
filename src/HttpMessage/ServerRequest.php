@@ -63,25 +63,25 @@ use Psr\Http\Message\UriInterface;
 class ServerRequest extends Request implements ServerRequestInterface
 {
     /** @var array */
-    private $attributes = array();
+    private array $attributes = array();
 
     /** @var array $_COOKIE */
-    private $cookie = array();
+    private array $cookie = array();
 
     /** @var array */
-    private $files = array();
+    private array $files = array();
 
     /** @var array $_GET */
-    private $get = array();
+    private array $get = array();
 
     /** @var null|array|object typically $_POST */
     private $parsedBody = null;
 
     /** @var array $_SERVER */
-    private $server = array();
+    private array $server = array();
 
     /** @var array<string,callable> */
-    protected $bodyParsers = array();
+    protected array $bodyParsers = array();
 
     /**
      * Constructor
@@ -160,7 +160,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withCookieParams(array $cookies): ServerRequestInterface
+    public function withCookieParams(array $cookies): static
     {
         $this->assertCookieParams($cookies);
         $new = clone $this;
@@ -191,7 +191,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withQueryParams(array $query): ServerRequestInterface
+    public function withQueryParams(array $query): static
     {
         $this->assertQueryParams($query);
         $new = clone $this;
@@ -220,7 +220,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @return static
      * @throws InvalidArgumentException if an invalid structure is provided.
      */
-    public function withUploadedFiles(array $uploadedFiles): ServerRequestInterface
+    public function withUploadedFiles(array $uploadedFiles): static
     {
         $this->assertUploadedFiles($uploadedFiles);
         $new = clone $this;
@@ -267,7 +267,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function registerMediaTypeParser($contentType, callable $callable): ServerRequestInterface
+    public function registerMediaTypeParser($contentType, callable $callable): static
     {
         $this->bodyParsers[$contentType] = $callable;
         return $this;
@@ -281,7 +281,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withParsedBody($data): ServerRequestInterface
+    public function withParsedBody($data): static
     {
         $this->assertParsedBody($data);
         $new = clone $this;
@@ -329,7 +329,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withAttribute(string $name, $value): ServerRequestInterface
+    public function withAttribute(string $name, $value): static
     {
         $this->assertAttributeName($name);
         $new = clone $this;
@@ -344,7 +344,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withoutAttribute(string $name): ServerRequestInterface
+    public function withoutAttribute(string $name): static
     {
         if ($this->assertAttributeName($name, false) === false) {
             // for versions with string type hint (2.x & 3.x), this will never be reached
@@ -365,7 +365,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return callable|null
      */
-    private function getBodyParser($contentType)
+    private function getBodyParser($contentType): ?callable
     {
         $contentType = \preg_replace('/\s*[;,].*$/', '', $contentType);
         $contentType = \strtolower($contentType);

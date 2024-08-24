@@ -32,8 +32,7 @@ class Stream extends AbstractStream implements StreamInterface
      *
      * @internal
      */
-    const READABLE_MODES = '/r|a\+|ab\+|w\+|wb\+|x\+|xb\+|c\+|cb\+/';
-
+    private const READABLE_MODES = '/r|a\+|ab\+|w\+|wb\+|x\+|xb\+|c\+|cb\+/';
 
     /**
      * @var string Writable modes regex
@@ -43,20 +42,20 @@ class Stream extends AbstractStream implements StreamInterface
      *
      * @internal
      */
-    const WRITABLE_MODES = '/a|w|r\+|rb\+|rw|x|c/';
+    private const WRITABLE_MODES = '/a|w|r\+|rb\+|rw|x|c/';
 
     /** @var int|null */
-    private $size;
+    private ?int $size = null;
     /** @var bool */
-    private $seekable;
+    private bool $seekable = false;
     /** @var bool */
-    private $readable;
+    private bool $readable = false;
     /** @var bool */
-    private $writable;
+    private bool $writable = false;
     /** @var string|null */
-    private $uri;
+    private ?string $uri = null;
     /** @var array */
-    private $customMetadata = array();
+    private array $customMetadata = array();
 
     /**
      * This constructor accepts an associative array of options.

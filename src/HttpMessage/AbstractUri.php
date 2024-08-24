@@ -31,22 +31,21 @@ abstract class AbstractUri
      *
      * @internal
      */
-    const CHAR_SUB_DELIMS = '!\$&\'\(\)\*\+,;=';
+    private const CHAR_SUB_DELIMS = '!\$&\'\(\)\*\+,;=';
 
     /**
      * @var string
      *
      * @internal
      */
-    const CHAR_UNRESERVED = 'a-zA-Z0-9_\-\.~';
+    private const CHAR_UNRESERVED = 'a-zA-Z0-9_\-\.~';
 
     /** @var array<string,int> */
-    private static $schemes = array(
+    private static array $schemes = array(
         'ftp' => 21,
         'http' => 80,
         'https' => 443,
     );
-
 
     /**
      * Throw exception if invalid host string.
@@ -214,7 +213,7 @@ abstract class AbstractUri
      *
      * @see https://www.regextester.com/103452
      */
-    private function isFqdn($host)
+    private function isFqdn($host): bool
     {
         if (PHP_VERSION_ID >= 70000) {
             return \filter_var($host, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) !== false;

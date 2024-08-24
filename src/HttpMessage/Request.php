@@ -40,13 +40,13 @@ use Psr\Http\Message\UriInterface;
 class Request extends Message implements RequestInterface
 {
     /** @var string */
-    private $method = 'GET';
+    private string $method = 'GET';
 
     /** @var string|null */
-    private $requestTarget;
+    private ?string $requestTarget = null;
 
     /** @var UriInterface */
-    private $uri;
+    private UriInterface $uri;
 
     /**
      * Constructor
@@ -120,7 +120,7 @@ class Request extends Message implements RequestInterface
      * @return static
      * @throws InvalidArgumentException
      */
-    public function withRequestTarget(string $requestTarget): RequestInterface
+    public function withRequestTarget(string $requestTarget): static
     {
         $this->assertString($requestTarget, 'Request target');
         if (\preg_match('#\s#', $requestTarget)) {
@@ -167,7 +167,7 @@ class Request extends Message implements RequestInterface
      *
      * @see https://datatracker.ietf.org/doc/html/rfc7231
      */
-    public function withMethod(string $method): RequestInterface
+    public function withMethod(string $method): static
     {
         $this->assertMethod($method);
         $new = clone $this;
@@ -218,7 +218,7 @@ class Request extends Message implements RequestInterface
      *
      * @throws InvalidArgumentException
      */
-    public function withUri(UriInterface $uri, bool $preserveHost = false): RequestInterface
+    public function withUri(UriInterface $uri, bool $preserveHost = false): static
     {
         if ($uri === $this->uri) {
             return $this;
@@ -234,7 +234,7 @@ class Request extends Message implements RequestInterface
      * {@inheritDoc}
      */
     #[\Override]
-    public function withoutHeader(string $name): MessageInterface
+    public function withoutHeader(string $name): static
     {
         $new = parent::withoutHeader($name);
         return \strtolower($name) === 'host'
@@ -249,7 +249,7 @@ class Request extends Message implements RequestInterface
      *
      * @return static
      */
-    private function updateHostHeader(): RequestInterface
+    private function updateHostHeader(): static
     {
         $uri = $this->getUri();
         $host = $uri->getHost();

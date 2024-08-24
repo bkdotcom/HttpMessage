@@ -9,7 +9,7 @@
  * @copyright 2024 Brad Kent
  */
 
- namespace bdk\HttpMessage;
+namespace bdk\HttpMessage;
 
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -195,7 +195,7 @@ interface ServerRequestExtendedInterface extends ServerRequestInterface
      *
      * @return static
      */
-    public function registerMediaTypeParser($contentType, callable $callable): ServerRequestInterface;
+    public function registerMediaTypeParser($contentType, callable $callable): static;
 
     /**
      * Return an instance with the specified derived request attributes.
@@ -213,5 +213,5 @@ interface ServerRequestExtendedInterface extends ServerRequestInterface
      *
      * @return static
      */
-    public function withAttributes(array $attributes): ServerRequestExtendedInterface;
+    public function withAttributes(array $attributes): static;
 }

@@ -26,7 +26,7 @@ use InvalidArgumentException;
 class ServerRequest
 {
     /** @var non-empty-string used for unit tests */
-    public static $inputStream = 'php://input';
+    public static string $inputStream = 'php://input';
 
     /**
      * Instantiate ServerRequest instance from superglobals

@@ -32,25 +32,25 @@ use Psr\Http\Message\UriInterface;
 class Uri extends AbstractUri implements UriInterface
 {
     /** @var string Uri scheme. */
-    private $scheme = '';
+    private string $scheme = '';
 
     /** @var string The URI user information, in "username[:password]" format. (or empty string) */
-    private $userInfo = '';
+    private string $userInfo = '';
 
     /** @var string Uri host. */
-    private $host = '';
+    private string $host = '';
 
     /** @var null|int Uri port. */
-    private $port;
+    private ?int $port = null;
 
     /** @var string Uri path. */
-    private $path = '';
+    private string $path = '';
 
     /** @var string Uri query string. */
-    private $query = '';
+    private string $query = '';
 
     /** @var string Uri fragment. */
-    private $fragment = '';
+    private string $fragment = '';
 
     /**
      * Constructor
@@ -284,7 +284,7 @@ class Uri extends AbstractUri implements UriInterface
      *
      * @throws InvalidArgumentException for invalid / unsupported schemes.
      */
-    public function withScheme(string $scheme): UriInterface
+    public function withScheme(string $scheme): static
     {
         $this->assertScheme($scheme);
         $scheme = self::lowercase($scheme);
@@ -309,7 +309,7 @@ class Uri extends AbstractUri implements UriInterface
      *
      * @return static A new instance with the specified user information.
      */
-    public function withUserInfo(string $user, ?string $password = null): UriInterface
+    public function withUserInfo(string $user, ?string $password = null): static
     {
         $this->assertString($user, 'user');
         $info = $user;
@@ -336,7 +336,7 @@ class Uri extends AbstractUri implements UriInterface
      *
      * @throws InvalidArgumentException for invalid hostnames.
      */
-    public function withHost(string $host): UriInterface
+    public function withHost(string $host): static
     {
         $this->assertHost($host);
         $host = self::lowercase($host);
@@ -359,7 +359,7 @@ class Uri extends AbstractUri implements UriInterface
      * @return static A new instance with the specified port.
      * @throws InvalidArgumentException for invalid ports.
      */
-    public function withPort(?int $port): UriInterface
+    public function withPort(?int $port): static
     {
         $port = $this->filterPort($port);
         if ($port === $this->port) {
@@ -391,7 +391,7 @@ class Uri extends AbstractUri implements UriInterface
      *
      * @throws InvalidArgumentException for invalid paths.
      */
-    public function withPath(string $path): UriInterface
+    public function withPath(string $path): static
     {
         $path = $this->filterPath($path);
         if ($path === $this->path) {
@@ -414,7 +414,7 @@ class Uri extends AbstractUri implements UriInterface
      * @return static A new instance with the specified query string.
      * @throws InvalidArgumentException for invalid query strings.
      */
-    public function withQuery(string $query): UriInterface
+    public function withQuery(string $query): static
     {
         $this->assertString($query, 'query');
         $query = $this->filterQueryAndFragment($query);
@@ -437,7 +437,7 @@ class Uri extends AbstractUri implements UriInterface
      *
      * @return static A new instance with the specified fragment.
      */
-    public function withFragment(string $fragment): UriInterface
+    public function withFragment(string $fragment): static
     {
         $this->assertString($fragment, 'fragment');
         $fragment = $this->filterQueryAndFragment($fragment);

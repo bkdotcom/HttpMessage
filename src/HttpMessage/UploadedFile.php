@@ -29,19 +29,19 @@ use RuntimeException;
 class UploadedFile implements UploadedFileInterface
 {
     /** @var string|null */
-    private $clientFilename;
+    private ?string $clientFilename = null;
 
     /** @var string|null */
-    private $clientFullPath;
+    private ?string $clientFullPath = null;
 
     /** @var string|null */
-    private $clientMediaType;
+    private ?string $clientMediaType = null;
 
     /** @var int */
-    private $error;
+    private int $error = UPLOAD_ERR_OK;
 
     /** @var array<int,string> */
-    private $errors = array(
+    private array $errors = array(
         UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
         UPLOAD_ERR_EXTENSION  => 'File upload stopped by extension.',
         UPLOAD_ERR_FORM_SIZE  => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.',
@@ -53,19 +53,19 @@ class UploadedFile implements UploadedFileInterface
     );
 
     /** @var string|null */
-    private $file;
+    private ?string $file = null;
 
     /** @var bool */
-    private $isMoved = false;
+    private bool $isMoved = false;
 
     /** @var int|null */
-    private $size;
+    private ?int $size = null;
 
     /** @var StreamInterface|null */
-    private $stream;
+    private ?StreamInterface $stream = null;
 
     /** @var string */
-    private $sapi = PHP_SAPI;
+    private string $sapi = PHP_SAPI;
 
     /**
      * Constructor

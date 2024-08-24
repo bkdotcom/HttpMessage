@@ -41,20 +41,20 @@ class Message implements MessageInterface
     /**
      * @var StreamInterface|null
      */
-    private $body;
+    private ?StreamInterface $body = null;
 
     /**
      * @var array<string,string[]> Map of all registered headers, as name => array of values
      */
-    private $headers = array();
+    private array $headers = array();
 
     /**
      * @var array<string,string> Map of lowercase header name => original name at registration
      */
-    private $headerNames = array();
+    private array $headerNames = array();
 
     /** @var string */
-    protected $protocolVersion = '1.1';
+    protected string $protocolVersion = '1.1';
 
     /**
      * Retrieves the HTTP protocol version as a string.
@@ -75,7 +75,7 @@ class Message implements MessageInterface
      *
      * @return static
      */
-    public function withProtocolVersion(string $version): MessageInterface
+    public function withProtocolVersion(string $version): static
     {
         $this->assertProtocolVersion($version);
         if ($version === $this->protocolVersion) {
@@ -167,7 +167,7 @@ class Message implements MessageInterface
      * @return static
      * @throws InvalidArgumentException for invalid header name or value
      */
-    public function withHeader(string $name, $value): MessageInterface
+    public function withHeader(string $name, $value): static
     {
         $this->assertHeaderName($name);
         $name = $this->normalizeHeaderName($name);
@@ -201,7 +201,7 @@ class Message implements MessageInterface
      * @return static
      * @throws InvalidArgumentException for invalid header name or value
      */
-    public function withAddedHeader(string $name, $value): MessageInterface
+    public function withAddedHeader(string $name, $value): static
     {
         // assert before using as array key (which will typecast)
         $this->assertHeaderName($name);
@@ -219,7 +219,7 @@ class Message implements MessageInterface
      *
      * @return static
      */
-    public function withoutHeader(string $name): MessageInterface
+    public function withoutHeader(string $name): static
     {
         $nameLower = \strtolower($name);
         if (!isset($this->headerNames[$nameLower])) {
@@ -250,7 +250,7 @@ class Message implements MessageInterface
      *
      * @return static
      */
-    public function withBody(StreamInterface $body): MessageInterface
+    public function withBody(StreamInterface $body): static
     {
         if ($body === $this->body) {
             return $this;

@@ -9,7 +9,7 @@
  * @copyright 2024 Brad Kent
  */
 
- namespace bdk\HttpMessage;
+namespace bdk\HttpMessage;
 
 use bdk\HttpMessage\ServerRequestExtendedInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -218,7 +218,7 @@ class ServerRequestExtended extends ServerRequest implements ServerRequestExtend
      *
      * @return static
      */
-    public function withAttributes(array $attributes): ServerRequestExtendedInterface
+    public function withAttributes(array $attributes): static
     {
         $new = clone $this;
         foreach ($attributes as $attribute => $value) {
