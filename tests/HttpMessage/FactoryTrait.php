@@ -5,6 +5,7 @@ namespace bdk\Test\HttpMessage;
 use bdk\HttpMessage\Request;
 use bdk\HttpMessage\Response;
 use bdk\HttpMessage\ServerRequest;
+use bdk\HttpMessage\ServerRequestExtended;
 use bdk\HttpMessage\Stream;
 use bdk\HttpMessage\UploadedFile;
 use bdk\HttpMessage\Uri;
@@ -29,6 +30,11 @@ trait FactoryTrait
     protected static function createServerRequest($method = 'GET', $uri = '', $serverParams = array())
     {
         return new ServerRequest($method, $uri, $serverParams);
+    }
+
+    protected static function createServerRequestExtended($method = 'GET', $uri = '', $serverParams = array())
+    {
+        return new ServerRequestExtended($method, $uri, $serverParams);
     }
 
     protected static function createStream($mixed = null)

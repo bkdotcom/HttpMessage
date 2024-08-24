@@ -73,4 +73,41 @@ class TestCase extends TestCaseBase
         }
         throw new AssertionFailedError('Exception not thrown');
     }
+
+    /*
+        Methods that help for testing.
+    */
+
+    /**
+     * Moke a uploadedFiles array
+     *
+     * @param int $item which array to return
+     *
+     * @return array
+     */
+    protected static function mockFiles($item = 1)
+    {
+        if ($item === 1) {
+            return array(
+                'file1' => self::createUploadedFile(
+                    '/tmp/php1234.tmp',
+                    100000,
+                    UPLOAD_ERR_OK,
+                    'file1.jpg',
+                    'image/jpeg'
+                ),
+            );
+        }
+        if ($item === 2) {
+            return array(
+                'file2' => self::createUploadedFile(
+                    '/tmp/php1235',
+                    123456,
+                    UPLOAD_ERR_OK,
+                    'file2.png',
+                    'image/png'
+                ),
+            );
+        }
+    }
 }

@@ -156,7 +156,7 @@ class MessageTest extends TestCase
     /**
      * @param $version
      *
-     * @dataProvider validProtocolVersions
+     * @dataProvider protocolVersionsValid
      */
     public function testAcceptsValidProtocolVersion($version)
     {
@@ -168,7 +168,7 @@ class MessageTest extends TestCase
     /**
      * @param mixed $version
      *
-     * @dataProvider invalidProtocolVersions
+     * @dataProvider protocolVersionsInvalid
      */
     public function testWithInvalidProtocolVersionThrowsException($version)
     {
@@ -182,7 +182,7 @@ class MessageTest extends TestCase
     /**
      * @param $name
      *
-     * @dataProvider validHeaderNames
+     * @dataProvider headerNamesValid
      */
     public function testWithoutHeader($name)
     {
@@ -203,7 +203,7 @@ class MessageTest extends TestCase
     /**
      * @param $name
      *
-     * @dataProvider validHeaderNames
+     * @dataProvider headerNamesValid
      */
     public function testWithHeaderAcceptsValidHeaderNames($name)
     {
@@ -217,7 +217,7 @@ class MessageTest extends TestCase
     /**
      * @param $name
      *
-     * @dataProvider validHeaderNames
+     * @dataProvider headerNamesValid
      */
     public function testWithAddedHeaderAcceptsValidHeaderNames($name)
     {
@@ -231,7 +231,7 @@ class MessageTest extends TestCase
     /**
      * @param $name
      *
-     * @dataProvider invalidHeaderNames
+     * @dataProvider headerNamesInvalid
      */
     public function testInvalidHeaderNameThrowsException($name)
     {
@@ -245,7 +245,7 @@ class MessageTest extends TestCase
     /**
      * @param $name
      *
-     * @dataProvider invalidHeaderNames
+     * @dataProvider headerNamesInvalid
      */
     public function testInvalidAddedHeaderNameThrowException($name)
     {
@@ -259,7 +259,7 @@ class MessageTest extends TestCase
     /**
      * @param $value
      *
-     * @dataProvider validHeaderValues
+     * @dataProvider headerValuesValid
      */
     public function testWithHeaderAcceptValidValues($value)
     {
@@ -272,7 +272,7 @@ class MessageTest extends TestCase
     /**
      * @param $value
      *
-     * @dataProvider validHeaderValues
+     * @dataProvider headerValuesValid
      */
     public function testWithAddedHeaderAcceptsValidValues($value)
     {
@@ -284,7 +284,7 @@ class MessageTest extends TestCase
     /**
      * @param mixed $value
      *
-     * @dataProvider invalidHeaderValues
+     * @dataProvider headerValuesInvalid
      */
     public function testWithHeaderRejectsInvalidValues($value)
     {
@@ -296,7 +296,7 @@ class MessageTest extends TestCase
     /**
      * @param mixed $value
      *
-     * @dataProvider invalidHeaderValues
+     * @dataProvider headerValuesInvalid
      */
     public function testWithHeaderRejectsInvalidArrayValues($value)
     {
@@ -308,7 +308,7 @@ class MessageTest extends TestCase
     /**
      * @param mixed $value
      *
-     * @dataProvider invalidHeaderValues
+     * @dataProvider headerValuesInvalid
      */
     public function testWithAddedHeaderRejectsInvalidValues($value)
     {
@@ -320,7 +320,7 @@ class MessageTest extends TestCase
     /**
      * @param mixed $value
      *
-     * @dataProvider invalidHeaderValues
+     * @dataProvider headerValuesInvalid
      */
     public function testWithAddedHeaderRejectsInvalidArrayValues($value)
     {

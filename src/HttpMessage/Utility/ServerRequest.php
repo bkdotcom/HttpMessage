@@ -7,21 +7,21 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage\Utility;
 
-use bdk\HttpMessage\ServerRequest as ServerRequestImplementation;
+use bdk\HttpMessage\ServerRequestExtended;
 use bdk\HttpMessage\Stream;
 use bdk\HttpMessage\UploadedFile;
-use bdk\HttpMessage\Uri as UriImplementation; // https://bugs.php.net/bug.php?id=66773
 use bdk\HttpMessage\Utility\ContentType;
 use bdk\HttpMessage\Utility\ParseStr;
+use bdk\HttpMessage\Utility\Uri as UriUtility;
 use InvalidArgumentException;
 
 /**
- * Build ServerRequest from globals ($_SERVER, $_COOKIE, $_POST, $_FILES)
+ * Build ServerRequest from globals (`$_SERVER`, `$_COOKIE`, `$_POST`, `$_FILES`)
  */
 class ServerRequest
 {
@@ -29,11 +29,11 @@ class ServerRequest
     public static $inputStream = 'php://input';
 
     /**
-     * Instantiate self from superglobals
+     * Instantiate ServerRequest instance from superglobals
      *
      * @param array $parseStrOpts Parse options (default: {convDot:false, convSpace:false})
      *
-     * @return ServerRequestImplementation
+     * @return ServerRequestExtended
      *
      * @SuppressWarnings(PHPMD.Superglobals)
      */
@@ -42,21 +42,24 @@ class ServerRequest
         $method = isset($_SERVER['REQUEST_METHOD'])
             ? $_SERVER['REQUEST_METHOD']
             : 'GET';
-        $uri = UriImplementation::fromGlobals();
+        $uri = UriUtility::fromGlobals();
         $files = self::filesFromGlobals($_FILES);
-        $serverRequest = new ServerRequestImplementation($method, $uri, $_SERVER);
+
+        $serverRequest = new ServerRequestExtended($method, $uri, $_SERVER);
+        $serverRequest->registerMediaTypeParser(ContentType::FORM, static function ($input) use ($parseStrOpts) {
+            return ParseStr::parse($input, $parseStrOpts);
+        });
+
         $contentType = $serverRequest->getHeaderLine('Content-Type');
-        // note: php://input not available with content-type = "multipart/form-data".
-        $parsedBody = $method !== 'GET'
-            ? self::postFromInput($contentType, self::$inputStream, $parseStrOpts) ?: $_POST
-            : null;
+        $parsedBody = self::parsedBodyFromGlobals($contentType, $method);
         $query = $uri->getQuery();
         $queryParams = ParseStr::parse($query, $parseStrOpts);
+
         return $serverRequest
             ->withBody(new Stream(
                 PHP_VERSION_ID < 70000
-                    ? \stream_get_contents(\fopen('php://input', 'r+')) // prev 5.6 is not seekable / read once.. still not reliable in 5.6
-                    : \fopen('php://input', 'r+')
+                    ? \stream_get_contents(\fopen(self::$inputStream, 'r+')) // prev 5.6 is not seekable / read once.. still not reliable in 5.6
+                    : \fopen(self::$inputStream, 'r+')
             ))
             ->withCookieParams($_COOKIE)
             ->withParsedBody($parsedBody)
@@ -157,23 +160,6 @@ class ServerRequest
     }
 
     /**
-     * Is the given Content-Type parsable
-     *
-     * @param string $contentType Content-Type / Mime-Type
-     *
-     * @return bool
-     */
-    private static function isContentTypeParsable($contentType)
-    {
-        $parsableTypes = array(
-            ContentType::FORM,
-            ContentType::FORM_MULTIPART, // would be parsable... but php doesn't make available
-            ContentType::JSON,
-        );
-        return \in_array($contentType, $parsableTypes, true);
-    }
-
-    /**
      * Are we uploaded file info array?  ('tmp_name', 'size', 'error', name', 'type'...
      *
      * Don't base this off a single key like 'tmp_name'.
@@ -207,32 +193,23 @@ class ServerRequest
     /**
      * Get parsed body (POST data)
      *
-     * Note: this will return null if content-type = "multipart/form-data" and input = "php://input"
+     * Only return if content-type is "multipart/form-data"...
+     * We can use custom parser for other content-types (incl application/x-www-form-urlencoded)
      *
-     * @param string $contentType  Content-Type header value
-     * @param string $input        ('php://input') specify input
-     * @param array  $parseStrOpts Parse options (default: {convDot:false, convSpace:false})
+     * @param string $contentType Content-Type header value
+     * @param string $method      Request method
      *
      * @return array|null
      */
-    private static function postFromInput($contentType, $input = 'php://input', array $parseStrOpts = array())
+    private static function parsedBodyFromGlobals($contentType, $method)
     {
+        if ($method === 'GET') {
+            return null;
+        }
         $contentType = \preg_replace('/\s*[;,].*$/', '', $contentType);
         $contentType = \strtolower($contentType);
-        if (self::isContentTypeParsable($contentType) === false) {
-            return null;
-        }
-        $rawBody = \file_get_contents($input);
-        if ($rawBody === '') {
-            return null;
-        }
-        if ($contentType !== ContentType::JSON) {
-            return ParseStr::parse($rawBody, $parseStrOpts);
-        }
-        /** @var array */
-        $jsonParsedBody = \json_decode($rawBody, true);
-        return \json_last_error() === JSON_ERROR_NONE
-            ? $jsonParsedBody
+        return $contentType === ContentType::FORM_MULTIPART
+            ? $_POST
             : null;
     }
 }

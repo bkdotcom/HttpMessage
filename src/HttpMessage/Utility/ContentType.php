@@ -28,5 +28,6 @@ class ContentType
     const SQL = 'application/sql';
     const TXT = 'text/plain';
     const XML = 'text/xml';
+    const XML_APP = 'application/xml';
     const ZIP = 'application/zip';
 }

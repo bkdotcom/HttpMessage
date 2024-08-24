@@ -7,7 +7,7 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage;
@@ -22,7 +22,7 @@ use RuntimeException;
  * Value object representing a file uploaded through an HTTP request.
  *
  * Instances of this interface are considered immutable; all methods that
- * might change state MUST be implemented such that they retain the internal
+ * might change state are implemented such that they retain the internal
  * state of the current instance and return an instance that contains the
  * changed state.
  */
@@ -218,7 +218,7 @@ class UploadedFile implements UploadedFileInterface
      * Returns one of PHP's UPLOAD_ERR_XXX constants.
      *
      * If the file was uploaded successfully, will return
-     * UPLOAD_ERR_OK.
+     * `UPLOAD_ERR_OK`.
      *
      * @return int One of PHP's UPLOAD_ERR_XXX constants.
      *
@@ -232,7 +232,9 @@ class UploadedFile implements UploadedFileInterface
     /**
      * Get uploaded file's error message
      *
-     * This is a non PSR-7 method
+     * If the file was uploaded successfully, will return ''
+     *
+     * Note: This method is not part of the PSR-7 standard.
      *
      * @return string
      */
@@ -262,16 +264,16 @@ class UploadedFile implements UploadedFileInterface
     /**
      * Retrieve the full_path sent by the client.
      *
-     * NOT DEFINED IN INTERFACE
+     * full_path value is new as of PHP 8.1 and passed by client when uploading a directory
      *
-     * full_path is new as of PHP 8.1 and passed by client when uploading a directory
+     * Do not trust the value returned by this method.
+     * A client could send a malicious filename with the
+     * intention to corrupt or hack your application.
      *
-     * Do not trust the value returned by this method. A client could send
-     * a malicious filename with the intention to corrupt or hack your
-     * application.
+     * Note: This method is not part of the PSR-7 standard.
      *
      * @return string|null The full-path sent by the client
-     *   or null if none was provided.
+     *   or `null` if none was provided.
      */
     public function getClientFullPath()
     {

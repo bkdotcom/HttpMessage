@@ -7,16 +7,16 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage\Utility;
 
-use bdk\HttpMessage\Response as ResponseImplementation;
-use bdk\HttpMessage\ServerRequest as ServerRequestImplementation;
+use bdk\HttpMessage\Response as BdkResponse;
+use bdk\HttpMessage\ServerRequestExtended;
 use bdk\HttpMessage\Stream;
 use bdk\HttpMessage\UploadedFile;
-use bdk\HttpMessage\Uri as UriImplementation;
+use bdk\HttpMessage\Uri as BdkUri;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile as HttpFoundationUploadedFile;
 use Symfony\Component\HttpFoundation\Request as HttpFoundationRequest;
@@ -35,7 +35,7 @@ class HttpFoundationBridge
      *
      * @param HttpFoundationRequest $request HttpFoundation\Request obj
      *
-     * @return ServerRequestImplementation
+     * @return ServerRequestExtended
      *
      * @psalm-suppress ReservedWord complains about HttpFoundations' : mixed return spec
      */
@@ -47,12 +47,12 @@ class HttpFoundationBridge
             . $request->getBaseUrl()
             . $request->getPathInfo()
             . ($query !== '' ? '?' . $query : '');
-        $uri = new UriImplementation($uri);
+        $uri = new BdkUri($uri);
 
         $bodyContentResource = $request->getContent(true);
         $stream = new Stream($bodyContentResource);
 
-        $psr7request = new ServerRequestImplementation($request->getMethod(), $uri, $request->server->all());
+        $psr7request = new ServerRequestExtended($request->getMethod(), $uri, $request->server->all());
         $psr7request = $psr7request
             ->withBody($stream)
             ->withUploadedFiles(self::getFiles($request->files->all()))
@@ -73,7 +73,7 @@ class HttpFoundationBridge
      *
      * @param HttpFoundationResponse $response HttpFoundationResponse instance
      *
-     * @return ResponseImplementation
+     * @return BdkResponse
      */
     public static function createResponse(HttpFoundationResponse $response)
     {
@@ -81,7 +81,7 @@ class HttpFoundationBridge
         $protocolVersion = $response->getProtocolVersion();
         $stream = self::createResponseStream($response);
 
-        $psr7response = new ResponseImplementation($statusCode);
+        $psr7response = new BdkResponse($statusCode);
         $psr7response = $psr7response
             ->withProtocolVersion($protocolVersion)
             ->withBody($stream);

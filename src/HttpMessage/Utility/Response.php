@@ -7,7 +7,7 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage\Utility;
@@ -134,11 +134,11 @@ class Response
     }
 
     /**
-     * Get the "phrase" associated with the status code
+     * Get the standard "phrase" associated with the status code
      *
      * @param int|string $code 3-digit status code
      *
-     * @return string (empty string if unknown code)
+     * @return string empty string if unknown code
      */
     public static function codePhrase($code)
     {

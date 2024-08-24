@@ -183,7 +183,7 @@ class RequestTest extends TestCase
     /**
      * @param mixed $uri invalid uri
      *
-     * @dataProvider invalidUris
+     * @dataProvider urisInvalid
      */
     public function testExceptionConstructor($uri)
     {
@@ -195,7 +195,7 @@ class RequestTest extends TestCase
     /**
      * @param mixed $version
      *
-     * @dataProvider invalidRequestMethods
+     * @dataProvider requestMethodsInvalid
      */
     public function testWithMethodInvalidThrowsException($method)
     {

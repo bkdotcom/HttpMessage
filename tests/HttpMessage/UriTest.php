@@ -186,7 +186,7 @@ class UriTest extends TestCase
     /**
      * @param string $input
      *
-     * @dataProvider validUris
+     * @dataProvider UrisValid
      */
     public function testValidUrisFormsArePreserved($input)
     {
@@ -197,7 +197,7 @@ class UriTest extends TestCase
     /**
      * @param string $scheme
      *
-     * @dataProvider validUriSchemes
+     * @dataProvider uriSchemesValid
      */
     public function testValidSchemesAreAccepted($scheme)
     {
@@ -226,7 +226,7 @@ class UriTest extends TestCase
     /**
      * @param mixed $uri
      *
-     * @dataProvider invalidUris
+     * @dataProvider urisInvalid
      */
     public function testInvalidUrisAreRejected($uri)
     {
@@ -237,7 +237,7 @@ class UriTest extends TestCase
     /**
      * @param mixed $scheme
      *
-     * @dataProvider invalidUriSchemes
+     * @dataProvider uriSchemesInvalid
      */
     public function testWithSchemeRejectsInvalid($scheme)
     {
@@ -252,7 +252,7 @@ class UriTest extends TestCase
      * @param mixed $user
      * @param mixed $password
      *
-     * @dataProvider invalidUriUserInfos
+     * @dataProvider uriUserInfosInvalid
      */
     public function testWithUserInfoRejectsInvalid($user, $password)
     {
@@ -266,7 +266,7 @@ class UriTest extends TestCase
     /**
      * @param mixed $host
      *
-     * @dataProvider invalidUriHosts
+     * @dataProvider uriHostsInvalid
      */
     public function testWithHostRejectsInvalid($host)
     {
@@ -280,7 +280,7 @@ class UriTest extends TestCase
     /**
      * @param mixed $port
      *
-     * @dataProvider invalidUriPorts
+     * @dataProvider uriPortsInvalid
      */
     public function testWithPortRejectsInvalid($port)
     {
@@ -294,7 +294,7 @@ class UriTest extends TestCase
     /**
      * @param mixed $path
      *
-     * @dataProvider invalidUriPaths
+     * @dataProvider uriPathsInvalid
      */
     public function testWithPathRejectsInvalid($path)
     {
@@ -308,7 +308,7 @@ class UriTest extends TestCase
     /**
      * @param mixed $query
      *
-     * @dataProvider invalidUriQueries
+     * @dataProvider uriQueriesInvalid
      */
     public function testWithQueryRejectsInvalidValues($query)
     {
@@ -322,7 +322,7 @@ class UriTest extends TestCase
     /**
      * @param mixed $fragment
      *
-     * @dataProvider invalidUriFragments
+     * @dataProvider uriFragmentsInvalid
      */
     public function testWithFragmentRejectsInvalidValues($fragment)
     {

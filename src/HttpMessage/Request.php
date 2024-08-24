@@ -7,7 +7,7 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage;
@@ -20,7 +20,20 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
- * Http Request
+ * Representation of an outgoing, client-side request.
+ *
+ * Per the HTTP specification, this class includes properties for
+ * each of the following:
+ *
+ * - Protocol version
+ * - HTTP method
+ * - URI
+ * - Headers
+ * - Message body
+ *
+ * Requests are considered immutable; all methods that might change state are
+ * implemented such that they retain the internal state of the current
+ * message and return an instance that contains the changed state.
  *
  * @psalm-consistent-constructor
  */
@@ -71,7 +84,7 @@ class Request extends Message implements RequestInterface
      * withRequestTarget() below).
      *
      * If no URI is available, and no request-target has been specifically
-     * provided, this method MUST return the string "/".
+     * provided, this method will return the string "/".
      *
      * @return string
      */
@@ -99,10 +112,6 @@ class Request extends Message implements RequestInterface
      * this method may be used to create an instance with the specified
      * request-target, verbatim.
      *
-     * This method MUST be implemented in such a way as to retain the
-     * immutability of the message, and MUST return an instance that has the
-     * changed request target.
-     *
      * @param string $requestTarget new request target
      *
      * @see https://datatracker.ietf.org/doc/html/rfc7230#section-5.3 (for the various
@@ -113,11 +122,7 @@ class Request extends Message implements RequestInterface
      */
     public function withRequestTarget($requestTarget)
     {
-        if (\is_string($requestTarget) === false) {
-            throw new InvalidArgumentException(
-                'Request target must be a string.'
-            );
-        }
+        $this->assertString($requestTarget, 'Request target');
         if (\preg_match('#\s#', $requestTarget)) {
             throw new InvalidArgumentException(
                 'Request target cannot contain whitespace'
@@ -173,8 +178,6 @@ class Request extends Message implements RequestInterface
     /**
      * Retrieves the URI instance.
      *
-     * This method MUST return a UriInterface instance.
-     *
      * @return UriInterface Returns a UriInterface instance
      *     representing the URI of the request.
      *
@@ -188,7 +191,7 @@ class Request extends Message implements RequestInterface
     /**
      * Returns an instance with the provided URI.
      *
-     * This method MUST update the Host header of the returned request by
+     * This method will update the Host header of the returned request by
      * default if the URI contains a host component. If the URI does not
      * contain a host component, any pre-existing Host header MUST be carried
      * over to the returned request.
@@ -198,17 +201,13 @@ class Request extends Message implements RequestInterface
      * `true`, this method interacts with the Host header in the following ways:
      *
      * - If the Host header is missing or empty, and the new URI contains
-     *   a host component, this method MUST update the Host header in the returned
+     *   a host component, this method will update the Host header in the returned
      *   request.
      * - If the Host header is missing or empty, and the new URI does not contain a
-     *   host component, this method MUST NOT update the Host header in the returned
+     *   host component, this method will NOT update the Host header in the returned
      *   request.
-     * - If a Host header is present and non-empty, this method MUST NOT update
+     * - If a Host header is present and non-empty, this method will NOT update
      *   the Host header in the returned request.
-     *
-     * This method MUST be implemented in such a way as to retain the
-     * immutability of the message, and MUST return an instance that has the
-     * new UriInterface instance.
      *
      * @param UriInterface $uri          New request URI to use.
      * @param bool         $preserveHost Preserve the original state of the Host header.

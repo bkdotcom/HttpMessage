@@ -4,6 +4,7 @@ namespace bdk\Test\HttpMessage\Utility;
 
 use bdk\HttpMessage\ServerRequest;
 use bdk\HttpMessage\Utility\ParseStr;
+use bdk\HttpMessage\Utility\ContentType;
 use bdk\HttpMessage\Utility\ServerRequest as ServerRequestUtil;
 use bdk\PhpUnitPolyfill\ExpectExceptionTrait;
 use bdk\Test\HttpMessage\FactoryTrait;
@@ -22,12 +23,31 @@ class ServerRequestTest extends TestCase
 	use ExpectExceptionTrait;
 	use FactoryTrait;
 
+    private $backupFiles;
+    private $backupGet;
+    private $backupInputStream;
+    private $backupServer;
+
+    public function setUp(): void
+    {
+        $this->backupFiles = $_FILES;
+        $this->backupGet = $_GET;
+        $this->backupInputStream = ServerRequestUtil::$inputStream;
+        $this->backupServer = $_SERVER;
+    }
+
+    public function tearDown(): void
+    {
+        $_FILES = $this->backupFiles;
+        $_GET = $this->backupGet;
+        $_SERVER = $this->backupServer;
+        ServerRequestUtil::$inputStream = $this->backupInputStream;
+    }
+
     public function testFromGlobals()
     {
-        $serverBackup = $_SERVER;
-        $getBackup = $_GET;
         $_SERVER = array(
-            'HTTP_CONTENT_TYPE' => 'application/json',
+            'HTTP_CONTENT_TYPE' => ContentType::JSON,
             'HTTP_HOST' => 'www.test.com:8080',
             'REQUEST_METHOD' => 'POST',
             'REQUEST_URI' => '/path?ding=dong',
@@ -102,8 +122,11 @@ class ServerRequestTest extends TestCase
                 ),
             ),
         ), $request->getUploadedFiles());
-        $_FILES = array();
+    }
 
+    public function testFromGlobalsHostError()
+    {
+        $_FILES = array();
         // test parse_url failure
         $_SERVER = array(
             'HTTP_HOST' => '/s?a=12&b=12.3.3.4:1233',
@@ -113,64 +136,60 @@ class ServerRequestTest extends TestCase
         $request = ServerRequest::fromGlobals();
         self::assertSame('GET', $request->getMethod());
         self::assertSame('http:/?ding=dong', (string) $request->getUri());
-
-        $_SERVER = $serverBackup;
-        $_GET = $getBackup;
     }
 
-    public function testPostFromInput()
+    public function testFromGlobalsMultipart()
     {
-        $serverRequestUtil = new ServerRequestUtil();
-        $reflectionMethod = new ReflectionMethod($serverRequestUtil, 'postFromInput');
-        $reflectionMethod->setAccessible(true);
-
-        $parsed = $reflectionMethod->invokeArgs($serverRequestUtil, array(
-            'application/unknown',
-        ));
-        self::assertNull($parsed);
-
-        $parsed = $reflectionMethod->invokeArgs($serverRequestUtil, array(
-            'application/json',
-        ));
-        self::assertNull($parsed);
-
-        $parsed = $reflectionMethod->invokeArgs($serverRequestUtil, array(
-            'application/x-www-form-urlencoded',
-            __DIR__ . '/input.txt'
-        ));
+        $_SERVER = array(
+            'HTTP_CONTENT_TYPE' => ContentType::FORM_MULTIPART,
+            'REQUEST_METHOD' => 'POST',
+        );
+        $_POST = array(
+            'foo' => 'bar',
+        );
+        $request = ServerRequest::fromGlobals();
         self::assertSame(array(
-            0 => 'foo',
-            1 => 'bar',
-            2 => 'baz',
-            4 => 'boom',
-            'dingle.berry' => 'brown',
-            'a b' => 'c',
-            'd e' => 'f',
-            'g h' => 'i',
-        ), $parsed);
+            'foo' => 'bar',
+        ), $request->getParsedBody());
+    }
 
-        ParseStr::setOpts(array(
+    public function testFromGlobalsForm()
+    {
+        $inputFile = __DIR__ . '/input.txt';
+        // pay no attention to $_GET... we parse from REQUEST_URI
+        $_GET = array(
+            'foo' => 'bar',
+        );
+        // pay no attention to $_POST... we parse from input stream
+        $_POST = array(
+            'foo' => 'bar',
+        );
+        $_SERVER = array(
+            'HTTP_CONTENT_TYPE' => ContentType::FORM,
+            'REQUEST_METHOD' => 'POST',
+            'REQUEST_URI' => '/path?' . \file_get_contents($inputFile),
+        );
+        ServerRequestUtil::$inputStream = $inputFile;
+        $request = ServerRequest::fromGlobals(array(
             'convDot' => true,
-            'convSpace' => false,
-        ));
-        $parsed = $reflectionMethod->invokeArgs($serverRequestUtil, array(
-            'application/x-www-form-urlencoded',
-            __DIR__ . '/input.txt'
+            'convSpace' => true,
         ));
         self::assertSame(array(
-            0 => 'foo',
-            1 => 'bar',
-            2 => 'baz',
-            4 => 'boom',
-            'dingle_berry' => 'brown',
-            'a b' => 'c',
-            'd e' => 'f',
-            'g h' => 'i',
-        ), $parsed);
-        ParseStr::setOpts(array(
-            'convDot' => false,
-            'convSpace' => false,
-        ));
+            'foo_bar' => 'baz 4',
+            'foo+bar' => 'baz 3',
+            'stuff' => array(
+                'a',
+                'b',
+            ),
+        ), $request->getParsedBody());
+        self::assertSame(array(
+            'foo_bar' => 'baz 4',
+            'foo+bar' => 'baz 3',
+            'stuff' => array(
+                'a',
+                'b',
+            ),
+        ), $request->getQueryParams());
     }
 
     public function testExceptionWithUploadedFile()

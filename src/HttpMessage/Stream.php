@@ -7,7 +7,7 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage;
@@ -18,21 +18,31 @@ use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 
 /**
- * Psr\Http\Message\Stream implementation
+ * Describes a data stream.
  *
  * @psalm-api
  */
 class Stream extends AbstractStream implements StreamInterface
 {
     /**
-     * Resource modes.
-     *
-     * @var string
+     * @var string Readable modes regex
      *
      * @see http://php.net/manual/function.fopen.php
      * @see http://php.net/manual/en/function.gzopen.php
+     *
+     * @internal
      */
     const READABLE_MODES = '/r|a\+|ab\+|w\+|wb\+|x\+|xb\+|c\+|cb\+/';
+
+
+    /**
+     * @var string Writable modes regex
+     *
+     * @see http://php.net/manual/function.fopen.php
+     * @see http://php.net/manual/en/function.gzopen.php
+     *
+     * @internal
+     */
     const WRITABLE_MODES = '/a|w|r\+|rb\+|rw|x|c/';
 
     /** @var int|null */

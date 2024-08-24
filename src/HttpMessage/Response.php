@@ -7,7 +7,7 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage;
@@ -19,6 +19,20 @@ use Psr\Http\Message\ResponseInterface;
 
 /**
  * Http Response
+ *
+ * Representation of an outgoing, server-side response.
+ *
+ * Per the HTTP specification, this class includes properties for
+ * each of the following:
+ *
+ * - Protocol version
+ * - Status code and reason phrase
+ * - Headers
+ * - Message body
+ *
+ * Responses are considered immutable; all methods that might change state are
+ * implemented such that they retain the internal state of the current
+ * message and return an instance that contains the changed state.
  *
  * @psalm-consistent-constructor
  */
@@ -101,8 +115,8 @@ class Response extends Message implements ResponseInterface
     /**
      * Filter/validate code and reason-phrase
      *
-     * @param int         $code   Status Code
-     * @param string|null $phrase Reason Phrase
+     * @param mixed $code   Status Code (will attempt to cast to int)
+     * @param mixed $phrase Reason Phrase (allow null or string.. will default to standard phrase)
      *
      * @return array{0:int,1:string} code & phrase
      *

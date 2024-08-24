@@ -7,7 +7,7 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2014-2024 Brad Kent
- * @version   v1.0
+ * @version   1.0
  */
 
 namespace bdk\HttpMessage;
@@ -19,6 +19,15 @@ use Psr\Http\Message\UriInterface;
 
 /**
  * Value object representing a URI.
+ *
+ * Represent a URI according to RFC 3986 and provide methods for most common operations.
+ *
+ * Instances of this interface are considered immutable; all methods that
+ * might change state are implemented such that they retain the internal
+ * state of the current instance and return an instance that contains the
+ * changed state.
+ *
+ * @link http://tools.ietf.org/html/rfc3986 (the URI specification)
  */
 class Uri extends AbstractUri implements UriInterface
 {
@@ -96,7 +105,7 @@ class Uri extends AbstractUri implements UriInterface
      *
      * @return self
      *
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @deprecated Use `\bdk\HttpMessage\Utiity\Uri::fromGlobals` instead
      */
     public static function fromGlobals()
     {
@@ -273,8 +282,7 @@ class Uri extends AbstractUri implements UriInterface
      *
      * @return static A new instance with the specified scheme.
      *
-     * @throws InvalidArgumentException for invalid schemes.
-     * @throws InvalidArgumentException for unsupported schemes.
+     * @throws InvalidArgumentException for invalid / unsupported schemes.
      */
     public function withScheme($scheme)
     {
