@@ -255,7 +255,7 @@ class Uri
      *
      * @return string[]
      */
-    private static function pathSegments($segments)
+    private static function pathSegments(array $segments)
     {
         $segmentsNew = [];
         foreach ($segments as $segment) {

@@ -34,7 +34,6 @@ class Stream extends AbstractStream implements StreamInterface
      */
     const READABLE_MODES = '/r|a\+|ab\+|w\+|wb\+|x\+|xb\+|c\+|cb\+/';
 
-
     /**
      * @var string Writable modes regex
      *

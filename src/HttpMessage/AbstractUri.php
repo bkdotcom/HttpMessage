@@ -47,7 +47,6 @@ abstract class AbstractUri
         'https' => 443,
     );
 
-
     /**
      * Throw exception if invalid host string.
      *
@@ -175,7 +174,7 @@ abstract class AbstractUri
      *
      * @param null|int|string $port Port
      *
-     * @return null|int
+     * @return int|null
      * @throws InvalidArgumentException
      */
     protected function filterPort($port)
@@ -255,7 +254,7 @@ abstract class AbstractUri
     }
 
     /**
-     * Call rawurlencode on on match
+     * Call rawurlencode on match
      *
      * @param non-empty-string $regex Regular expression
      * @param string           $str   string

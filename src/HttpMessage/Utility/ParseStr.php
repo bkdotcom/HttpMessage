@@ -129,7 +129,7 @@ class ParseStr
      *
      * @return array
      */
-    private static function parseStrCustom($str, $opts)
+    private static function parseStrCustom($str, array $opts)
     {
         // Use a regex to replace keys with a bin2hex'd version
         // this will prevent parse_str from modifying the keys

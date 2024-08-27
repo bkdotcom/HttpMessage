@@ -71,11 +71,18 @@ class ServerRequest extends Request implements ServerRequestInterface
     /** @var array */
     private $files = array();
 
-    /** @var array $_GET */
-    private $get = array();
-
     /** @var null|array|object typically $_POST */
     private $parsedBody = null;
+
+    /**
+     * Query (aka $_GET) params.
+     *
+     * Non null value = explicitly set
+     * If null we will obtain from URI
+     *
+     * @var array|null $_GET
+     */
+    private $queryParams = null;
 
     /** @var array $_SERVER */
     private $server = array();
@@ -128,7 +135,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @deprecated Use `\bdk\HttpMessage\Utility\ServerRequest::fromGlobals` instead
      */
-    public static function fromGlobals($parseStrOpts = array())
+    public static function fromGlobals(array $parseStrOpts = array())
     {
         return ServerRequestUtil::fromGlobals($parseStrOpts);
     }
@@ -175,8 +182,8 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getQueryParams()
     {
-        if ($this->get !== array()) {
-            return $this->get;
+        if ($this->queryParams !== null) {
+            return $this->queryParams;
         }
         $query = $this->getUri()->getQuery();
         return $query !== ''
@@ -195,7 +202,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     {
         $this->assertQueryParams($query);
         $new = clone $this;
-        $new->get = $query;
+        $new->queryParams = $query;
         return $new;
     }
 
@@ -267,7 +274,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function registerMediaTypeParser($contentType, $callable)
+    public function registerMediaTypeParser($contentType, callable $callable)
     {
         $this->bodyParsers[$contentType] = $callable;
         return $this;
@@ -422,9 +429,9 @@ class ServerRequest extends Request implements ServerRequestInterface
     }
 
     /**
-     * Build Authorization header value from $_SERVER values
+     * Build Authorization header value from `$_SERVER` values
      *
-     * @param array $serverParams $_SERVER vals
+     * @param array $serverParams `$_SERVER` values
      *
      * @return string (empty string if no auth)
      */

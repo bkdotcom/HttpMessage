@@ -179,7 +179,7 @@ class UploadedFile implements UploadedFileInterface
      */
     public function moveTo($targetPath)
     {
-        $this->validateCanMove();
+        $this->assertCanMove();
         $this->assertTargetPath($targetPath);
         if ($this->file !== null) {
             $this->isMoved = $this->moveFile($targetPath);
@@ -296,6 +296,21 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
+     * @return void
+     *
+     * @throws RuntimeException if is moved or not ok
+     */
+    private function assertCanMove()
+    {
+        if ($this->isOk() === false) {
+            throw new RuntimeException('Cannot move upload due to upload error: ' . $this->getErrorMessage());
+        }
+        if ($this->isMoved) {
+            throw new RuntimeException('Cannot move upload after it has already been moved (#reasons)');
+        }
+    }
+
+    /**
      * Assert valid client filename
      *
      * @param mixed $filename filename to validate
@@ -387,7 +402,7 @@ class UploadedFile implements UploadedFileInterface
      * Validate client filename / filepath / mediaType
      *
      * @param mixed  $value Reported filesize
-     * @param string $key   nNme of param being tested
+     * @param string $key   Name of param being tested
      *
      * @return void
      *
@@ -531,19 +546,5 @@ class UploadedFile implements UploadedFileInterface
             return;
         }
         throw new InvalidArgumentException('Invalid file, resource, or StreamInterface provided for UploadedFile');
-    }
-
-    /**
-     * @return void
-     * @throws RuntimeException if is moved or not ok
-     */
-    private function validateCanMove()
-    {
-        if ($this->isOk() === false) {
-            throw new RuntimeException('Cannot move upload due to upload error: ' . $this->getErrorMessage());
-        }
-        if ($this->isMoved) {
-            throw new RuntimeException('Cannot move upload after it has already been moved (#reasons)');
-        }
     }
 }

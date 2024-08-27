@@ -270,7 +270,7 @@ trait AssertionTrait
      *
      * @see https://httpwg.org/http-extensions/draft-ietf-httpbis-rfc6265bis.html#name-syntax
      */
-    protected function assertCookieParams($cookies)
+    protected function assertCookieParams(array $cookies)
     {
         $nameRegex = '/^[!#-+\--:<-[\]-~]+$/';
         \array_walk(
@@ -302,7 +302,7 @@ trait AssertionTrait
      * @return void
      * @throws InvalidArgumentException
      */
-    protected function assertQueryParams($get)
+    protected function assertQueryParams(array $get)
     {
         $iterator = new RecursiveIteratorIterator(
             new RecursiveArrayIterator($get),
@@ -356,7 +356,7 @@ trait AssertionTrait
      *
      * @throws InvalidArgumentException if any leaf is not an UploadedFileInterface instance.
      */
-    protected function assertUploadedFiles($uploadedFiles)
+    protected function assertUploadedFiles(array $uploadedFiles)
     {
         \array_walk_recursive($uploadedFiles, static function ($val) {
             if (!($val instanceof UploadedFileInterface)) {
@@ -375,7 +375,7 @@ trait AssertionTrait
     /**
      * Validate reason phrase
      *
-     * @param string $phrase Reason phrase to test
+     * @param mixed $phrase Reason phrase to test
      *
      * @return void
      *
