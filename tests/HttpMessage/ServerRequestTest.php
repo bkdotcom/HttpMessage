@@ -96,8 +96,8 @@ class ServerRequestTest extends TestCase
         $properties = array(
             'attributes' => array(),
             'cookie' => array(),
-            'get' => array(),
             'parsedBody' => null,
+            'queryParams' => null,
             'server' => array(
                 'REQUEST_METHOD' => 'GET',
             ),
