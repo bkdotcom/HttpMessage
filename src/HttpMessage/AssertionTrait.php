@@ -50,7 +50,7 @@ trait AssertionTrait
      *
      * @psalm-assert string $value
      */
-    protected function assertString($value, $what = '', $allowNumeric = false)
+    protected function assertString($value, string $what = '', bool $allowNumeric = false): void
     {
         if (\is_string($value)) {
             return;
@@ -72,7 +72,7 @@ trait AssertionTrait
      *
      * @return string
      */
-    protected static function getDebugType($value)
+    protected static function getDebugType($value): string
     {
         return \is_object($value)
             ? \get_class($value)
@@ -93,7 +93,7 @@ trait AssertionTrait
      *
      * @psalm-assert non-empty-string $name
      */
-    private function assertHeaderName($name)
+    private function assertHeaderName($name): void
     {
         $this->assertString($name, 'Header name', true);
         if ($name === '') {
@@ -123,7 +123,7 @@ trait AssertionTrait
      *
      * @psalm-assert non-empty-string|int|float|string[]|int[]|float[] $value
      */
-    private function assertHeaderValue($value)
+    private function assertHeaderValue($value): void
     {
         if (\is_scalar($value) && \is_bool($value) === false) {
             $value = array((string) $value);
@@ -155,7 +155,7 @@ trait AssertionTrait
      *
      * @psalm-assert string $value
      */
-    private function assertHeaderValueLine($value)
+    private function assertHeaderValueLine($value): void
     {
         if ($value === '') {
             return;
@@ -191,7 +191,7 @@ trait AssertionTrait
      *
      * @psalm-assert numeric-string $version
      */
-    private function assertProtocolVersion($version)
+    private function assertProtocolVersion($version): void
     {
         if (\is_numeric($version) === false) {
             throw new InvalidArgumentException(\sprintf(
@@ -222,7 +222,7 @@ trait AssertionTrait
      *
      * @psalm-assert non-empty-string $method
      */
-    protected function assertMethod($method)
+    protected function assertMethod($method): void
     {
         $this->assertString($method, 'HTTP method');
         if ($method === '') {
@@ -246,7 +246,7 @@ trait AssertionTrait
      * @return bool
      * @throws InvalidArgumentException if $throw === true
      */
-    protected function assertAttributeName($name, $throw = true)
+    protected function assertAttributeName($name, bool $throw = true): bool
     {
         try {
             $this->assertString($name, 'Attribute name', true);
@@ -270,7 +270,7 @@ trait AssertionTrait
      *
      * @see https://httpwg.org/http-extensions/draft-ietf-httpbis-rfc6265bis.html#name-syntax
      */
-    protected function assertCookieParams($cookies)
+    protected function assertCookieParams(array $cookies): void
     {
         $nameRegex = '/^[!#-+\--:<-[\]-~]+$/';
         \array_walk(
@@ -302,7 +302,7 @@ trait AssertionTrait
      * @return void
      * @throws InvalidArgumentException
      */
-    protected function assertQueryParams($get)
+    protected function assertQueryParams(array $get): void
     {
         $iterator = new RecursiveIteratorIterator(
             new RecursiveArrayIterator($get),
@@ -332,7 +332,7 @@ trait AssertionTrait
      *
      * @throws InvalidArgumentException
      */
-    protected function assertParsedBody($data)
+    protected function assertParsedBody($data): void
     {
         if (
             $data === null ||
@@ -356,7 +356,7 @@ trait AssertionTrait
      *
      * @throws InvalidArgumentException if any leaf is not an UploadedFileInterface instance.
      */
-    protected function assertUploadedFiles($uploadedFiles)
+    protected function assertUploadedFiles(array $uploadedFiles): void
     {
         \array_walk_recursive($uploadedFiles, static function ($val) {
             if (!($val instanceof UploadedFileInterface)) {
@@ -375,7 +375,7 @@ trait AssertionTrait
     /**
      * Validate reason phrase
      *
-     * @param string $phrase Reason phrase to test
+     * @param mixed $phrase Reason phrase to test
      *
      * @return void
      *
@@ -385,7 +385,7 @@ trait AssertionTrait
      *
      * @psalm-assert string $phrase
      */
-    protected function assertReasonPhrase($phrase)
+    protected function assertReasonPhrase($phrase): void
     {
         if ($phrase === '') {
             return;
@@ -411,7 +411,7 @@ trait AssertionTrait
      *
      * @psalm-assert numeric $code
      */
-    protected function assertStatusCode($code)
+    protected function assertStatusCode($code): void
     {
         if (\is_string($code) && \preg_match('/^\d+$/', $code)) {
             $code = (int) $code;
@@ -441,7 +441,7 @@ trait AssertionTrait
      *
      * @return string Path to current position as a string
      */
-    private function iteratorPath(RecursiveIteratorIterator $iterator)
+    private function iteratorPath(RecursiveIteratorIterator $iterator): string
     {
         $path = array();
         for ($i = 0, $depth = $iterator->getDepth(); $i <= $depth; $i++) {

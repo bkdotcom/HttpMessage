@@ -77,7 +77,7 @@ class ServerRequest
      *
      * @throws InvalidArgumentException
      */
-    private static function filesFromGlobals(array $phpFiles, array $path = array())
+    private static function filesFromGlobals(array $phpFiles, array $path = array()): array
     {
         $files = array();
         /** @var mixed $value */
@@ -177,7 +177,7 @@ class ServerRequest
      *   error: array|int,
      *   full_path: array|string} $array
      */
-    private static function isUploadFileInfoArray(array $array)
+    private static function isUploadFileInfoArray(array $array): bool
     {
         $keysMustHave = array('name', 'type', 'tmp_name', 'size', 'error');
         $keysMayHave = array('full_path');
@@ -201,7 +201,7 @@ class ServerRequest
      *
      * @return array|null
      */
-    private static function parsedBodyFromGlobals($contentType, $method)
+    private static function parsedBodyFromGlobals(string $contentType, string $method): ?array
     {
         if ($method === 'GET') {
             return null;

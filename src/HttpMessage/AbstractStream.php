@@ -45,7 +45,7 @@ abstract class AbstractStream
      *
      * @return string
      */
-    protected static function getDebugType($value)
+    protected static function getDebugType($value): string
     {
         return \is_object($value)
             ? \get_class($value)
@@ -61,7 +61,7 @@ abstract class AbstractStream
      *
      * @psalm-assert-if-true non-empty-string $value
      */
-    protected static function isFile($value)
+    protected static function isFile($value): bool
     {
         return \is_string($value)
             && \preg_match('#(://|[\r\n\x00])#', $value) !== 1
@@ -75,7 +75,7 @@ abstract class AbstractStream
      *
      * @psalm-assert-if-true resource $this->resource
      */
-    protected function isResourceOpen()
+    protected function isResourceOpen(): bool
     {
         return isset($this->resource) && \is_resource($this->resource);
     }
@@ -90,7 +90,7 @@ abstract class AbstractStream
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    protected function setResource($value)
+    protected function setResource($value): void
     {
         if ($value === null) {
             $this->resource = \fopen('php://temp', 'wb+');
@@ -125,7 +125,7 @@ abstract class AbstractStream
      *
      * @throws RuntimeException
      */
-    protected function setResourceFile($file)
+    protected function setResourceFile(string $file): void
     {
         \set_error_handler(static function () {
             return true; // Don't execute PHP internal error handler

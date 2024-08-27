@@ -56,7 +56,7 @@ abstract class AbstractUri
      *
      * @throws InvalidArgumentException
      */
-    protected function assertHost($host)
+    protected function assertHost($host): void
     {
         $this->assertString($host, 'host');
         if (\in_array($host, array('', 'localhost'), true)) {
@@ -88,7 +88,7 @@ abstract class AbstractUri
      *
      * @psalm-assert int $port
      */
-    protected function assertPort($port)
+    protected function assertPort($port): void
     {
         if (\is_int($port) === false) {
             // for versions with int type-hint, this will never be reached
@@ -112,7 +112,7 @@ abstract class AbstractUri
      *
      * @psalm-assert string $scheme
      */
-    protected function assertScheme($scheme)
+    protected function assertScheme($scheme): void
     {
         $this->assertString($scheme, 'scheme');
         if ($scheme === '') {
@@ -134,7 +134,7 @@ abstract class AbstractUri
      *
      * @return string
      */
-    protected static function createUriPath($authority, $path)
+    protected static function createUriPath(string $authority, string $path): string
     {
         if ($path === '') {
             return $path;
@@ -160,7 +160,7 @@ abstract class AbstractUri
      * @return string
      * @throws InvalidArgumentException
      */
-    protected function filterPath($path)
+    protected function filterPath(string $path): string
     {
         $this->assertString($path, 'path');
         $specPattern = '%:@\/';
@@ -174,10 +174,10 @@ abstract class AbstractUri
      *
      * @param null|int|string $port Port
      *
-     * @return null|int
+     * @return int|null
      * @throws InvalidArgumentException
      */
-    protected function filterPort($port)
+    protected function filterPort($port): ?int
     {
         if ($port === null) {
             return null;
@@ -196,7 +196,7 @@ abstract class AbstractUri
      *
      * @return string
      */
-    protected function filterQueryAndFragment($str)
+    protected function filterQueryAndFragment(string $str): string
     {
         $specPattern = '%:@\/\?';
         $encodePattern = '%(?![A-Fa-f0-9]{2})';
@@ -213,7 +213,7 @@ abstract class AbstractUri
      *
      * @see https://www.regextester.com/103452
      */
-    private function isFqdn($host): bool
+    private function isFqdn(string $host): bool
     {
         if (PHP_VERSION_ID >= 70000) {
             return \filter_var($host, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) !== false;
@@ -232,7 +232,7 @@ abstract class AbstractUri
      *
      * @return bool
      */
-    protected static function isStandardPort($scheme, $port)
+    protected static function isStandardPort(string $scheme, ?int $port): bool
     {
         return isset(self::$schemes[$scheme]) && $port === self::$schemes[$scheme];
     }
@@ -244,7 +244,7 @@ abstract class AbstractUri
      *
      * @return string
      */
-    protected static function lowercase($str)
+    protected static function lowercase(string $str): string
     {
         return \strtr(
             $str,
@@ -254,14 +254,14 @@ abstract class AbstractUri
     }
 
     /**
-     * Call rawurlencode on on match
+     * Call rawurlencode on match
      *
      * @param non-empty-string $regex Regular expression
      * @param string           $str   string
      *
      * @return string
      */
-    private static function regexEncode($regex, $str)
+    private static function regexEncode(string $regex, string $str): string
     {
         return \preg_replace_callback($regex, static function ($matches) {
             return \rawurlencode($matches[0]);

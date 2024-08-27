@@ -15,6 +15,10 @@ PSR-7 (HttpMessage) Implementation
 
 `composer require bdk/http-message`
 
+### Documentation
+
+http://bradkent.com/php/httpmessage
+
 ### 3 maintained versions:
 
 | Version | http-message | php | note |

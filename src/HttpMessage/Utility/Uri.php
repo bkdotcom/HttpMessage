@@ -152,7 +152,7 @@ class Uri
      *
      * @return int
      */
-    private static function computePort(UriInterface $uri)
+    private static function computePort(UriInterface $uri): int
     {
         $port = $uri->getPort();
         if ($port !== null) {
@@ -171,7 +171,7 @@ class Uri
      *
      * @return array<string,int|string>|false
      */
-    private static function parseUrlPatched($url)
+    private static function parseUrlPatched(string $url)
     {
         if (PHP_VERSION_ID >= 80000) {
             return \parse_url($url);
@@ -200,7 +200,7 @@ class Uri
      *
      * @return array<string,int|string>
      */
-    private static function parseUrlAddEmpty(array $parts, $url)
+    private static function parseUrlAddEmpty(array $parts, string $url): array
     {
         // @phpcs:ignore SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder
         $default = array(
@@ -227,7 +227,7 @@ class Uri
      *
      * @link http://tools.ietf.org/html/rfc3986#section-5.2.4
      */
-    private static function pathRemoveDots($path)
+    private static function pathRemoveDots(string $path): string
     {
         if ($path === '') {
             return '';
@@ -255,7 +255,7 @@ class Uri
      *
      * @return string[]
      */
-    private static function pathSegments($segments)
+    private static function pathSegments(array $segments): array
     {
         $segmentsNew = [];
         foreach ($segments as $segment) {
@@ -276,7 +276,7 @@ class Uri
      *
      * @return string
      */
-    private static function resolveTargetPath(UriInterface $base, UriInterface $rel)
+    private static function resolveTargetPath(UriInterface $base, UriInterface $rel): string
     {
         $relPath = $rel->getPath();
         $lastSlashPos = \strrpos($base->getPath(), '/');
@@ -298,7 +298,7 @@ class Uri
      *
      * @return array<string,int|string>
      */
-    private static function uriInterfaceToParts(UriInterface $url)
+    private static function uriInterfaceToParts(UriInterface $url): array
     {
         $userInfo = \array_replace(array(null, null), \explode(':', $url->getUserInfo(), 2));
         // @phpcs:ignore SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder
@@ -324,7 +324,7 @@ class Uri
      *
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    private static function hostPortFromGlobals()
+    private static function hostPortFromGlobals(): array
     {
         $hostPort = array(
             'host' => null,
@@ -353,7 +353,7 @@ class Uri
      * @psalm-suppress InvalidReturnType
      * @psalm-suppress InvalidReturnStatement
      */
-    private static function hostPortFromHttpHost($httpHost)
+    private static function hostPortFromHttpHost($httpHost): array
     {
         $url = 'http://' . $httpHost;
         $partsDefault = array(
@@ -374,7 +374,7 @@ class Uri
      *
      * @psalm-suppress InvalidReturnType
      */
-    private static function pathQueryFromGlobals()
+    private static function pathQueryFromGlobals(): array
     {
         $path = '/';
         $query = null;

@@ -267,7 +267,7 @@ class Message implements MessageInterface
      *
      * @throws InvalidArgumentException
      */
-    private function afterUpdateHost()
+    private function afterUpdateHost(): void
     {
         $this->headers['Host'] = \array_unique($this->headers['Host']);
         if (\count($this->headers['Host']) > 1) {
@@ -292,7 +292,7 @@ class Message implements MessageInterface
      *
      * @return string
      */
-    private function normalizeHeaderName($name)
+    private function normalizeHeaderName(string $name): string
     {
         $nameLower = \strtolower($name);
         return $nameLower === 'host'
@@ -314,7 +314,7 @@ class Message implements MessageInterface
      *
      * @see https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.4
      */
-    private function normalizeHeaderValue($value)
+    private function normalizeHeaderValue($value): array
     {
         $values = (array) $value;
         $values = \array_map(static function ($value) {
@@ -330,7 +330,7 @@ class Message implements MessageInterface
      *
      * @return void
      */
-    protected function setHeaders(array $headers)
+    protected function setHeaders(array $headers): void
     {
         \array_walk($headers, function ($value, $name) {
             if (\is_int($name)) {
@@ -354,7 +354,7 @@ class Message implements MessageInterface
      *
      * @return void
      */
-    private function setHeaderValues($name, array $values)
+    private function setHeaderValues(string $name, array $values): void
     {
         $nameLower = \strtolower($name);
         if (isset($this->headerNames[$nameLower])) {
