@@ -9,7 +9,7 @@
  * @copyright 2024 Brad Kent
  */
 
- namespace bdk\HttpMessage;
+namespace bdk\HttpMessage;
 
 use bdk\HttpMessage\ServerRequestExtendedInterface;
 use Psr\Http\Message\ServerRequestInterface;

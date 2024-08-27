@@ -110,7 +110,7 @@ class Response
      *
      * @phpcs:disable SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions.NonFullyQualified
      */
-    public static function emit(ResponseInterface $response)
+    public static function emit(ResponseInterface $response): void
     {
         $httpLine = \sprintf(
             'HTTP/%s %s %s',

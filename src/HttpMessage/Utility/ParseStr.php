@@ -92,7 +92,7 @@ class ParseStr
      *
      * @throws InvalidArgumentException
      */
-    public static function setOpts($mixed, $val = null)
+    public static function setOpts($mixed, $val = null): void
     {
         if (\is_string($mixed)) {
             $mixed = array($mixed => $val);
@@ -114,7 +114,7 @@ class ParseStr
      *
      * @return string
      */
-    protected static function getDebugType($value)
+    protected static function getDebugType($value): string
     {
         return \is_object($value)
             ? \get_class($value)
@@ -129,7 +129,7 @@ class ParseStr
      *
      * @return array
      */
-    private static function parseStrCustom($str, $opts)
+    private static function parseStrCustom(string $str, array $opts): array
     {
         // Use a regex to replace keys with a bin2hex'd version
         // this will prevent parse_str from modifying the keys

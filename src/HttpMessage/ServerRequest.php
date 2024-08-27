@@ -91,7 +91,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @param array               $serverParams An array of Server API (SAPI) parameters with
      *     which to seed the generated request instance. (and headers)
      */
-    public function __construct($method = 'GET', $uri = '', array $serverParams = array())
+    public function __construct(string $method = 'GET', $uri = '', array $serverParams = array())
     {
         parent::__construct($method, $uri);
 
@@ -128,7 +128,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @deprecated Use `\bdk\HttpMessage\Utility\ServerRequest::fromGlobals` instead
      */
-    public static function fromGlobals($parseStrOpts = array())
+    public static function fromGlobals(array $parseStrOpts = array())
     {
         return ServerRequestUtil::fromGlobals($parseStrOpts);
     }
@@ -267,7 +267,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function registerMediaTypeParser($contentType, callable $callable): ServerRequestInterface
+    public function registerMediaTypeParser(string $contentType, callable $callable): ServerRequestInterface
     {
         $this->bodyParsers[$contentType] = $callable;
         return $this;
@@ -365,7 +365,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return callable|null
      */
-    private function getBodyParser($contentType)
+    private function getBodyParser(string $contentType): ?callable
     {
         $contentType = \preg_replace('/\s*[;,].*$/', '', $contentType);
         $contentType = \strtolower($contentType);
@@ -392,7 +392,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return array<string,string> The HTTP header key/value pairs.
      */
-    protected function getHeadersViaServer(array $serverParams)
+    protected function getHeadersViaServer(array $serverParams): array
     {
         $headers = array();
         $keysSansHttp = array(
@@ -422,13 +422,13 @@ class ServerRequest extends Request implements ServerRequestInterface
     }
 
     /**
-     * Build Authorization header value from $_SERVER values
+     * Build Authorization header value from `$_SERVER` values
      *
-     * @param array $serverParams $_SERVER vals
+     * @param array $serverParams `$_SERVER` values
      *
      * @return string (empty string if no auth)
      */
-    private function getAuthorizationHeader(array $serverParams)
+    private function getAuthorizationHeader(array $serverParams): string
     {
         if (isset($serverParams['REDIRECT_HTTP_AUTHORIZATION'])) {
             return (string) $serverParams['REDIRECT_HTTP_AUTHORIZATION'];

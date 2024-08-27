@@ -179,7 +179,7 @@ class UploadedFile implements UploadedFileInterface
      */
     public function moveTo(string $targetPath): void
     {
-        $this->validateCanMove();
+        $this->assertCanMove();
         $this->assertTargetPath($targetPath);
         if ($this->file !== null) {
             $this->isMoved = $this->moveFile($targetPath);
@@ -296,6 +296,21 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
+     * @return void
+     *
+     * @throws RuntimeException if is moved or not ok
+     */
+    private function assertCanMove(): void
+    {
+        if ($this->isOk() === false) {
+            throw new RuntimeException('Cannot move upload due to upload error: ' . $this->getErrorMessage());
+        }
+        if ($this->isMoved) {
+            throw new RuntimeException('Cannot move upload after it has already been moved (#reasons)');
+        }
+    }
+
+    /**
      * Assert valid client filename
      *
      * @param mixed $filename filename to validate
@@ -357,7 +372,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @psalm-assert int<0,8> $error
      */
-    private function assertError($error)
+    private function assertError($error): void
     {
         if (\is_int($error) === false || \array_key_exists($error, $this->errors) === false) {
             throw new InvalidArgumentException('Upload file error status must be an integer value and one of the "UPLOAD_ERR_*" constants.');
@@ -375,7 +390,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @psalm-assert null|positive-int $size
      */
-    private function assertSize($size)
+    private function assertSize($size): void
     {
         if ($size === null || (\is_int($size) && $size > -1)) {
             return;
@@ -387,7 +402,7 @@ class UploadedFile implements UploadedFileInterface
      * Validate client filename / filepath / mediaType
      *
      * @param mixed  $value Reported filesize
-     * @param string $key   nNme of param being tested
+     * @param string $key   Name of param being tested
      *
      * @return void
      *
@@ -395,7 +410,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @psalm-assert string|null $value
      */
-    private function assertStringOrNull($value, $key)
+    private function assertStringOrNull($value, string $key): void
     {
         if ($value === null || \is_string($value)) {
             return;
@@ -419,7 +434,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @psalm-assert non-empty-string $targetPath
      */
-    private function assertTargetPath($targetPath)
+    private function assertTargetPath($targetPath): void
     {
         if (\is_string($targetPath) === false || $targetPath === '') {
             throw new InvalidArgumentException('Invalid path provided for move operation; must be a non-empty string');
@@ -440,7 +455,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @throws RuntimeException
      */
-    private function getStreamFromFile()
+    private function getStreamFromFile(): Stream
     {
         /** @var non-empty-string $this->file */
         $errMsg = '';
@@ -463,7 +478,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @return bool
      */
-    private function isOk()
+    private function isOk(): bool
     {
         return $this->error === UPLOAD_ERR_OK;
     }
@@ -477,7 +492,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @throws RuntimeException
      */
-    private function moveFile($targetPath)
+    private function moveFile(string $targetPath): bool
     {
         /** @var string $this->file */
         $errMsg = '';
@@ -511,7 +526,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @psalm-assert string|resource|StreamInterface $streamOrFile
      */
-    private function setStream($streamOrFile)
+    private function setStream($streamOrFile): void
     {
         if (\is_string($streamOrFile)) {
             $this->file = $streamOrFile;
@@ -531,19 +546,5 @@ class UploadedFile implements UploadedFileInterface
             return;
         }
         throw new InvalidArgumentException('Invalid file, resource, or StreamInterface provided for UploadedFile');
-    }
-
-    /**
-     * @return void
-     * @throws RuntimeException if is moved or not ok
-     */
-    private function validateCanMove()
-    {
-        if ($this->isOk() === false) {
-            throw new RuntimeException('Cannot move upload due to upload error: ' . $this->getErrorMessage());
-        }
-        if ($this->isMoved) {
-            throw new RuntimeException('Cannot move upload after it has already been moved (#reasons)');
-        }
     }
 }

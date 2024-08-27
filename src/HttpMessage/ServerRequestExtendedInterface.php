@@ -9,7 +9,7 @@
  * @copyright 2024 Brad Kent
  */
 
- namespace bdk\HttpMessage;
+namespace bdk\HttpMessage;
 
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -21,19 +21,19 @@ use Psr\Http\Message\ServerRequestInterface;
  * Heavily inspired by Slim Framework's ServerRequest decorator
  *
  * We have opted not to provide the following methods:
- *  - getContentCharset  (simple wrapper for getMediaTypeParams()['charset'])
- *  - getContentLength   (simple wrapper for getHeader('Content-Length'))
- *  - getContentType     (simple wrapper for getHeader('Content-Type'))
+ *  - getContentCharset  (simple wrapper for `getMediaTypeParams()['charset']`)
+ *  - getContentLength   (simple wrapper for `getHeader('Content-Length')`)
+ *  - getContentType     (simple wrapper for `getHeader('Content-Type')`)
  *  - isDelete           (`getMethod() === 'DELETE'`)
  *  - isGet              (`getMethod() === 'GET'`)
  *  - isHead             (`getMethod() === 'HEAD'`)
  *  - isMethod           (`getMethod() === $method`)
  *  - isOptions          (`getMethod() === 'DELETE'`)
- *  - isPatch            (`getMethod() === 'DELETE'`)
+ *  - isPatch            (`getMethod() === 'PATCH'`)
  *  - isPost             (`getMethod() === 'POST'`)
  *  - isPut              (`getMethod() === 'PUT'`)
  *
- * @link https://github.com/slimphp/Slim-Http/blob/master/src/ServerRequest.php
+ * @link https://github.com/slimphp/Slim-Http/blob/master/src/ServerRequest.php "Forked" from Slim Framework's ServerRequest
  */
 interface ServerRequestExtendedInterface extends ServerRequestInterface
 {
@@ -195,7 +195,7 @@ interface ServerRequestExtendedInterface extends ServerRequestInterface
      *
      * @return static
      */
-    public function registerMediaTypeParser($contentType, callable $callable): ServerRequestInterface;
+    public function registerMediaTypeParser(string $contentType, callable $callable): ServerRequestInterface;
 
     /**
      * Return an instance with the specified derived request attributes.

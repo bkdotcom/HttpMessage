@@ -56,7 +56,7 @@ class Request extends Message implements RequestInterface
      *
      * @throws InvalidArgumentException
      */
-    public function __construct($method = 'GET', $uri = '')
+    public function __construct(string $method = 'GET', $uri = '')
     {
         $this->assertMethod($method);
         $this->method = \strtoupper($method);
