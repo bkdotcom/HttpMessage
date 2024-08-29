@@ -7,6 +7,7 @@
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
  * @copyright 2024 Brad Kent
+ * @since     1.3
  */
 
 namespace bdk\HttpMessage;

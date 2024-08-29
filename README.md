@@ -8,8 +8,9 @@ PSR-7 (HttpMessage) Implementation
    - application/x-www-form-urlencoded - Preserves "." and space in keys
    - application/json - decoded to array
    - application/xml, text/xml parsed to SimpleXMLElement obj
-* query string parsed preserves "." and spaces in keys
+* parsedBody and queryParams preserves "." and spaces in keys
 * `UploadedFile::getClientFullPath()`.  PHP 8.1 added a new file upload property (not included in PSR-7)
+* `ServerRequestExtended` interface and implementation - Extends standard server request with helpful methods
 
 ### Installation 
 
@@ -44,7 +45,7 @@ http://bradkent.com/php/httpmessage
 
 ## Tests / Quality
 
-![Supported PHP versions](https://img.shields.io/static/v1?label=PHP&message=5.4%20-%208.3&color=blue)
+![Supported PHP versions](https://img.shields.io/static/v1?label=PHP&message=5.4%20-%208.4&color=blue)
 ![Build Status](https://img.shields.io/github/actions/workflow/status/bkdotcom/HttpMessage/phpunit.yml.svg?logo=github)
 [![Maintainability](https://img.shields.io/codeclimate/maintainability/bkdotcom/HttpMessage.svg?logo=codeclimate)](https://codeclimate.com/github/bkdotcom/HttpMessage)
 [![Coverage](https://img.shields.io/codeclimate/coverage/bkdotcom/HttpMessage.svg?logo=codeclimate)](https://codeclimate.com/github/bkdotcom/HttpMessage)
