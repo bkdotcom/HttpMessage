@@ -13,13 +13,13 @@ class FactoryTest extends TestCase
     {
         $factory = new Factory();
         $request = $factory->createRequest('GET', 'http://example.com');
-        $this->assertInstanceOf(\Psr\Http\Message\RequestInterface::class, $request);
+        $this->assertInstanceOf('bdk\HttpMessage\Request', $request);
         $this->assertSame('GET', $request->getMethod());
         $this->assertSame('http://example.com', (string) $request->getUri());
 
         $uri = $factory->createUri('http://example.com/test');
         $request = $factory->createRequest('POST', $uri);
-        $this->assertInstanceOf(\Psr\Http\Message\RequestInterface::class, $request);
+        $this->assertInstanceOf('bdk\HttpMessage\Request', $request);
         $this->assertSame('POST', $request->getMethod());
         $this->assertSame($uri, $request->getUri());
     }
@@ -28,7 +28,7 @@ class FactoryTest extends TestCase
     {
         $factory = new Factory();
         $response = $factory->createResponse();
-        $this->assertInstanceOf(\Psr\Http\Message\ResponseInterface::class, $response);
+        $this->assertInstanceOf('bdk\HttpMessage\Response', $response);
         $this->assertSame(200, $response->getStatusCode());
 
         $response = $factory->createResponse(500, 'Dang');
@@ -40,12 +40,12 @@ class FactoryTest extends TestCase
     {
         $factory = new Factory();
         $serverRequest = $factory->createServerRequest('GET', 'http://example.com');
-        $this->assertInstanceOf(\Psr\Http\Message\ServerRequestInterface::class, $serverRequest);
+        $this->assertInstanceOf('bdk\HttpMessage\ServerRequestExtended', $serverRequest);
 
         $uri = $factory->createUri('http://example.com/test');
         $serverParams = array('foo' => 'bar');
         $request = $factory->createServerRequest('POST', $uri, $serverParams);
-        $this->assertInstanceOf(\Psr\Http\Message\RequestInterface::class, $request);
+        $this->assertInstanceOf('bdk\HttpMessage\ServerRequestExtended', $request);
         $this->assertSame('POST', $request->getMethod());
         $this->assertSame($uri, $request->getUri());
         $this->assertSame($serverParams, \array_intersect_key($request->getServerParams(), array('foo' => 'bar')));
@@ -56,7 +56,7 @@ class FactoryTest extends TestCase
         $factory = new Factory();
         $content = 'test 1' . "\n" . 'test 2';
         $stream = $factory->createStream($content);
-        $this->assertInstanceOf(\Psr\Http\Message\StreamInterface::class, $stream);
+        $this->assertInstanceOf('bdk\HttpMessage\Stream', $stream);
         $this->assertSame($content, (string) $stream);
     }
 
@@ -64,7 +64,7 @@ class FactoryTest extends TestCase
     {
         $factory = new Factory();
         $stream = $factory->createStreamFromFile(__FILE__);
-        $this->assertInstanceOf(\Psr\Http\Message\StreamInterface::class, $stream);
+        $this->assertInstanceOf('bdk\HttpMessage\Stream', $stream);
         $this->assertSame(\file_get_contents(__FILE__), (string) $stream);
     }
 
@@ -94,7 +94,7 @@ class FactoryTest extends TestCase
         \fwrite($resource, $content);
 
         $stream = $factory->createStreamFromResource($resource);
-        $this->assertInstanceOf(\Psr\Http\Message\StreamInterface::class, $stream);
+        $this->assertInstanceOf('bdk\HttpMessage\Stream', $stream);
         $this->assertSame($content, (string) $stream);
     }
 
@@ -109,7 +109,7 @@ class FactoryTest extends TestCase
             'test.txt',
             'text/plain'
         );
-        $this->assertInstanceOf(\Psr\Http\Message\UploadedFileInterface::class, $uploadedFile);
+        $this->assertInstanceOf('bdk\HttpMessage\UploadedFile', $uploadedFile);
         $this->assertSame($content, (string) $uploadedFile->getStream());
         $this->assertSame(\strlen($content), $uploadedFile->getSize());
         $this->assertSame(UPLOAD_ERR_OK, $uploadedFile->getError());
@@ -121,7 +121,7 @@ class FactoryTest extends TestCase
     {
         $factory = new Factory();
         $uri = $factory->createUri('http://example.com');
-        $this->assertInstanceOf(\Psr\Http\Message\UriInterface::class, $uri);
+        $this->assertInstanceOf('bdk\HttpMessage\Uri', $uri);
         $this->assertSame('http://example.com', (string) $uri);
     }
 }
