@@ -71,7 +71,7 @@ class FactoryTest extends TestCase
     public function testCreateStreamFromFileInvalidMode()
     {
         $factory = new Factory();
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage('The mode "bork" is invalid.');
         $factory->createStreamFromFile(__FILE__, 'bork');
     }
@@ -79,7 +79,7 @@ class FactoryTest extends TestCase
     public function testCreateStreamFromFileInvalidFile()
     {
         $factory = new Factory();
-        $this->expectException(\RuntimeException::class);
+        $this->expectException('RuntimeException');
         $file = __DIR__ . '/not-exists';
         $this->expectExceptionMessage(\sprintf('The file %s cannot be opened.', $file));
         $factory->createStreamFromFile($file, 'r');
