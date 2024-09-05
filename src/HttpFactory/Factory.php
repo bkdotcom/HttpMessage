@@ -20,11 +20,15 @@ use bdk\HttpMessage\UploadedFile;
 use bdk\HttpMessage\Uri;
 use InvalidArgumentException;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
+use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use RuntimeException;
@@ -50,7 +54,7 @@ class Factory implements
      *
      * @return Request
      */
-    public function createRequest(string $method, $uri): Request
+    public function createRequest(string $method, $uri): RequestInterface
     {
         return new Request($method, $uri);
     }
@@ -65,7 +69,7 @@ class Factory implements
      *
      * @return Response
      */
-    public function createResponse(int $code = 200, string $reasonPhrase = ''): Response
+    public function createResponse(int $code = 200, string $reasonPhrase = ''): ResponseInterface
     {
         return new Response($code, $reasonPhrase);
     }
@@ -84,7 +88,7 @@ class Factory implements
      *
      * @return ServerRequestExtended
      */
-    public function createServerRequest(string $method, $uri, array $serverParams = array()): ServerRequestExtended
+    public function createServerRequest(string $method, $uri, array $serverParams = array()): ServerRequestInterface
     {
         return new ServerRequestExtended($method, $uri, $serverParams);
     }
@@ -98,7 +102,7 @@ class Factory implements
      *
      * @return Stream
      */
-    public function createStream(string $content = ''): Stream
+    public function createStream(string $content = ''): StreamInterface
     {
         $resource = \fopen('php://temp', 'wb+');
         \fwrite($resource, $content);
@@ -122,7 +126,7 @@ class Factory implements
      *
      * @return Stream
      */
-    public function createStreamFromFile(string $filename, string $mode = 'r'): Stream
+    public function createStreamFromFile(string $filename, string $mode = 'r'): StreamInterface
     {
         \set_error_handler(static function () {
             return true; // Don't execute PHP internal error handler
@@ -150,7 +154,7 @@ class Factory implements
      *
      * @return Stream
      */
-    public function createStreamFromResource($resource): Stream
+    public function createStreamFromResource($resource): StreamInterface
     {
         return new Stream($resource);
     }
@@ -183,7 +187,7 @@ class Factory implements
         ?string $clientFilename = null,
         ?string $clientMediaType = null,
         ?string $clientFullPath = null
-    ): UploadedFile
+    ): UploadedFileInterface
     {
         return new UploadedFile($stream, $size, $error, $clientFilename, $clientMediaType, $clientFullPath);
     }
@@ -197,7 +201,7 @@ class Factory implements
      *
      * @return Uri
      */
-    public function createUri(string $uri = ''): Uri
+    public function createUri(string $uri = ''): UriInterface
     {
         return new Uri($uri);
     }
