@@ -17,7 +17,6 @@ class MessageTest extends TestCase
         $this->assertTrue($message instanceof Message);
     }
 
-    /*
     public function testGetMethods()
     {
         $message = $this->testSetHeaders();
@@ -28,9 +27,7 @@ class MessageTest extends TestCase
         // Test - has
         $this->assertTrue($message->hasHeader('user-agent'));
     }
-    */
 
-    /*
     public function testWithMethods()
     {
         $message = $this->testSetHeaders();
@@ -60,7 +57,6 @@ class MessageTest extends TestCase
         $messageNew = $message->withoutHeader('hello-world');
         $this->assertSame($message, $messageNew);
     }
-    */
 
     public function testBodyMethods()
     {

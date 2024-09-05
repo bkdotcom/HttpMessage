@@ -78,6 +78,7 @@ class Message implements MessageInterface
     public function withProtocolVersion($version)
     {
         $this->assertProtocolVersion($version);
+        $version = (string) $version; // for implementations without string typehint
         if ($version === $this->protocolVersion) {
             return $this;
         }
