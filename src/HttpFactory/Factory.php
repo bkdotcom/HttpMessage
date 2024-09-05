@@ -189,7 +189,7 @@ class Factory
      *
      * @return Uri
      */
-    public function createUri(string $uri = '')
+    public function createUri($uri = '')
     {
         return new Uri($uri);
     }
