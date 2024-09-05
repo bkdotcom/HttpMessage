@@ -42,7 +42,7 @@ class Factory
      *
      * @return Request
      */
-    public function createRequest($method, $uri): Request
+    public function createRequest($method, $uri)
     {
         return new Request($method, $uri);
     }
@@ -57,7 +57,7 @@ class Factory
      *
      * @return Response
      */
-    public function createResponse($code = 200, $reasonPhrase = ''): Response
+    public function createResponse($code = 200, $reasonPhrase = '')
     {
         return new Response($code, $reasonPhrase);
     }
@@ -76,7 +76,7 @@ class Factory
      *
      * @return ServerRequestExtended
      */
-    public function createServerRequest($method, $uri, array $serverParams = array()): ServerRequestExtended
+    public function createServerRequest($method, $uri, array $serverParams = array())
     {
         return new ServerRequestExtended($method, $uri, $serverParams);
     }
@@ -90,7 +90,7 @@ class Factory
      *
      * @return Stream
      */
-    public function createStream($content = ''): Stream
+    public function createStream($content = '')
     {
         $resource = \fopen('php://temp', 'wb+');
         \fwrite($resource, $content);
@@ -114,7 +114,7 @@ class Factory
      *
      * @return Stream
      */
-    public function createStreamFromFile($filename, $mode = 'r'): Stream
+    public function createStreamFromFile($filename, $mode = 'r')
     {
         \set_error_handler(static function () {
             return true; // Don't execute PHP internal error handler
@@ -142,7 +142,7 @@ class Factory
      *
      * @return Stream
      */
-    public function createStreamFromResource($resource): Stream
+    public function createStreamFromResource($resource)
     {
         return new Stream($resource);
     }
@@ -175,7 +175,7 @@ class Factory
         $clientFilename = null,
         $clientMediaType = null,
         $clientFullPath = null
-    ): UploadedFile
+    )
     {
         return new UploadedFile($stream, $size, $error, $clientFilename, $clientMediaType, $clientFullPath);
     }
@@ -189,7 +189,7 @@ class Factory
      *
      * @return Uri
      */
-    public function createUri(string $uri = ''): Uri
+    public function createUri(string $uri = '')
     {
         return new Uri($uri);
     }
