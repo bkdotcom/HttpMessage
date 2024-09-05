@@ -21,11 +21,11 @@
       <text outputFile="php://stdout" showUncoveredFiles="true" showOnlySummary="true"/>
     </report>
     -->
-    <exclude>
-      <file>src/HttpMessage/Factory.php</file>
-    </exclude>
   </coverage>
   <testsuites>
+    <testsuite name="HttpFactory">
+      <directory>tests/HttpFactory</directory>
+    </testsuite>
     <testsuite name="HttpMessage">
       <directory>tests/HttpMessage</directory>
     </testsuite>
