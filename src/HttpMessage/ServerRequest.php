@@ -18,6 +18,7 @@ use bdk\HttpMessage\Utility\ParseStr;
 use bdk\HttpMessage\Utility\ServerRequest as ServerRequestUtil;
 use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -74,6 +75,9 @@ class ServerRequest extends Request implements ServerRequestInterface
     private $get = array();
     /** @var null|array|object typically $_POST */
     private $parsedBody = null;
+
+    /** @var bool */
+    private $parsedBodyExplicitlySet = false;
 
     /**
      * Query (aka $_GET) params.
@@ -139,6 +143,20 @@ class ServerRequest extends Request implements ServerRequestInterface
     public static function fromGlobals(array $parseStrOpts = array())
     {
         return ServerRequestUtil::fromGlobals($parseStrOpts);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    #[\Override]
+    public function withBody(StreamInterface $body): static
+    {
+        $new = parent::withBody($body);
+        if ($new->parsedBodyExplicitlySet === false) {
+            // ensure that getParsedBody() will re-parse body
+            $new->parsedBody = null;
+        }
+        return $new;
     }
 
     /**
@@ -294,6 +312,7 @@ class ServerRequest extends Request implements ServerRequestInterface
         $this->assertParsedBody($data);
         $new = clone $this;
         $new->parsedBody = $data;
+        $new->parsedBodyExplicitlySet = $data !== null;
         return $new;
     }
 
