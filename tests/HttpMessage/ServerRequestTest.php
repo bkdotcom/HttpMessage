@@ -5,6 +5,7 @@ namespace bdk\Test\HttpMessage;
 use bdk\HttpMessage\Message;
 use bdk\HttpMessage\Request;
 use bdk\HttpMessage\ServerRequest;
+use bdk\HttpMessage\Utility\ContentType;
 use bdk\HttpMessage\Utility\ParseStr;
 use ReflectionObject;
 
@@ -158,6 +159,48 @@ class ServerRequestTest extends TestCase
             $serverRequest->getUploadedFiles()
         );
     }
+
+    public function testWithBodyClearsParsedBody()
+    {
+        $serverRequest = $this->createServerRequest('POST', '', array(
+            'CONTENT_TYPE' => ContentType::JSON,
+        ))->withBody(
+            $this->createStream(\json_encode(array('foo' => 'bar')))
+        );
+
+        $this->assertSame(array('foo' => 'bar'), $serverRequest->getParsedBody());
+
+        $serverRequest = $serverRequest->withBody(
+            $this->createStream(\json_encode(array('ding' => 'dong')))
+        );
+
+        $this->assertSame(array('ding' => 'dong'), $serverRequest->getParsedBody());
+    }
+
+    public function testWithBodyDoesNotClearParsedBody()
+    {
+        $serverRequest = $this->createServerRequest('POST', '', array(
+            'CONTENT_TYPE' => ContentType::JSON,
+        ))->withBody(
+            $this->createStream(\json_encode(array('foo' => 'bar')))
+        )->withParsedBody(array(
+            'snap' => 'crackle',
+        ));
+
+        // we explicitly set the parsed body - ignore the body
+        $this->assertSame(array('snap' => 'crackle'), $serverRequest->getParsedBody());
+
+        // updating the body does nothing.... use the explicit parsed body
+        $serverRequest = $serverRequest->withBody(
+            $this->createStream(\json_encode(array('ding' => 'dong')))
+        );
+        $this->assertSame(array('snap' => 'crackle'), $serverRequest->getParsedBody());
+
+        // withParsedBody(null) -> we will attempt to parsed the body
+        $serverRequest = $serverRequest->withParsedBody(null);
+        $this->assertSame(array('ding' => 'dong'), $serverRequest->getParsedBody());
+    }
+
 
     /**
      * @param string       $contentType Request content type
