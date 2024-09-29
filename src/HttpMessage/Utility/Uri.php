@@ -31,8 +31,7 @@ class Uri
      */
     public static function fromGlobals(): BdkUri
     {
-        $uri = new BdkUri();
-        $parts = \array_filter(\array_merge(
+        $parsed = \array_merge(
             array(
                 'scheme' => isset($_SERVER['HTTPS']) && \filter_var($_SERVER['HTTPS'], FILTER_VALIDATE_BOOLEAN)
                     ? 'https'
@@ -40,18 +39,36 @@ class Uri
             ),
             self::hostPortFromGlobals(),
             self::pathQueryFromGlobals()
-        ));
-        $methods = array(
-            'host' => 'withHost',
-            'path' => 'withPath',
-            'port' => 'withPort',
-            'query' => 'withQuery',
-            'scheme' => 'withScheme',
         );
-        foreach ($parts as $name => $value) {
-            $method = $methods[$name];
+        return self::fromParsed($parsed);
+    }
+
+    /**
+     * Get a Uri populated with component values
+     *
+     * Username & password accepted in multiple ways (highest precedence first):
+     *  - userInfo ("username:password" or ["username", "password"])
+     *  - user & pass
+     *  - username & password
+     *
+     * @param array $parsed Url component values (ie from `parse_url()`)
+     *
+     * @return BdkUri
+     *
+     * @since x.3.2
+     */
+    public static function fromParsed(array $parsed): BdkUri
+    {
+        $uriKeys = ['fragment', 'host', 'path', 'port', 'query', 'scheme', 'userInfo'];
+        $parsed = \array_intersect_key(self::parsedPartsPrep($parsed), \array_flip($uriKeys));
+        $parsed = \array_filter($parsed, static function ($val) {
+            return \in_array($val, array(null, ''), true) === false;
+        });
+        $uri = new BdkUri();
+        foreach ($parsed as $key => $value) {
+            $method = 'with' . \ucfirst($key);
             /** @var BdkUri */
-            $uri = $uri->{$method}($value);
+            $uri = \call_user_func_array(array($uri, $method), (array) $value);
         }
         return $uri;
     }
@@ -69,11 +86,9 @@ class Uri
         if (\strcasecmp($uri1->getHost(), $uri2->getHost()) !== 0) {
             return true;
         }
-
         if ($uri1->getScheme() !== $uri2->getScheme()) {
             return true;
         }
-
         return self::computePort($uri1) !== self::computePort($uri2);
     }
 
@@ -122,8 +137,7 @@ class Uri
         }
         if ($rel->getScheme() !== '') {
             // rel specified scheme... return rel (with path cleaned up)
-            return $rel
-                ->withPath(self::pathRemoveDots($rel->getPath()));
+            return $rel->withPath(self::pathRemoveDots($rel->getPath()));
         }
         if ($rel->getAuthority() !== '') {
             // rel specified "authority"..
@@ -162,6 +176,41 @@ class Uri
     }
 
     /**
+     * Converted parsed values to keys used by `fromParsed()`
+     *
+     *  (`fromParsed()` accepts multiple key names for username & password)
+     *
+     * @param array $parsed Url values as you would obtain from from `parse_url()`
+     *
+     * @return array
+     */
+    private static function parsedPartsPrep(array $parsed): array
+    {
+        $map = array(
+            'password' => 'pass',
+            'username' => 'user',
+        );
+        \ksort($parsed);
+        $rename = \array_intersect_key($parsed, $map);
+        $keysNew = \array_values(\array_intersect_key($map, $rename));
+        $renamed = \array_combine($keysNew, \array_values($rename));
+        $parsed = \array_merge(array(
+            'pass' => '',
+            'user' => '',
+        ), $renamed, $parsed);
+        if (\array_key_exists('userInfo', $parsed) === false) {
+            $parsed['userInfo'] = array($parsed['user'], $parsed['pass']);
+        }
+        if (\is_array($parsed['userInfo']) === false) {
+            $parsed['userInfo'] = \explode(':', (string) $parsed['userInfo'], 2);
+        }
+        if ((string) $parsed['userInfo'][0] === '') {
+            unset($parsed['userInfo']);
+        }
+        return $parsed;
+    }
+
+    /**
      * Parse URL with latest `parse_url` fixes / behavior
      *
      * PHP < 8.0 : return empty query and fragment
@@ -173,9 +222,6 @@ class Uri
      */
     private static function parseUrlPatched(string $url)
     {
-        if (PHP_VERSION_ID >= 80000) {
-            return \parse_url($url);
-        }
         $hasTempScheme = false;
         if (PHP_VERSION_ID < 50500 && \strpos($url, '//') === 0) {
             // php 5.4 chokes without the scheme
@@ -186,7 +232,9 @@ class Uri
         if ($parts === false) {
             return false;
         }
+        \ksort($parts);
         if ($hasTempScheme) {
+            // only applicable for php 5.4
             unset($parts['scheme']);
         }
         return self::parseUrlAddEmpty($parts, $url);
@@ -202,18 +250,12 @@ class Uri
      */
     private static function parseUrlAddEmpty(array $parts, string $url): array
     {
-        // @phpcs:ignore SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder
-        $default = array(
-            'scheme' => null,
-            'host' => null,
-            'port' => null,
-            'user' => null,
-            'pass' => null,
-            'path' => null,
-            'query' => \strpos($url, '?') !== false ? '' : null,
+        $parts = \array_merge(array(
             'fragment' => \strpos($url, '#') !== false ? '' : null,
-        );
-        return \array_filter(\array_merge($default, $parts), static function ($val) {
+            'query' => \strpos($url, '?') !== false ? '' : null,
+        ), $parts);
+        \ksort($parts);
+        return \array_filter($parts, static function ($val) {
             return $val !== null;
         });
     }
@@ -301,19 +343,17 @@ class Uri
     private static function uriInterfaceToParts(UriInterface $url): array
     {
         $userInfo = \array_replace(array(null, null), \explode(':', $url->getUserInfo(), 2));
-        // @phpcs:ignore SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder
         $parts = array(
-            'scheme' => $url->getScheme(),
-            'host' => $url->getHost(),
-            'port' => $url->getPort(),
-            'user' => $userInfo[0],
             'pass' => $userInfo[1],
-            'path' => $url->getPath(),
-            'query' => $url->getQuery(),
-            'fragment' => $url->getFragment(),
+            'user' => $userInfo[0],
         );
+        foreach (['fragment', 'host', 'path', 'port', 'query', 'scheme'] as $key) {
+            $method = 'get' . \ucfirst($key);
+            $parts[$key] = $url->{$method}();
+        }
+        \ksort($parts);
         return \array_filter($parts, static function ($val) {
-            return !empty($val);
+            return \strlen((string) $val) > 0;
         });
     }
 
@@ -331,38 +371,18 @@ class Uri
             'port' => null,
         );
         if (isset($_SERVER['HTTP_HOST'])) {
-            $hostPort = self::hostPortFromHttpHost($_SERVER['HTTP_HOST']);
+            $parts = \parse_url('http://' . $_SERVER['HTTP_HOST']); // may return false
+            $parts = \array_merge($hostPort, (array) $parts);
+            return \array_intersect_key($parts, $hostPort);
         } elseif (isset($_SERVER['SERVER_NAME'])) {
             $hostPort['host'] = $_SERVER['SERVER_NAME'];
         } elseif (isset($_SERVER['SERVER_ADDR'])) {
             $hostPort['host'] = $_SERVER['SERVER_ADDR'];
         }
-        if ($hostPort['port'] === null && isset($_SERVER['SERVER_PORT'])) {
+        if (isset($_SERVER['SERVER_PORT'])) {
             $hostPort['port'] = (int) $_SERVER['SERVER_PORT'];
         }
         return $hostPort;
-    }
-
-    /**
-     * Get host & port from `$_SERVER['HTTP_HOST']`
-     *
-     * @param string $httpHost `$_SERVER['HTTP_HOST']` value
-     *
-     * @return array{host:string|null,port:int|null}
-     *
-     * @psalm-suppress InvalidReturnType
-     * @psalm-suppress InvalidReturnStatement
-     */
-    private static function hostPortFromHttpHost($httpHost): array
-    {
-        $url = 'http://' . $httpHost;
-        $partsDefault = array(
-            'host' => null,
-            'port' => null,
-        );
-        $parts = \parse_url($url) ?: array();
-        $parts = \array_merge($partsDefault, $parts);
-        return \array_intersect_key($parts, $partsDefault);
     }
 
     /**

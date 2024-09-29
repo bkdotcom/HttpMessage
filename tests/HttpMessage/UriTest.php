@@ -263,6 +263,14 @@ class UriTest extends TestCase
         });
     }
 
+    public function testWithUserInfoRemovesIfUserNameEmpty()
+    {
+        $uri = $this->createUri()->withUserInfo('dingus', 'swordfish');
+        self::assertSame('dingus:swordfish', $uri->getUserInfo());
+        $uri = $uri->withUserInfo('', 'trout');
+        self::assertSame('', $uri->getUserInfo());
+    }
+
     /**
      * @param mixed $host
      *
