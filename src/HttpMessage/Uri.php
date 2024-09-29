@@ -312,11 +312,10 @@ class Uri extends AbstractUri implements UriInterface
     public function withUserInfo($user, $password = null)
     {
         $this->assertString($user, 'user', true);
-        $this->assertString($password, 'password', false, true);
+        $this->assertString($user, 'password', true, true);
         $userInfo = (string) $user; // for versions without type hint in method signature
         $password = (string) $password; // for versions without type hint in method signature
         if ($userInfo !== '' && $password !== '') {
-            $this->assertString($password, 'password');
             $userInfo .= ':' . $password;
         }
         if ($userInfo === $this->userInfo) {
