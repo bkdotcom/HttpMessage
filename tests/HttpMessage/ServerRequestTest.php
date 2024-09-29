@@ -64,7 +64,21 @@ class ServerRequestTest extends TestCase
         $this->assertSame('1.0', $serverRequest->getProtocolVersion());
         $this->assertSame('text/html', $serverRequest->getHeaderLine('Content-Type'));
 
-        // test options parsing works on constructor
+        ParseStr::setOpts('convDot', true);
+        ParseStr::setOpts('convSpace', false);
+        $serverRequest = $this->createServerRequest(
+            'GET',
+            '/some/page?foo=bar&dingle.berry=brown&a%20b=c&d+e=f&g h=i'
+        );
+        $this->assertSame(array(
+            'foo' => 'bar',
+            'dingle_berry' => 'brown',
+            'a b' => 'c',
+            'd e' => 'f',
+            'g h' => 'i',
+        ), $serverRequest->getQueryParams());
+
+        ParseStr::setOpts('convDot', false);
         ParseStr::setOpts('convSpace', true);
         $serverRequest = $this->createServerRequest(
             'GET',
@@ -77,7 +91,9 @@ class ServerRequestTest extends TestCase
             'd_e' => 'f',
             'g_h' => 'i',
         ), $serverRequest->getQueryParams());
+
         ParseStr::setOpts('convSpace', false);
+        ParseStr::setOpts('convDot', false);
 
         /*
             Test new values replace
@@ -393,10 +409,21 @@ class ServerRequestTest extends TestCase
             ->withParsedBody('I am a string');
     }
 
-    public function testExceptionParseStrOpts()
+    /**
+     * @dataProvider providerParseStrOpts
+     */
+    public function testExceptionParseStrOpts($val, $message)
     {
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('parseStrOpts expects string or array. boolean provided.');
-        ParseStr::setOpts(false);
+        $this->expectExceptionMessage($message);
+        ParseStr::setOpts($val);
+    }
+
+    public function providerParseStrOpts()
+    {
+        return array(
+            'boolean' => array(false, 'parseStrOpts expects string or array. boolean provided.'),
+            'object' => array(new \stdClass(), 'parseStrOpts expects string or array. stdClass provided.'),
+        );
     }
 }

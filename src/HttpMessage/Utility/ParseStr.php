@@ -66,8 +66,8 @@ class ParseStr
     {
         $str = (string) $str;
         $opts = \array_merge(self::$parseStrOpts, $opts);
-        $useParseStr = ($opts['convDot'] || \strpos($str, '.') === false)
-            && ($opts['convSpace'] || \strpos($str, ' ') === false);
+        $useParseStr = ($opts['convDot'] || \preg_match('/(.|%2E)/', $str) !== 1)
+            && ($opts['convSpace'] || \preg_match('/( |\+|%20)/', $str) !== 1);
         if ($useParseStr) {
             // there are no spaces or dots in serialized data
             //   and/or we're not interested in converting them
