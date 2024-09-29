@@ -184,7 +184,7 @@ class Uri
      *
      * @return array
      */
-    private static function parsedPartsPrep(array $parsed): array
+    private static function parsedPartsPrep(array $parsed)
     {
         $map = array(
             'password' => 'pass',
