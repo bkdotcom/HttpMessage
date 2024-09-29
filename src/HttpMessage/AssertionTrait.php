@@ -43,6 +43,7 @@ trait AssertionTrait
      * @param mixed  $value        The value to check.
      * @param string $what         The name of the value.
      * @param bool   $allowNumeric Allow float or int?
+     * @param bool   $allowNull    Allow null?
      *
      * @return void
      *
@@ -50,9 +51,12 @@ trait AssertionTrait
      *
      * @psalm-assert string $value
      */
-    protected function assertString($value, $what = '', $allowNumeric = false)
+    protected function assertString($value, $what = '', $allowNumeric = false, $allowNull = false)
     {
         if (\is_string($value)) {
+            return;
+        }
+        if ($allowNull && $value === null) {
             return;
         }
         if ($allowNumeric && \is_numeric($value)) {

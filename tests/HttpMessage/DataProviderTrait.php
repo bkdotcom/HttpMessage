@@ -1089,7 +1089,7 @@ trait DataProviderTrait
         $tests = [
             'password closure' => ['user', new stdClass()],
             'password true' => ['user', true],
-            'user int' => [0, null],
+            // 'user int' => [0, null],
             'user null' => [null, null],
             'user object' => [new stdClass(), null],
             'user true' => [true, null],

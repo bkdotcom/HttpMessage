@@ -311,17 +311,19 @@ class Uri extends AbstractUri implements UriInterface
      */
     public function withUserInfo($user, $password = null)
     {
-        $this->assertString($user, 'user');
-        $info = $user;
-        if ($password !== null && $password !== '') {
+        $this->assertString($user, 'user', true);
+        $this->assertString($password, 'password', false, true);
+        $userInfo = (string) $user; // for versions without type hint in method signature
+        $password = (string) $password; // for versions without type hint in method signature
+        if ($userInfo !== '' && $password !== '') {
             $this->assertString($password, 'password');
-            $info .= ':' . $password;
+            $userInfo .= ':' . $password;
         }
-        if ($info === $this->userInfo) {
+        if ($userInfo === $this->userInfo) {
             return $this;
         }
         $new = clone $this;
-        $new->userInfo = $info;
+        $new->userInfo = $userInfo;
         return $new;
     }
 
@@ -416,7 +418,7 @@ class Uri extends AbstractUri implements UriInterface
      */
     public function withQuery($query)
     {
-        $this->assertString($query, 'query');
+        $this->assertString($query, 'query', true);
         $query = $this->filterQueryAndFragment($query);
         if ($query === $this->query) {
             return $this;
@@ -458,30 +460,11 @@ class Uri extends AbstractUri implements UriInterface
      */
     private function setUrlParts(array $urlParts)
     {
-        $asserts = \array_intersect_key(array(
-            'scheme' => 'assertScheme',
-        ), $urlParts);
-        $filters = \array_intersect_key(array(
-            'fragment' => 'filterQueryAndFragment',
-            'host' => 'lowercase',
-            'path' => 'filterPath',
-            'port' => 'filterPort',
-            'query' => 'filterQueryAndFragment',
-            'scheme' => 'lowercase',
-        ), $urlParts);
-        foreach ($asserts as $part => $method) {
-            $val = $urlParts[$part];
-            $this->{$method}($val);
-        }
-        foreach ($filters as $part => $method) {
-            $val = $urlParts[$part];
-            $this->{$part} = $this->{$method}($val);
-        }
-        if (isset($urlParts['user'])) {
-            $this->userInfo = (string) $urlParts['user'];
-        }
-        if (isset($urlParts['pass'])) {
-            $this->userInfo .= ':' . $urlParts['pass'];
+        $uri = UriUtil::fromParsed($urlParts);
+        $validKeys = ['fragment', 'host', 'path', 'port', 'query', 'scheme', 'userInfo'];
+        foreach ($validKeys as $key) {
+            $method = 'get' . \ucfirst($key);
+            $this->{$key} = $uri->{$method}();
         }
     }
 }

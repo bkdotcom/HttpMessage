@@ -33,6 +33,15 @@ class UriTest extends TestCase
     }
 
     /**
+     * @dataProvider providerFromParsed
+     */
+    public function testFromParsed(array $parsed, $expectUriString)
+    {
+        $uri = UriUtils::fromParsed($parsed);
+        self::assertSame($expectUriString, (string) $uri);
+    }
+
+    /**
      * @dataProvider providerIsCrossOrigin
      */
     public function testIsCrossOrigin($uri1, $uri2, $expect)
@@ -127,6 +136,54 @@ class UriTest extends TestCase
         );
     }
 
+    public static function providerFromParsed()
+    {
+        return array(
+            'usernamePassword' => array(
+                array(
+                    'scheme' => 'http',
+                    'host' => 'example.com',
+                    'username' => 'user',
+                    'password' => 'pass',
+                ),
+                'http://user:pass@example.com',
+            ),
+            'userInfoArray' => array(
+                array(
+                    'scheme' => 'http',
+                    'host' => 'example.com',
+                    'user' => 'ignoredUser',
+                    'pass' => 'ignoredPass',
+                    'userInfo' => ['user', 'pass'],
+                ),
+                'http://user:pass@example.com',
+            ),
+            'userInfoString' => array(
+                array(
+                    'scheme' => 'http',
+                    'host' => 'example.com',
+                    'username' => 'ignoredUser',
+                    'password' => 'ignoredPass',
+                    'userInfo' => 'user:pass',
+                ),
+                'http://user:pass@example.com',
+            ),
+            'zeros' => array(
+                array(
+                    'fragment' => '0',
+                    'host' => 'example.com',
+                    'pass' => '0',
+                    'path' => '0',
+                    'port' => 1234,
+                    'query' => 0,
+                    'scheme' => 'http',
+                    'user' => 0,
+                ),
+                'http://0:0@example.com:1234/0?0#0'
+            ),
+        );
+    }
+
     public static function providerIsCrossOrigin()
     {
         return [
@@ -154,30 +211,41 @@ class UriTest extends TestCase
         // chars from parseUrl with %" \
         $chars = '!*\'();:@&=$,/?#[]%" \\';
         return array(
-            array('https://user:pass@example.com:80/path/È/💩/page.html?foo=bar&zip=zap#fragment', array(
-                'scheme' => 'https',
+            'basic' => array('https://user:pass@example.com:80/path/È/💩/page.html?foo=bar&zip=zap#fragment', array(
+                'fragment' => 'fragment',
                 'host' => 'example.com',
-                'port' => 80,
-                'user' => 'user',
                 'pass' => 'pass',
                 'path' => '/path/È/💩/page.html',
+                'port' => 80,
                 'query' => 'foo=bar&zip=zap',
-                'fragment' => 'fragment',
+                'scheme' => 'https',
+                'user' => 'user',
+            )),
+            // ensure we don't filter out '0' values
+            'zeros' => array('https://0:0@example.com:80/0?0#0', array(
+                'fragment' => '0',
+                'host' => 'example.com',
+                'pass' => '0',
+                'path' => '/0',
+                'port' => 80,
+                'query' => '0',
+                'scheme' => 'https',
+                'user' => '0',
             )),
             'encodedChars' => array('http://mydomain.com/' . \rawurlencode($chars), array(
-                'scheme' => 'http',
                 'host' => 'mydomain.com',
                 'path' => '/' . \rawurlencode($chars),
+                'scheme' => 'http',
             )),
             'invalid' => array('http:///example.com', false),
             'mixed' => array('/%È21%25È3*%(', array(
                 'path' => '/%È21%25È3*%(',
             )),
             'specialChars' => array('//example.com/' . $chars, array(
+                'fragment' => '[]%" \\',
                 'host' => 'example.com',
                 'path' => '/' . \substr($chars, 0, \strpos($chars, '?')),
                 'query' => '',
-                'fragment' => '[]%" \\',
             )),
             'uriInterface' => array(
                 new Uri('//example.com/'),
@@ -189,14 +257,14 @@ class UriTest extends TestCase
             'uriInterface2' => array(
                 new Uri('http://foo:bar@example.com:8080/path?zip=zap#frag'),
                 array(
-                    'scheme' => 'http',
+                    'fragment' => 'frag',
                     'host' => 'example.com',
-                    'port' => 8080,
-                    'user' => 'foo',
                     'pass' => 'bar',
                     'path' => '/path',
+                    'port' => 8080,
                     'query' => 'zip=zap',
-                    'fragment' => 'frag',
+                    'scheme' => 'http',
+                    'user' => 'foo',
                 ),
             ),
         );
