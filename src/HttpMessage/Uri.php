@@ -311,11 +311,11 @@ class Uri extends AbstractUri implements UriInterface
      */
     public function withUserInfo(string $user, ?string $password = null): UriInterface
     {
-        $this->assertString($user, 'user');
+        $this->assertString($user, 'user', true);
+        $this->assertString($password, 'password', true, true);
         $userInfo = (string) $user; // for versions without type hint in method signature
         $password = (string) $password; // for versions without type hint in method signature
         if ($userInfo !== '' && $password !== '') {
-            $this->assertString($password, 'password');
             $userInfo .= ':' . $password;
         }
         if ($userInfo === $this->userInfo) {
@@ -417,7 +417,7 @@ class Uri extends AbstractUri implements UriInterface
      */
     public function withQuery(string $query): UriInterface
     {
-        $this->assertString($query, 'query');
+        $this->assertString($query, 'query', true);
         $query = $this->filterQueryAndFragment($query);
         if ($query === $this->query) {
             return $this;
