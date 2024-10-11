@@ -27,7 +27,7 @@ trait AssertionTrait
      *
      * @var numeric-string[]
      */
-    protected $validProtocolVers = array(
+    protected $validProtocolVers = [
         '0.9',
         '1.0',
         '1.1',
@@ -35,7 +35,7 @@ trait AssertionTrait
         '2.0',
         '3',
         '3.0',
-    );
+    ];
 
     /**
      * Test that value is a string (or optionally numeric)
@@ -130,7 +130,7 @@ trait AssertionTrait
     private function assertHeaderValue($value): void
     {
         if (\is_scalar($value) && \is_bool($value) === false) {
-            $value = array((string) $value);
+            $value = [(string) $value];
         }
         if (\is_array($value) === false) {
             throw new InvalidArgumentException(\sprintf(
@@ -447,7 +447,7 @@ trait AssertionTrait
      */
     private function iteratorPath(RecursiveIteratorIterator $iterator): string
     {
-        $path = array();
+        $path = [];
         for ($i = 0, $depth = $iterator->getDepth(); $i <= $depth; $i++) {
             $key = $iterator->getSubIterator($i)->key();
             $path[] = $i > 0

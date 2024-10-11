@@ -130,6 +130,6 @@ class Response extends Message implements ResponseInterface
             $phrase = ResponseUtil::codePhrase($code);
         }
         $this->assertReasonPhrase($phrase);
-        return array($code, $phrase);
+        return [$code, $phrase];
     }
 }
