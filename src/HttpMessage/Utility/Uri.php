@@ -68,7 +68,7 @@ class Uri
         foreach ($parsed as $key => $value) {
             $method = 'with' . \ucfirst($key);
             /** @var BdkUri */
-            $uri = \call_user_func_array([uri, $method], (array) $value);
+            $uri = \call_user_func_array([$uri, $method], (array) $value);
         }
         return $uri;
     }
