@@ -27,7 +27,7 @@ trait AssertionTrait
      *
      * @var numeric-string[]
      */
-    protected array $validProtocolVers = array(
+    protected $validProtocolVers = array(
         '0.9',
         '1.0',
         '1.1',
@@ -35,7 +35,7 @@ trait AssertionTrait
         '2.0',
         '3',
         '3.0',
-    );
+    ];
 
     /**
      * Test that value is a string (or optionally numeric)
@@ -43,6 +43,7 @@ trait AssertionTrait
      * @param mixed  $value        The value to check.
      * @param string $what         The name of the value.
      * @param bool   $allowNumeric Allow float or int?
+     * @param bool   $allowNull    Allow null?
      *
      * @return void
      *
@@ -50,9 +51,12 @@ trait AssertionTrait
      *
      * @psalm-assert string $value
      */
-    protected function assertString($value, string $what = '', bool $allowNumeric = false): void
+    protected function assertString($value, string $what = '', bool $allowNumeric = false, $allowNull = false): void
     {
         if (\is_string($value)) {
+            return;
+        }
+        if ($allowNull && $value === null) {
             return;
         }
         if ($allowNumeric && \is_numeric($value)) {
@@ -126,7 +130,7 @@ trait AssertionTrait
     private function assertHeaderValue($value): void
     {
         if (\is_scalar($value) && \is_bool($value) === false) {
-            $value = array((string) $value);
+            $value = [(string) $value];
         }
         if (\is_array($value) === false) {
             throw new InvalidArgumentException(\sprintf(
@@ -443,7 +447,7 @@ trait AssertionTrait
      */
     private function iteratorPath(RecursiveIteratorIterator $iterator): string
     {
-        $path = array();
+        $path = [];
         for ($i = 0, $depth = $iterator->getDepth(); $i <= $depth; $i++) {
             $key = $iterator->getSubIterator($i)->key();
             $path[] = $i > 0

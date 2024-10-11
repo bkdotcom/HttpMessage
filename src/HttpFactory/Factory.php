@@ -130,7 +130,7 @@ class Factory implements
         $resource = \fopen($filename, $mode);
         \restore_error_handler();
         if ($resource === false) {
-            if ($mode === '' || \in_array($mode[0], array('r', 'w', 'a', 'x', 'c'), true) === false) {
+            if ($mode === '' || \in_array($mode[0], ['r', 'w', 'a', 'x', 'c'], true) === false) {
                 throw new InvalidArgumentException('The mode "' . $mode . '" is invalid.');
             }
             throw new RuntimeException(\sprintf(

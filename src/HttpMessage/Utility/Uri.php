@@ -62,13 +62,13 @@ class Uri
         $uriKeys = ['fragment', 'host', 'path', 'port', 'query', 'scheme', 'userInfo'];
         $parsed = \array_intersect_key(self::parsedPartsPrep($parsed), \array_flip($uriKeys));
         $parsed = \array_filter($parsed, static function ($val) {
-            return \in_array($val, array(null, ''), true) === false;
+            return \in_array($val, [null, ''], true) === false;
         });
         $uri = new BdkUri();
         foreach ($parsed as $key => $value) {
             $method = 'with' . \ucfirst($key);
             /** @var BdkUri */
-            $uri = \call_user_func_array(array($uri, $method), (array) $value);
+            $uri = \call_user_func_array([$uri, $method], (array) $value);
         }
         return $uri;
     }
@@ -199,7 +199,7 @@ class Uri
             'user' => '',
         ), $renamed, $parsed);
         if (\array_key_exists('userInfo', $parsed) === false) {
-            $parsed['userInfo'] = array($parsed['user'], $parsed['pass']);
+            $parsed['userInfo'] = [$parsed['user'], $parsed['pass']];
         }
         if (\is_array($parsed['userInfo']) === false) {
             $parsed['userInfo'] = \explode(':', (string) $parsed['userInfo'], 2);
@@ -282,7 +282,7 @@ class Uri
         if ($path[0] === '/' && (!isset($pathNew[0]) || $pathNew[0] !== '/')) {
             // Re-add the leading slash if necessary for cases like "/.."
             $pathNew = '/' . $pathNew;
-        } elseif ($pathNew !== '' && \in_array(\end($segments), array('.', '..'), true)) {
+        } elseif ($pathNew !== '' && \in_array(\end($segments), ['.', '..'], true)) {
             // Add the trailing slash if necessary
             $pathNew .= '/';
         }
@@ -342,7 +342,7 @@ class Uri
      */
     private static function uriInterfaceToParts(UriInterface $url): array
     {
-        $userInfo = \array_replace(array(null, null), \explode(':', $url->getUserInfo(), 2));
+        $userInfo = \array_replace([null, null], \explode(':', $url->getUserInfo(), 2));
         $parts = array(
             'pass' => $userInfo[1],
             'user' => $userInfo[0],

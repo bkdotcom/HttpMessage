@@ -77,7 +77,7 @@ class ServerRequest
      *
      * @throws InvalidArgumentException
      */
-    private static function filesFromGlobals(array $phpFiles, array $path = array()): array
+    private static function filesFromGlobals(array $phpFiles, array $path = []): array
     {
         $files = array();
         /** @var mixed $value */
@@ -179,15 +179,15 @@ class ServerRequest
      */
     private static function isUploadFileInfoArray(array $array): bool
     {
-        $keysMustHave = array('name', 'type', 'tmp_name', 'size', 'error');
-        $keysMayHave = array('full_path');
+        $keysMustHave = ['name', 'type', 'tmp_name', 'size', 'error'];
+        $keysMayHave = ['full_path'];
         $keys = \array_keys($array);
         if (\array_intersect($keysMustHave, $keys) !== $keysMustHave) {
             // missing must have
             return false;
         }
         // return true if no unknown keys
-        return \array_diff($keys, \array_merge($keysMustHave, $keysMayHave)) === array();
+        return \array_diff($keys, \array_merge($keysMustHave, $keysMayHave)) === [];
     }
 
     /**

@@ -87,7 +87,7 @@ class ServerRequestExtended extends ServerRequest implements ServerRequestExtend
             'charset' => null,
         );
 
-        if ($contentType === array()) {
+        if ($contentType === []) {
             return $params;
         }
 
