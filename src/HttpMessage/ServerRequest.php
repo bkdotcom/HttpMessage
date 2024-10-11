@@ -126,8 +126,8 @@ class ServerRequest extends Request implements ServerRequestInterface
                 ? $parsed
                 : null;
         });
-        $this->registerMediaTypeParser(ContentType::XML_APP, array(__CLASS__, 'parseXml'));
-        $this->registerMediaTypeParser(ContentType::XML, array(__CLASS__, 'parseXml'));
+        $this->registerMediaTypeParser(ContentType::XML_APP, [__CLASS__, 'parseXml']);
+        $this->registerMediaTypeParser(ContentType::XML, [__CLASS__, 'parseXml']);
     }
 
     /**

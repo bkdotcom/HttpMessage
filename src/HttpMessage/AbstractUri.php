@@ -59,7 +59,7 @@ abstract class AbstractUri
     protected function assertHost($host)
     {
         $this->assertString($host, 'host');
-        if (\in_array($host, array('', 'localhost'), true)) {
+        if (\in_array($host, ['', 'localhost'], true)) {
             // An empty host value is equivalent to removing the host.
             // No validation required
             return;

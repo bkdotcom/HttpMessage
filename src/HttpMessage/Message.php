@@ -128,7 +128,7 @@ class Message implements MessageInterface
     {
         $nameLower = \strtolower($name);
         if (!isset($this->headerNames[$nameLower])) {
-            return array();
+            return [];
         }
         $name = $this->headerNames[$nameLower];
         return $this->headers[$name];
