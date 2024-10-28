@@ -14,7 +14,7 @@ namespace bdk\HttpMessage\Utility;
 
 use bdk\HttpMessage\Response as BdkResponse;
 use bdk\HttpMessage\ServerRequestExtended;
-use bdk\HttpMessage\Stream;
+use bdk\HttpMessage\Stream as BdkStream;
 use bdk\HttpMessage\UploadedFile;
 use bdk\HttpMessage\Uri as BdkUri;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -50,7 +50,7 @@ class HttpFoundationBridge
         $uri = new BdkUri($uri);
 
         $bodyContentResource = $request->getContent(true);
-        $stream = new Stream($bodyContentResource);
+        $stream = new BdkStream($bodyContentResource);
 
         $psr7request = new ServerRequestExtended($request->getMethod(), $uri, $request->server->all());
         $psr7request = $psr7request
@@ -104,15 +104,15 @@ class HttpFoundationBridge
      *
      * @param HttpFoundationResponse $response response instance
      *
-     * @return Stream
+     * @return BdkStream
      */
-    private static function createResponseStream(HttpFoundationResponse $response): Stream
+    private static function createResponseStream(HttpFoundationResponse $response): BdkStream
     {
         if ($response instanceof BinaryFileResponse && !$response->headers->has('Content-Range')) {
             $pathName = $response->getFile()->getPathname();
-            return new Stream(\fopen($pathName, 'rb+'));
+            return new BdkStream(\fopen($pathName, 'rb+'));
         }
-        $stream = new Stream(\fopen('php://temp', 'wb+'));
+        $stream = new BdkStream(\fopen('php://temp', 'wb+'));
         if ($response instanceof StreamedResponse || $response instanceof BinaryFileResponse) {
             \ob_start(
                 /**
