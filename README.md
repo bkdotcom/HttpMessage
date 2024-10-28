@@ -39,8 +39,11 @@ http://bradkent.com/php/httpmessage
   * `codePhrase(int|string $code): string` - Get standard code phrase for given HTTP status code
 * ServerRequest:
   * `fromGlobals(): ServerRequestInterface`
+* Stream
+  * `getContent(StreamInterface): string`
 * Uri: 
   * `fromGlobals(): UriInterface`
+  * `fromParsed(array): UriInterface`
   * `isCrossOrigin(UriInterface $uri1, UriInterface $uri2): bool`
   * `parseUrl(string|UriInterface): array` - like php's `parse_url` but with bug fixes backported 
   * `resolve(UriInterface $base, UriInterface $rel): UriInterface` - Converts the relative URI into a new URI that is resolved against the base URI.
