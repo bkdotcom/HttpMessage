@@ -29,7 +29,7 @@ class Stream
      *
      * @return string
      */
-    public static function getContents(StreamInterface $stream)
+    public static function getContents(StreamInterface $stream): string
     {
         try {
             $pos = $stream->tell();
