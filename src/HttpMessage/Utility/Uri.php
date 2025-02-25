@@ -205,6 +205,7 @@ class Uri
     private static function parsedPartsPrep(array $parsed): array
     {
         $map = array(
+            'passwd' => 'pass',
             'password' => 'pass',
             'username' => 'user',
         );
