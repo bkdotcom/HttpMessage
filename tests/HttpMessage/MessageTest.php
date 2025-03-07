@@ -120,13 +120,6 @@ class MessageTest extends TestCase
         Exceptions
     */
 
-    public function testExceptionHeaderValueInvalidString()
-    {
-        $this->expectException('InvalidArgumentException');
-        $this->createMessage()
-            ->withHeader('hello-world', 'This string contains many invisible spaces.');
-    }
-
     public function testWithHeaderRejectsMultipleHostValues()
     {
         $this->expectException('InvalidArgumentException');

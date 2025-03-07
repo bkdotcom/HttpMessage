@@ -261,6 +261,7 @@ trait DataProviderTrait
             'null' => [null],
             'object' => [new stdClass()],
             'true' => [true],
+            // 'invisible' => ['This string contains many invisible spaces.'],
         ];
     }
 
@@ -268,6 +269,7 @@ trait DataProviderTrait
     {
         return [
             [1234],
+            ['⛄'], // "opaque data"
             ['text/plain'],
             ['PHP 9.1'],
             ['text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'],

@@ -39,7 +39,7 @@ jobs:
     - name: Unit test
       run: composer run test
     - name: Publish code coverage
-      if: ${{ matrix.php-version == '8.3' && github.ref_name == 'main' }}
+      if: ${{ matrix.php-version == '8.3' && github.ref_name == '2.x' }}
       uses: paambaati/codeclimate-action@v5.0.0
       continue-on-error: true
       env:
@@ -49,6 +49,6 @@ jobs:
         coverageCommand: vendor/bin/phpunit --coverage-clover coverage/clover.xml
         coverageLocations: coverage/clover.xml:clover
     - name: Coverage summary
-      if: ${{ matrix.php-version == '8.3' && github.ref_name == 'main' }}
+      if: ${{ matrix.php-version == '8.3' && github.ref_name == '2.x' }}
       continue-on-error: true
       run: php -f vendor/bdk/devutil/src/coverageChecker.php -- coverage/clover.xml
