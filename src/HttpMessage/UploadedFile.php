@@ -395,7 +395,10 @@ class UploadedFile implements UploadedFileInterface
         if ($size === null || (\is_int($size) && $size > -1)) {
             return;
         }
-        throw new InvalidArgumentException(\sprintf('Upload file size must be a positive integer.  %s provided', \gettype($size)));
+        throw new InvalidArgumentException(\sprintf(
+            'Upload file size must be a positive integer.  %s provided', 
+            \bdk\HttpMessage\Utility\ParseStr::getDebugType($size)
+        ));
     }
 
     /**
@@ -418,7 +421,7 @@ class UploadedFile implements UploadedFileInterface
         throw new InvalidArgumentException(\sprintf(
             'Upload file %s must be a string or null. %s provided.',
             $key,
-            \gettype($value)
+            \bdk\HttpMessage\Utility\ParseStr::getDebugType($value)
         ));
     }
 

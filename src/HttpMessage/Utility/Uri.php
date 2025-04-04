@@ -59,18 +59,8 @@ class Uri
      */
     public static function fromParsed(array $parsed): BdkUri
     {
-        $uriKeys = ['fragment', 'host', 'path', 'port', 'query', 'scheme', 'userInfo'];
-        $parsed = \array_intersect_key(self::parsedPartsPrep($parsed), \array_flip($uriKeys));
-        $parsed = \array_filter($parsed, static function ($val) {
-            return \in_array($val, [null, ''], true) === false;
-        });
         $uri = new BdkUri();
-        foreach ($parsed as $key => $value) {
-            $method = 'with' . \ucfirst($key);
-            /** @var BdkUri */
-            $uri = \call_user_func_array([$uri, $method], (array) $value);
-        }
-        return $uri;
+        return self::withParsedValues($uri, $parsed);
     }
 
     /**
@@ -136,29 +126,60 @@ class Uri
             return $base;
         }
         if ($rel->getScheme() !== '') {
-            // rel specified scheme... return rel (with path cleaned up)
-            return $rel->withPath(self::pathRemoveDots($rel->getPath()));
-        }
-        if ($rel->getAuthority() !== '') {
-            // rel specified "authority"..
-            //   return base's scheme, rel's everything else (with path cleaned up)
+            // rel specified scheme
+            //   return rel (with path cleaned up)
             return $rel
-                ->withScheme($base->getScheme())
                 ->withPath(self::pathRemoveDots($rel->getPath()));
         }
-        if ($rel->getPath() === '') {
-            $targetQuery = $rel->getQuery() !== ''
-                ? $rel->getQuery()
-                : $base->getQuery();
-            return $base
-                ->withQuery($targetQuery)
-                ->withFragment($rel->getFragment());
+        $targetValues = array(
+            'fragment' => $rel->getFragment(),
+        );
+        if ($rel->getAuthority() !== '') {
+            // rel specified "authority"
+            //   return base's scheme, rel's everything else (with path cleaned up)
+            $targetValues['userInfo'] = $rel->getUserInfo();
+            $targetValues['host'] = $rel->getHost();
+            $targetValues['port'] = $rel->getPort();
+            $targetValues['path'] = self::pathRemoveDots($rel->getPath());
+            $targetValues['query'] = $rel->getQuery();
+        } elseif ($rel->getPath() !== '') {
+            // rel specified path
+            //   return base with resolved path (cleaned up), rel's query & fragment
+            $targetValues['path'] = self::pathRemoveDots(self::resolveTargetPath($base, $rel));
+            $targetValues['query'] = $rel->getQuery();
+        } elseif ($rel->getQuery() !== '') {
+            // rel specified query
+            $targetValues['query'] = $rel->getQuery();
         }
-        $targetPath = self::resolveTargetPath($base, $rel);
-        return $base
-            ->withPath(self::pathRemoveDots($targetPath))
-            ->withQuery($rel->getQuery())
-            ->withFragment($rel->getFragment());
+        return self::withParsedValues($base, $targetValues);
+    }
+
+    /**
+     * Apply component values to a Uri
+     *
+     * @param UriInterface $uri    UriInterface instance
+     * @param array        $parsed Component values
+     *
+     * @return UriInterface
+     *
+     * @since x3.4
+     */
+    public static function withParsedValues(UriInterface $uri, array $values): UriInterface
+    {
+        $uriKeys = ['fragment', 'host', 'path', 'port', 'query', 'scheme', 'userInfo'];
+        $values = \array_intersect_key(self::parsedPartsPrep($values), \array_flip($uriKeys));
+        if (\array_key_exists('path', $values) && $values['path'] === null) {
+            $values['path'] = '';
+        }
+        foreach ($values as $key => $value) {
+            $method = 'with' . \ucfirst($key);
+            // using call_user_func_array...  some methods (withUserInfo) accept multiple arguments
+            $args = $value === null
+                ? array(null)
+                : (array) $value;
+            $uri = \call_user_func_array([$uri, $method], $args);
+        }
+        return $uri;
     }
 
     /**
@@ -187,6 +208,7 @@ class Uri
     private static function parsedPartsPrep(array $parsed): array
     {
         $map = array(
+            'passwd' => 'pass',
             'password' => 'pass',
             'username' => 'user',
         );
@@ -358,16 +380,16 @@ class Uri
     }
 
     /**
-     * Get host and port from `$_SERVER` vals
+     * Get host and port from `$_SERVER` values
      *
-     * @return array{host:string|null,port:int|null} host & port
+     * @return array{host:string,port:int|null} host & port
      *
      * @SuppressWarnings(PHPMD.Superglobals)
      */
     private static function hostPortFromGlobals(): array
     {
         $hostPort = array(
-            'host' => null,
+            'host' => '',
             'port' => null,
         );
         if (isset($_SERVER['HTTP_HOST'])) {

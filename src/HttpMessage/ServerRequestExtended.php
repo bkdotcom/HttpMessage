@@ -183,8 +183,8 @@ class ServerRequestExtended extends ServerRequest implements ServerRequestExtend
     {
         $serverParams = $this->getServerParams();
         return isset($serverParams[$key])
-        	? $serverParams[$key]
-        	: $default;
+            ? $serverParams[$key]
+            : $default;
     }
 
     /**
@@ -195,7 +195,7 @@ class ServerRequestExtended extends ServerRequest implements ServerRequestExtend
         return $this->getServerParam('HTTPS') === 'on';
     }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     public function isXhr(): bool

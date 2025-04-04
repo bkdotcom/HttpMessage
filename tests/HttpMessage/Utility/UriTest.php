@@ -67,7 +67,7 @@ class UriTest extends TestCase
     /**
      * @dataProvider providerResolve
      */
-    public function testResolveUri($base, $rel, $expect)
+    public function testResolve($base, $rel, $expect)
     {
         $base = new Uri($base);
         $rel = new Uri($rel);

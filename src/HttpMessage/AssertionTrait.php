@@ -65,22 +65,8 @@ trait AssertionTrait
         throw new InvalidArgumentException(\sprintf(
             '%s must be a string, %s provided.',
             \ucfirst($what),
-            $this->getDebugType($value)
+            \bdk\HttpMessage\Utility\ParseStr::getDebugType($value)
         ));
-    }
-
-    /**
-     * Gets the type name of a variable in a way that is suitable for debugging
-     *
-     * @param mixed $value Value to inspect
-     *
-     * @return string
-     */
-    protected static function getDebugType($value): string
-    {
-        return \is_object($value)
-            ? \get_class($value)
-            : \gettype($value);
     }
 
     /*
@@ -109,7 +95,7 @@ trait AssertionTrait
             digit  => 0-9
             others => !#$%&\'*+-.^_`|~
         */
-        if (\preg_match('/^[a-zA-Z0-9!#$%&\'*+-.^_`|~]+$/', $name) !== 1) {
+        if (\preg_match('/^[a-zA-Z0-9!#$%&\'*+-.^_`|~]+$/D', $name) !== 1) {
             throw new InvalidArgumentException(\sprintf(
                 '"%s" is not valid header name, it must be an RFC 7230 compatible string.',
                 $name
@@ -135,7 +121,7 @@ trait AssertionTrait
         if (\is_array($value) === false) {
             throw new InvalidArgumentException(\sprintf(
                 'The header field value only accepts string and array, %s provided.',
-                self::getDebugType($value)
+                \bdk\HttpMessage\Utility\ParseStr::getDebugType($value)
             ));
         }
         if (empty($value)) {
@@ -151,9 +137,20 @@ trait AssertionTrait
     /**
      * Validate header value
      *
+     * headers values should be ISO-8859-1 encoded by default
+     *
+     * field-value    = *( field-content / obs-fold )
+     * field-content  = field-vchar [ 1*( SP / HTAB ) field-vchar ]
+     * field-vchar    = VCHAR / obs-text
+     * VCHAR          = %x21-7E
+     * obs-text       = %x80-FF
+     * obs-fold       = CRLF 1*( SP / HTAB )
+
      * @param mixed $value Header value to test
      *
      * @return void
+     *
+     * @see https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
      *
      * @throws InvalidArgumentException
      *
@@ -165,20 +162,21 @@ trait AssertionTrait
             return;
         }
         $this->assertString($value, 'Header value', true);
-        /*
-            https://www.rfc-editor.org/rfc/rfc7230.txt (page.25)
-
-            field-content = field-vchar [ 1*( SP / HTAB ) field-vchar ]
-            field-vchar   = VCHAR / obs-text
-            obs-text      = %x80-FF (character range outside ASCII.)
-                             NOT ALLOWED
-            SP            = space
-            HTAB          = horizontal tab
-            VCHAR         = any visible [USASCII] character. (x21-x7e)
-        */
-        if (\preg_match('/^[ \t\x21-\x7e]+$/', $value) !== 1) {
+        $value = \trim((string) $value, " \t");
+        // The regular expression intentionally does not support the obs-fold production, because as
+        // per RFC 7230#3.2.4:
+        //
+        // A sender MUST NOT generate a message that includes
+        // line folding (i.e., that has any field-value that contains a match to
+        // the obs-fold rule) unless the message is intended for packaging
+        // within the message/http media type.
+        //
+        // Clients must not send a request with line folding and a server sending folded headers is
+        // likely very rare. Line folding is a fairly obscure feature of HTTP/1.1 and thus not accepting
+        // folding is not likely to break any legitimate use case.
+        if (\preg_match('/^[\x20\x09\x21-\x7E\x80-\xFF]*$/D', $value) !== 1) {
             throw new InvalidArgumentException(\sprintf(
-                '"%s" is not valid header value, it must contains visible ASCII characters only.',
+                '"%s" is not valid header value.',
                 $value
             ));
         }
@@ -200,7 +198,7 @@ trait AssertionTrait
         if (\is_numeric($version) === false) {
             throw new InvalidArgumentException(\sprintf(
                 'Unsupported HTTP protocol version number. %s provided.',
-                self::getDebugType($version)
+                \bdk\HttpMessage\Utility\ParseStr::getDebugType($version)
             ));
         }
         if (\in_array((string) $version, $this->validProtocolVers, true) === false) {
@@ -321,7 +319,7 @@ trait AssertionTrait
             throw new InvalidArgumentException(\sprintf(
                 'Query params must only contain scalar values, %s contains %s.',
                 $this->iteratorPath($iterator),
-                $this->getDebugType($value)
+                \bdk\HttpMessage\Utility\ParseStr::getDebugType($value)
             ));
         }
     }
@@ -347,7 +345,7 @@ trait AssertionTrait
         }
         throw new InvalidArgumentException(\sprintf(
             'ParsedBody must be array, object, or null. %s provided.',
-            self::getDebugType($data)
+            \bdk\HttpMessage\Utility\ParseStr::getDebugType($data)
         ));
     }
 
@@ -366,7 +364,7 @@ trait AssertionTrait
             if (!($val instanceof UploadedFileInterface)) {
                 throw new InvalidArgumentException(\sprintf(
                     'Invalid file in uploaded files structure. Expected UploadedFileInterface, %s provided',
-                    self::getDebugType($val)
+                    \bdk\HttpMessage\Utility\ParseStr::getDebugType($val)
                 ));
             }
         });
@@ -423,7 +421,7 @@ trait AssertionTrait
         if (\is_int($code) === false) {
             throw new InvalidArgumentException(\sprintf(
                 'Status code must to be an integer, %s provided.',
-                self::getDebugType($code)
+                \bdk\HttpMessage\Utility\ParseStr::getDebugType($code)
             ));
         }
         if ($code < 100 || $code > 599) {
