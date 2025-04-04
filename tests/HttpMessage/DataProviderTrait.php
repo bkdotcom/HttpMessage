@@ -139,7 +139,7 @@ trait DataProviderTrait
             [-1],
             [74],
             [10000],
-            [PHP_INT_MIN],
+            [PHP_INT_MAX * -1], // PHP_INT_MIN is php 7.0
             [PHP_INT_MAX],
         ];
     }

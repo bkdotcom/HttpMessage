@@ -39,20 +39,6 @@ abstract class AbstractStream
     protected $resource;
 
     /**
-     * Gets the type name of a variable in a way that is suitable for debugging
-     *
-     * @param mixed $value The value being type checked
-     *
-     * @return string
-     */
-    protected static function getDebugType($value): string
-    {
-        return \is_object($value)
-            ? \get_class($value)
-            : \strtolower(\gettype($value));
-    }
-
-    /**
      * Safely test if value is a file
      *
      * @param mixed $value The value to check
@@ -112,7 +98,7 @@ abstract class AbstractStream
         }
         throw new InvalidArgumentException(\sprintf(
             $this->strings['resourceInvalidType'],
-            $this->getDebugType($value)
+            \bdk\HttpMessage\Utility\ParseStr::getDebugType($value)
         ));
     }
 

@@ -170,7 +170,7 @@ interface ServerRequestExtendedInterface extends ServerRequestInterface
      */
     public function isSecure(): bool;
 
-	/**
+    /**
      * Is this an XHR (aka ajax) request?
      *
      * Note: This method is not part of the PSR-7 standard.

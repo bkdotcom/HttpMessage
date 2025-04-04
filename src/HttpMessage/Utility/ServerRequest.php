@@ -84,17 +84,17 @@ class ServerRequest
         foreach ($phpFiles as $key => $value) {
             $pathCurKey = $path;
             $pathCurKey[] = (string) $key;
-	        if (\is_array($value) === false) {
-	            throw new InvalidArgumentException(\sprintf(
-	                'Invalid value in files specification at %s.  Array expected.  %s provided.',
-	                \implode('.', $pathCurKey),
-	                \gettype($value)
-	            ));
-	        }
-	        if (self::isUploadFileInfoArray($value)) {
-	        	$files[$key] = self::fileFromGlobalCreate($value);
-	        	continue;
-	        }
+            if (\is_array($value) === false) {
+                throw new InvalidArgumentException(\sprintf(
+                    'Invalid value in files specification at %s.  Array expected.  %s provided.',
+                    \implode('.', $pathCurKey),
+                    \bdk\HttpMessage\Utility\ParseStr::getDebugType($value)
+                ));
+            }
+            if (self::isUploadFileInfoArray($value)) {
+                $files[$key] = self::fileFromGlobalCreate($value);
+                continue;
+            }
             $files[$key] = self::filesFromGlobals($value, $pathCurKey);
         }
         return $files;
