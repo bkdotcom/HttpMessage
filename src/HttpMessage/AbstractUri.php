@@ -94,7 +94,7 @@ abstract class AbstractUri
             // for versions with int type-hint, this will never be reached
             throw new InvalidArgumentException(\sprintf(
                 'Port must be a int, %s provided.',
-                $this->getDebugType($port)
+                \bdk\HttpMessage\Utility\ParseStr::getDebugType($port)
             ));
         }
         if ($port < 1 || $port > 0xffff) {

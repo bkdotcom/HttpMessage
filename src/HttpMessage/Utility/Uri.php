@@ -164,10 +164,13 @@ class Uri
      *
      * @since x3.4
      */
-    public static function withParsedValues(UriInterface $uri, array $values): UriInterface
+    public static function withParsedValues(UriInterface $uri, array $values)
     {
         $uriKeys = ['fragment', 'host', 'path', 'port', 'query', 'scheme', 'userInfo'];
         $values = \array_intersect_key(self::parsedPartsPrep($values), \array_flip($uriKeys));
+        if (\array_key_exists('path', $values) && $values['path'] === null) {
+            $values['path'] = '';
+        }
         foreach ($values as $key => $value) {
             $method = 'with' . \ucfirst($key);
             // using call_user_func_array...  some methods (withUserInfo) accept multiple arguments

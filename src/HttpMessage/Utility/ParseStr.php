@@ -51,6 +51,25 @@ class ParseStr
     );
 
     /**
+     * Gets the type name of a variable in a way that is suitable for debugging
+     *
+     * @param mixed $value Value to inspect
+     *
+     * @return string
+     */
+    public static function getDebugType($value)
+    {
+        if (\is_object($value)) {
+            return \get_class($value);
+        }
+        return \strtr(\strtolower(\gettype($value)), array(
+            'boolean' => 'bool',
+            'double' => 'float',
+            'integer' => 'int',
+        ));
+    }
+
+    /**
      * like PHP's `parse_str()`
      *
      * Key difference: by default this does not convert root key dots and spaces to '_'
@@ -105,20 +124,6 @@ class ParseStr
         }
         $mixed = \array_intersect_key($mixed, self::$parseStrOpts);
         self::$parseStrOpts = \array_merge(self::$parseStrOpts, $mixed);
-    }
-
-    /**
-     * Gets the type name of a variable in a way that is suitable for debugging
-     *
-     * @param mixed $value Value to inspect
-     *
-     * @return string
-     */
-    protected static function getDebugType($value)
-    {
-        return \is_object($value)
-            ? \get_class($value)
-            : \strtolower(\gettype($value));
     }
 
     /**

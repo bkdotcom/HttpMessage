@@ -422,7 +422,7 @@ class ServerRequestTest extends TestCase
     public function providerParseStrOpts()
     {
         return array(
-            'boolean' => array(false, 'parseStrOpts expects string or array. boolean provided.'),
+            'boolean' => array(false, 'parseStrOpts expects string or array. bool provided.'),
             'object' => array(new \stdClass(), 'parseStrOpts expects string or array. stdClass provided.'),
         );
     }

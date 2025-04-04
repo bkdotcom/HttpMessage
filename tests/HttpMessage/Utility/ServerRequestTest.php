@@ -20,8 +20,8 @@ use ReflectionMethod;
  */
 class ServerRequestTest extends TestCase
 {
-	use ExpectExceptionTrait;
-	use FactoryTrait;
+    use ExpectExceptionTrait;
+    use FactoryTrait;
 
     private $backupFiles;
     private $backupGet;
@@ -210,7 +210,7 @@ class ServerRequestTest extends TestCase
     public function testExceptionWithUploadedFile2()
     {
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('Invalid value in files specification at bogusFile.error.  Array expected.  integer provided.');
+        $this->expectExceptionMessage('Invalid value in files specification at bogusFile.error.  Array expected.  int provided.');
         $files = [
             'bogusFile' => array(
                 'error' => UPLOAD_ERR_OK,

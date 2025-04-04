@@ -65,22 +65,8 @@ trait AssertionTrait
         throw new InvalidArgumentException(\sprintf(
             '%s must be a string, %s provided.',
             \ucfirst($what),
-            $this->getDebugType($value)
+            \bdk\HttpMessage\Utility\ParseStr::getDebugType($value)
         ));
-    }
-
-    /**
-     * Gets the type name of a variable in a way that is suitable for debugging
-     *
-     * @param mixed $value Value to inspect
-     *
-     * @return string
-     */
-    protected static function getDebugType($value)
-    {
-        return \is_object($value)
-            ? \get_class($value)
-            : \strtolower(\gettype($value));
     }
 
     /*
@@ -135,7 +121,7 @@ trait AssertionTrait
         if (\is_array($value) === false) {
             throw new InvalidArgumentException(\sprintf(
                 'The header field value only accepts string and array, %s provided.',
-                self::getDebugType($value)
+                \bdk\HttpMessage\Utility\ParseStr::getDebugType($value)
             ));
         }
         if (empty($value)) {
@@ -212,7 +198,7 @@ trait AssertionTrait
         if (\is_numeric($version) === false) {
             throw new InvalidArgumentException(\sprintf(
                 'Unsupported HTTP protocol version number. %s provided.',
-                self::getDebugType($version)
+                \bdk\HttpMessage\Utility\ParseStr::getDebugType($version)
             ));
         }
         if (\in_array((string) $version, $this->validProtocolVers, true) === false) {
@@ -333,7 +319,7 @@ trait AssertionTrait
             throw new InvalidArgumentException(\sprintf(
                 'Query params must only contain scalar values, %s contains %s.',
                 $this->iteratorPath($iterator),
-                $this->getDebugType($value)
+                \bdk\HttpMessage\Utility\ParseStr::getDebugType($value)
             ));
         }
     }
@@ -359,7 +345,7 @@ trait AssertionTrait
         }
         throw new InvalidArgumentException(\sprintf(
             'ParsedBody must be array, object, or null. %s provided.',
-            self::getDebugType($data)
+            \bdk\HttpMessage\Utility\ParseStr::getDebugType($data)
         ));
     }
 
@@ -378,7 +364,7 @@ trait AssertionTrait
             if (!($val instanceof UploadedFileInterface)) {
                 throw new InvalidArgumentException(\sprintf(
                     'Invalid file in uploaded files structure. Expected UploadedFileInterface, %s provided',
-                    self::getDebugType($val)
+                    \bdk\HttpMessage\Utility\ParseStr::getDebugType($val)
                 ));
             }
         });
@@ -435,7 +421,7 @@ trait AssertionTrait
         if (\is_int($code) === false) {
             throw new InvalidArgumentException(\sprintf(
                 'Status code must to be an integer, %s provided.',
-                self::getDebugType($code)
+                \bdk\HttpMessage\Utility\ParseStr::getDebugType($code)
             ));
         }
         if ($code < 100 || $code > 599) {
