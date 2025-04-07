@@ -181,6 +181,19 @@ class UriTest extends TestCase
                 ),
                 'http://0:0@example.com:1234/0?0#0'
             ),
+            'nullValues' => array(
+                array(
+                    'fragment' => null,
+                    'host' => null,
+                    'username' => null,
+                    'password' => null,
+                    'path' => null,
+                    'port' => null,
+                    'query' => null,
+                    'scheme' => null,
+                ),
+                '',
+            ),
         );
     }
 
