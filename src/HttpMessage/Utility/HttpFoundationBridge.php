@@ -172,7 +172,7 @@ class HttpFoundationBridge
                     UPLOAD_ERR_NO_FILE
                 );
             } elseif ($value instanceof HttpFoundationUploadedFile) {
-                $value =  self::createUploadedFile($value);
+                $value = self::createUploadedFile($value);
             } elseif (\is_array($value)) {
                 $value = self::getFiles($value);
             }

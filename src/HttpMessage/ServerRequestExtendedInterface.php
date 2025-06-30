@@ -173,7 +173,9 @@ interface ServerRequestExtendedInterface extends ServerRequestInterface
     /**
      * Is this an XHR (aka ajax) request?
      *
-     * Note: This method is not part of the PSR-7 standard.
+     * Note 1: This method is not part of the PSR-7 standard.
+     * Note 2: This method likely relies on the non-standard X-Requested-With header
+     * Note 3: Javascript's fetch API does not pass any distinguishing headers
      *
      * @return bool
      */

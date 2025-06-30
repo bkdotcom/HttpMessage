@@ -31,7 +31,7 @@ class ServerRequestExtended extends ServerRequest implements ServerRequestExtend
             return $serverRequest;
         }
 
-        $instance =  new static(
+        $instance = new static(
             $serverRequest->getMethod(),
             $serverRequest->getUri(),
             $serverRequest->getServerParams()
