@@ -1,12 +1,10 @@
 <?php
 
 /**
- * This file is part of HttpMessage
- *
  * @package   bdk/http-message
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
- * @copyright 2014-2024 Brad Kent
+ * @copyright 2014-2025 Brad Kent
  * @since     2.3 since 2.3 & 3.3
  */
 
