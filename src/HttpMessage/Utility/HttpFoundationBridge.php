@@ -1,12 +1,10 @@
 <?php
 
 /**
- * This file is part of HttpMessage
- *
  * @package   bdk/http-message
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
- * @copyright 2014-2024 Brad Kent
+ * @copyright 2020-2024 Brad Kent
  * @since     1.0
  */
 
@@ -172,7 +170,7 @@ class HttpFoundationBridge
                     UPLOAD_ERR_NO_FILE
                 );
             } elseif ($value instanceof HttpFoundationUploadedFile) {
-                $value =  self::createUploadedFile($value);
+                $value = self::createUploadedFile($value);
             } elseif (\is_array($value)) {
                 $value = self::getFiles($value);
             }

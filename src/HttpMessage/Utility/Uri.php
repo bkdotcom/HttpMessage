@@ -1,12 +1,10 @@
 <?php
 
 /**
- * This file is part of HttpMessage
- *
  * @package   bdk/http-message
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
- * @copyright 2014-2024 Brad Kent
+ * @copyright 2023-2025 Brad Kent
  * @since     1.0
  */
 
@@ -59,8 +57,7 @@ class Uri
      */
     public static function fromParsed(array $parsed): BdkUri
     {
-        $uri = new BdkUri();
-        return self::withParsedValues($uri, $parsed);
+        return self::withParsedValues(new BdkUri(), $parsed);
     }
 
     /**
@@ -128,8 +125,7 @@ class Uri
         if ($rel->getScheme() !== '') {
             // rel specified scheme
             //   return rel (with path cleaned up)
-            return $rel
-                ->withPath(self::pathRemoveDots($rel->getPath()));
+            return $rel->withPath(self::pathRemoveDots($rel->getPath()));
         }
         $targetValues = array(
             'fragment' => $rel->getFragment(),
@@ -158,7 +154,7 @@ class Uri
      * Apply component values to a Uri
      *
      * @param UriInterface $uri    UriInterface instance
-     * @param array        $parsed Component values
+     * @param array        $values Component values
      *
      * @return UriInterface
      *
@@ -166,19 +162,19 @@ class Uri
      */
     public static function withParsedValues(UriInterface $uri, array $values): UriInterface
     {
-        $uriKeys = ['fragment', 'host', 'path', 'port', 'query', 'scheme', 'userInfo'];
-        $values = \array_intersect_key(self::parsedPartsPrep($values), \array_flip($uriKeys));
-        if (\array_key_exists('path', $values) && $values['path'] === null) {
-            $values['path'] = '';
-        }
-        foreach ($values as $key => $value) {
+        $keys = ['fragment', 'host', 'path', 'port', 'query', 'scheme', 'userInfo'];
+        $nullToStringKeys = ['fragment', 'host', 'path', 'query', 'scheme'];
+        $values = \array_intersect_key(self::parsedPartsPrep($values), \array_flip($keys));
+        \array_walk($values, static function ($value, $key) use ($nullToStringKeys, &$uri) {
+            if ($value === null && \in_array($key, $nullToStringKeys, true)) {
+                $value = '';
+            }
             $method = 'with' . \ucfirst($key);
             // using call_user_func_array...  some methods (withUserInfo) accept multiple arguments
-            $args = $value === null
+            $uri = \call_user_func_array([$uri, $method], $value === null
                 ? array(null)
-                : (array) $value;
-            $uri = \call_user_func_array([$uri, $method], $args);
-        }
+                : (array) $value);
+        });
         return $uri;
     }
 

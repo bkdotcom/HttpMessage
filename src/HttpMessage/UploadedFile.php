@@ -1,12 +1,10 @@
 <?php
 
 /**
- * This file is part of HttpMessage
- *
  * @package   bdk/http-message
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
- * @copyright 2014-2024 Brad Kent
+ * @copyright 2014-2025 Brad Kent
  * @since     1.0
  */
 
@@ -396,7 +394,7 @@ class UploadedFile implements UploadedFileInterface
             return;
         }
         throw new InvalidArgumentException(\sprintf(
-            'Upload file size must be a positive integer.  %s provided', 
+            'Upload file size must be a positive integer.  %s provided',
             \bdk\HttpMessage\Utility\ParseStr::getDebugType($size)
         ));
     }
