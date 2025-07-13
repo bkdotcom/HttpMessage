@@ -1,6 +1,14 @@
 <?php
 
-namespace bdk\HttpMessage\Utility;
+/**
+ * @package   bdk/http-message
+ * @author    Brad Kent <bkfake-github@yahoo.com>
+ * @license   http://opensource.org/licenses/MIT MIT
+ * @copyright 2023-2025 Brad Kent
+ * @since     1.0
+ */
+
+ namespace bdk\HttpMessage\Utility;
 
 /**
  * Define common mime types

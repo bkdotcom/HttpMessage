@@ -1,12 +1,10 @@
 <?php
 
 /**
- * This file is part of HttpMessage
- *
  * @package   bdk/http-message
  * @author    Brad Kent <bkfake-github@yahoo.com>
  * @license   http://opensource.org/licenses/MIT MIT
- * @copyright 2024 Brad Kent
+ * @copyright 2024-2025 Brad Kent
  * @since     1.3
  */
 
@@ -31,7 +29,7 @@ class ServerRequestExtended extends ServerRequest implements ServerRequestExtend
             return $serverRequest;
         }
 
-        $instance =  new static(
+        $instance = new static(
             $serverRequest->getMethod(),
             $serverRequest->getUri(),
             $serverRequest->getServerParams()
