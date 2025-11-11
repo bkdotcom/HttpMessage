@@ -23,11 +23,11 @@ class TestCase extends TestCaseBase
 
     public static function setUpBeforeClass(): void
     {
-        self::$errorHandler = \set_error_handler(static function ($type, $msg) {
+        self::$errorHandler = \set_error_handler(static function ($type, $msg, $file, $line) {
             if ($type & E_USER_DEPRECATED) {
                 return true;
             }
-            throw new RuntimeException($msg);
+            throw new RuntimeException($msg . ': ' . $file . '(' . $line . ')');
         });
     }
 

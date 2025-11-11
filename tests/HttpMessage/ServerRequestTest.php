@@ -125,7 +125,9 @@ class ServerRequestTest extends TestCase
 
         foreach ($properties as $k => $vExpect) {
             $prop = $reflection->getProperty($k);
-            $prop->setAccessible(true);
+            if (PHP_VERSION_ID < 80100) {
+                $prop->setAccessible(true);
+            }
             $this->assertSame($vExpect, $prop->getValue($serverRequest), $k);
             unset($prop);
         }

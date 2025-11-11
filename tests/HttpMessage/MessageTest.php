@@ -88,7 +88,9 @@ class MessageTest extends TestCase
         ];
         $reflection = new ReflectionObject($message);
         $setHeaders = $reflection->getMethod('setHeaders');
-        $setHeaders->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $setHeaders->setAccessible(true);
+        }
         $setHeaders->invokeArgs($message, [$testArray]);
         $this->assertEquals($expectedArray, $message->getHeaders());
         $this->assertTrue($message instanceof Message);

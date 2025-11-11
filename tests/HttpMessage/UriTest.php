@@ -66,7 +66,9 @@ class UriTest extends TestCase
 
         foreach ($properties as $k => $v) {
             $prop = $reflection->getProperty($k);
-            $prop->setAccessible(true);
+            if (PHP_VERSION_ID < 80100) {
+                $prop->setAccessible(true);
+            }
             $this->assertSame($v, $prop->getValue($uri));
             unset($prop);
         }
