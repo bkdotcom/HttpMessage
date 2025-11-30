@@ -274,7 +274,9 @@ class StreamTest extends TestCase
         $stream->write('Foo Bar');
 
         $reflectionMethod = new ReflectionMethod($stream, 'setResourceFile');
-        $reflectionMethod->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $reflectionMethod->setAccessible(true);
+        }
         $reflectionMethod->invoke($stream, 'some/readonly/file');
     }
 
@@ -405,7 +407,9 @@ class StreamTest extends TestCase
                 $prop
             ));
         }
-        $refProp->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $refProp->setAccessible(true);
+        }
         \is_string($obj) || $refProp->isStatic()
             ? $refProp->setValue(null, $val)
             : $refProp->setValue($obj, $val);

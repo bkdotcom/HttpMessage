@@ -111,7 +111,9 @@ class UploadedFileTest extends TestCase
         $this->assertSame('', $uploadedFile->getErrorMessage());
 
         $reflection = new ReflectionProperty($uploadedFile, 'error');
-        $reflection->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $reflection->setAccessible(true);
+        }
 
         $reflection->setValue($uploadedFile, UPLOAD_ERR_INI_SIZE);
         $this->assertSame(
@@ -239,7 +241,9 @@ class UploadedFileTest extends TestCase
         );
 
         $reflection = new ReflectionProperty($uploadedFile, 'isMoved');
-        $reflection->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $reflection->setAccessible(true);
+        }
         $reflection->setValue($uploadedFile, true);
 
         $targetPath = self::getTestFilepath('logo_moved.png');
@@ -296,7 +300,9 @@ class UploadedFileTest extends TestCase
 
         $this->expectException('RuntimeException');
         $reflection = new ReflectionMethod($uploadedFile, 'moveFile');
-        $reflection->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $reflection->setAccessible(true);
+        }
         // Exception => The target path "/tmp/folder-not-exists/test.png" is not writable.
         $reflection->invoke($uploadedFile, 'some/bogus/path');
     }
@@ -317,7 +323,9 @@ class UploadedFileTest extends TestCase
         );
 
         $reflection = new ReflectionProperty($uploadedFile, 'sapi');
-        $reflection->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $reflection->setAccessible(true);
+        }
         $reflection->setValue($uploadedFile, 'apache');
         // Exception => not an uploaded file
         $uploadedFile->moveTo($targetPath);

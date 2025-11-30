@@ -37,7 +37,7 @@ class TestCase extends TestCaseBase
         });
     }
 
-    public static function tearDownAfter(): void
+    public static function tearDownAfterClass(): void
     {
         \set_error_handler(self::$errorHandler);
     }

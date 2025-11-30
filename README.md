@@ -16,21 +16,21 @@ PSR-7 (HttpMessage) & PSR-17 (HttpFactory) Implementations
 * ContentType: common mime-type constants
 * HttpFoundationBridge: create ServerRequest and Response from HttpFoundation request and response
 * ParseStr: PHP's `parse_str()`, but does not convert dots and spaces to '_' by default
-* Response: 
-  * `emit(ResponseInterface $response)` - Output response headers and body 
+* Response:
+  * `emit(ResponseInterface $response)` - Output response headers and body
   * `codePhrase(int|string $code): string` - Get standard code phrase for given HTTP status code
 * ServerRequest:
   * `fromGlobals(): ServerRequestInterface`
 * Stream
   * `getContent(StreamInterface): string` - Get stream contents without affecting pointer
-* Uri: 
+* Uri:
   * `fromGlobals(): UriInterface`
   * `fromParsed(array): UriInterface`
   * `isCrossOrigin(UriInterface $uri1, UriInterface $uri2): bool`
-  * `parseUrl(string|UriInterface): array` - like php's `parse_url` but with bug fixes backported 
+  * `parseUrl(string|UriInterface): array` - like php's `parse_url` but with bug fixes backported
   * `resolve(UriInterface $base, UriInterface $rel): UriInterface` - Converts the relative URI into a new URI that is resolved against the base URI.
 
-### Installation 
+### Installation
 
 `composer require bdk/http-message`
 
@@ -48,7 +48,5 @@ http://bradkent.com/php/httpmessage
 
 ## Tests / Quality
 
-![Supported PHP versions](https://img.shields.io/static/v1?label=PHP&message=5.4%20-%208.4&color=blue)
+![Supported PHP versions](https://img.shields.io/static/v1?label=PHP&message=8.0%20-%208.5&color=blue)
 ![Build Status](https://img.shields.io/github/actions/workflow/status/bkdotcom/HttpMessage/phpunit.yml.svg?logo=github)
-[![Maintainability](https://img.shields.io/codeclimate/maintainability/bkdotcom/HttpMessage.svg?logo=codeclimate)](https://codeclimate.com/github/bkdotcom/HttpMessage)
-[![Coverage](https://img.shields.io/codeclimate/coverage/bkdotcom/HttpMessage.svg?logo=codeclimate)](https://codeclimate.com/github/bkdotcom/HttpMessage)
