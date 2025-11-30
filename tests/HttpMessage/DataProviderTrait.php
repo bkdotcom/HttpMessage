@@ -1112,7 +1112,7 @@ trait DataProviderTrait
             'false' => [false],
             'float' => [7.4],
             'max' => [PHP_INT_MAX],
-            'min' => [PHP_INT_MIN],
+            'min' => [PHP_INT_MAX * -1], // PHP_INT_MIN is php 7.0
             'negative' => [-2],
             'object' => [new stdClass()],
             'outOfRange 1' => [0xffff + 1],
