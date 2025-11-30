@@ -201,7 +201,9 @@ class ServerRequestTest extends TestCase
         ];
         $serverRequestUtil = new ServerRequestUtil();
         $reflectionMethod = new ReflectionMethod($serverRequestUtil, 'filesFromGlobals');
-        $reflectionMethod->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $reflectionMethod->setAccessible(true);
+        }
         $reflectionMethod->invokeArgs($serverRequestUtil, array(
             $files,
         ));
@@ -222,7 +224,9 @@ class ServerRequestTest extends TestCase
         ];
         $serverRequestUtil = new ServerRequestUtil();
         $reflectionMethod = new ReflectionMethod($serverRequestUtil, 'filesFromGlobals');
-        $reflectionMethod->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $reflectionMethod->setAccessible(true);
+        }
         $reflectionMethod->invokeArgs($serverRequestUtil, array(
             $files,
         ));
@@ -398,7 +402,9 @@ class ServerRequestTest extends TestCase
 
         $serverRequestUtil = new ServerRequestUtil();
         $reflectionMethod = new ReflectionMethod($serverRequestUtil, 'filesFromGlobals');
-        $reflectionMethod->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $reflectionMethod->setAccessible(true);
+        }
 
         $uploadedFiles = $reflectionMethod->invokeArgs($serverRequestUtil, array(
             $files,
